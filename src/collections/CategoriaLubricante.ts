@@ -129,7 +129,9 @@ export const CategoriaLubricante: CollectionConfig = {
         labels: { singular: "Producto", plural: "Productos" },
         admin: {
           description:
-            "En este orden en la página. Nombre y grado tal como los publica el fabricante; no inventes especificaciones.",
+            "En este orden en la página (se cambia arrastrando las filas). Nombre y grado tal como los publica el fabricante; no inventes especificaciones. Cada fila dice si el producto está oculto y si le falta la foto o la ficha técnica.",
+          // Edición fácil (tanda 21, tarea 3, fase 2): la fila plegada dice qué producto es.
+          components: { RowLabel: "/components/admin/EtiquetaProducto" },
         },
         fields: [
           {
@@ -159,7 +161,16 @@ export const CategoriaLubricante: CollectionConfig = {
                 "Opcional. Los productos seguidos con el mismo grupo salen bajo ese subtítulo (p. ej. «Compresores»).",
             },
           },
-          { name: "imagen", type: "upload", relationTo: "media", label: "Foto del producto" },
+          {
+            name: "imagen",
+            type: "upload",
+            relationTo: "media",
+            label: "Foto del producto",
+            admin: {
+              description:
+                "La del envase, de frente y con el fondo blanco o transparente: sale en la tarjeta del producto.",
+            },
+          },
           {
             name: "ficha",
             type: "upload",
@@ -167,7 +178,14 @@ export const CategoriaLubricante: CollectionConfig = {
             label: "Ficha técnica (PDF)",
             admin: { description: "El PDF del fabricante. Sale como «Ficha técnica»." },
           },
-          { name: "descripcion", type: "textarea", label: "Descripción" },
+          {
+            name: "descripcion",
+            type: "textarea",
+            label: "Descripción",
+            admin: {
+              placeholder: "Ej. Aceite sintético para motores de gasolina de última generación.",
+            },
+          },
           mostrarEnWebField({
             sidebar: false,
             descripcion:

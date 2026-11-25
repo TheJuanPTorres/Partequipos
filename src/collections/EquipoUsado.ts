@@ -4,7 +4,14 @@ import { ocultoSinUso } from "../lib/fields/ocultoSinUso";
 
 import { revalidarEquipoUsado, revalidarEquipoUsadoBorrado } from "./hooks/maquinariaHooks";
 import { mostrarEnWebField } from "../lib/fields/mostrarEnWeb";
-import { borradoAdmin, escrituraContenido, lecturaContenido } from "../lib/seguridad/acceso";
+import {
+  borradoAdmin,
+  escrituraContenido,
+  lecturaContenido,
+  soloPersonal,
+} from "../lib/seguridad/acceso";
+import { VERSIONES_SIN_BORRADORES, versionesRecientesPrimero } from "../lib/borradores";
+import { VISTA_PREVIA_USADA } from "../lib/vistaPrevia/enVivo";
 import { revalidarPortada } from "./hooks/portadaHooks";
 import { avisoField } from "../lib/fields/avisoField";
 import { marcaUsadaSincronizada } from "./hooks/marcaUsada";
@@ -45,16 +52,24 @@ export const EquipoUsado: CollectionConfig = {
     group: "Maquinaria",
     description:
       "Inventario de maquinaria usada. Cada unidad sale en la página de su categoría y en la de su marca, con filtros, y tiene su propia página.",
+    // Vista previa en vivo (tanda 21, tarea 3, fase 2, punto 5): la ficha se pinta mientras se escribe.
+    livePreview: VISTA_PREVIA_USADA,
   },
   access: {
     read: lecturaContenido,
     create: escrituraContenido,
     update: escrituraContenido,
     delete: borradoAdmin,
+    // El historial de versiones, solo con sesión del personal (tanda 21, tarea 3, fase 2, punto 4).
+    readVersions: soloPersonal,
   },
+  // Historial sin borradores: cada guardado, una versión que se compara y se restaura.
+  versions: VERSIONES_SIN_BORRADORES,
   // La dirección web es única dentro de la categoría (la ruta lleva categoría y unidad).
   indexes: [{ fields: ["categoria", "slug"], unique: true }],
   hooks: {
+    // La lista de versiones, la más reciente primero.
+    beforeOperation: [versionesRecientesPrimero],
     beforeValidate: [slugUnidadUsada],
     beforeChange: [marcaUsadaSincronizada],
     afterChange: [revalidarEquipoUsado, portada.afterChange],

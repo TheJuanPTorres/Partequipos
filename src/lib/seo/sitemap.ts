@@ -138,6 +138,13 @@ export const RUTAS_FUERA_DEL_SITEMAP = {
   "/noticias/pagina/[pagina]": "paginación: se llega desde la página 1 del índice del blog",
   "/category/[categoria]/pagina/[pagina]":
     "paginación: se llega desde la página 1 del archivo de la categoría",
+  /*
+   * Vista previa en vivo del panel (tanda 21, tarea 3, fase 2, punto 5): solo con sesión del
+   * personal (sin ella, 404) y `noindex, nofollow`. No es una página del sitio.
+   */
+  "/vista-previa/equipos-usados/[id]": "vista previa del panel: solo con sesión, noindex",
+  "/vista-previa/equipos-nuevos/[id]": "vista previa del panel: solo con sesión, noindex",
+  "/vista-previa/modelos-repuesto/[id]": "vista previa del panel: solo con sesión, noindex",
 } as const;
 
 /** Slug reservado de la portada dentro de la colección de páginas. */

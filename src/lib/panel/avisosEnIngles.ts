@@ -10,7 +10,8 @@
 export const AVISOS_EN_INGLES: Record<string, string> = {
   // `OrderableTable`: al arrastrar una fila con la lista ordenada por otra columna (el orden por arrastre de B).
   'To reorder the rows you must first sort them by the "Order" column':
-    "Para cambiar el orden arrastrando, ordena antes la lista por la columna «Orden».",
+    // Tanda 23 (dirección): las ordenables se abren ya por su arrastre; esto sale si se reordenó por otra columna.
+    "La lista está ordenada por otra columna. Pulsa el icono ⇅ de la izquierda para volver al orden personalizado.",
   // Subidas y peticiones del panel.
   "Error making request": "No se pudo completar la petición. Inténtalo de nuevo.",
   "Error parsing response": "La respuesta del servidor no se pudo leer. Inténtalo de nuevo.",

@@ -42,6 +42,8 @@ export const MarcaMaquinaria: CollectionConfig = {
    * web lo usa cuando se pasen sus consultas a `_order` (§6.3).
    */
   orderable: true,
+  // Se abre YA ordenada por el arrastre: así se puede arrastrar sin pulsar antes el icono ⇅.
+  defaultSort: "_order",
   access: {
     read: lecturaContenido,
     create: escrituraContenido,

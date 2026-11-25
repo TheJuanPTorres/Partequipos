@@ -901,6 +901,633 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
+    "public._modelos_repuesto_v_version_piezas": {
+      "name": "_modelos_repuesto_v_version_piezas",
+      "schema": "",
+      "columns": {
+        "_order": {
+          "name": "_order",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "_parent_id": {
+          "name": "_parent_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "texto": {
+          "name": "texto",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "_uuid": {
+          "name": "_uuid",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "_modelos_repuesto_v_version_piezas_order_idx": {
+          "name": "_modelos_repuesto_v_version_piezas_order_idx",
+          "columns": [
+            {
+              "expression": "_order",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "_modelos_repuesto_v_version_piezas_parent_id_idx": {
+          "name": "_modelos_repuesto_v_version_piezas_parent_id_idx",
+          "columns": [
+            {
+              "expression": "_parent_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "_modelos_repuesto_v_version_piezas_parent_id_fk": {
+          "name": "_modelos_repuesto_v_version_piezas_parent_id_fk",
+          "tableFrom": "_modelos_repuesto_v_version_piezas",
+          "tableTo": "_modelos_repuesto_v",
+          "columnsFrom": [
+            "_parent_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public._modelos_repuesto_v": {
+      "name": "_modelos_repuesto_v",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "parent_id": {
+          "name": "parent_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version__modelos_repuesto_modelos_order": {
+          "name": "version__modelos_repuesto_modelos_order",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_nombre": {
+          "name": "version_nombre",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "version_marca_id": {
+          "name": "version_marca_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "version_tipo_id": {
+          "name": "version_tipo_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "version_codigo": {
+          "name": "version_codigo",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_serie": {
+          "name": "version_serie",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_descripcion": {
+          "name": "version_descripcion",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_antetitulo": {
+          "name": "version_antetitulo",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_titulo_pagina": {
+          "name": "version_titulo_pagina",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_titulo_disponibles": {
+          "name": "version_titulo_disponibles",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_mostrar_piezas": {
+          "name": "version_mostrar_piezas",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": false
+        },
+        "version_seo_meta_title": {
+          "name": "version_seo_meta_title",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_seo_meta_description": {
+          "name": "version_seo_meta_description",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_seo_og_image_id": {
+          "name": "version_seo_og_image_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_mostrar_en_web": {
+          "name": "version_mostrar_en_web",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": true
+        },
+        "version_slug": {
+          "name": "version_slug",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "version_actualizado_por_id": {
+          "name": "version_actualizado_por_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_updated_at": {
+          "name": "version_updated_at",
+          "type": "timestamp(3) with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_created_at": {
+          "name": "version_created_at",
+          "type": "timestamp(3) with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp(3) with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp(3) with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "_modelos_repuesto_v_parent_idx": {
+          "name": "_modelos_repuesto_v_parent_idx",
+          "columns": [
+            {
+              "expression": "parent_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "_modelos_repuesto_v_version_version__modelos_repuesto_mo_idx": {
+          "name": "_modelos_repuesto_v_version_version__modelos_repuesto_mo_idx",
+          "columns": [
+            {
+              "expression": "version__modelos_repuesto_modelos_order",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "_modelos_repuesto_v_version_version_marca_idx": {
+          "name": "_modelos_repuesto_v_version_version_marca_idx",
+          "columns": [
+            {
+              "expression": "version_marca_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "_modelos_repuesto_v_version_version_tipo_idx": {
+          "name": "_modelos_repuesto_v_version_version_tipo_idx",
+          "columns": [
+            {
+              "expression": "version_tipo_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "_modelos_repuesto_v_version_seo_version_seo_og_image_idx": {
+          "name": "_modelos_repuesto_v_version_seo_version_seo_og_image_idx",
+          "columns": [
+            {
+              "expression": "version_seo_og_image_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "_modelos_repuesto_v_version_version_slug_idx": {
+          "name": "_modelos_repuesto_v_version_version_slug_idx",
+          "columns": [
+            {
+              "expression": "version_slug",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "_modelos_repuesto_v_version_version_actualizado_por_idx": {
+          "name": "_modelos_repuesto_v_version_version_actualizado_por_idx",
+          "columns": [
+            {
+              "expression": "version_actualizado_por_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "_modelos_repuesto_v_version_version_updated_at_idx": {
+          "name": "_modelos_repuesto_v_version_version_updated_at_idx",
+          "columns": [
+            {
+              "expression": "version_updated_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "_modelos_repuesto_v_version_version_created_at_idx": {
+          "name": "_modelos_repuesto_v_version_version_created_at_idx",
+          "columns": [
+            {
+              "expression": "version_created_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "_modelos_repuesto_v_created_at_idx": {
+          "name": "_modelos_repuesto_v_created_at_idx",
+          "columns": [
+            {
+              "expression": "created_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "_modelos_repuesto_v_updated_at_idx": {
+          "name": "_modelos_repuesto_v_updated_at_idx",
+          "columns": [
+            {
+              "expression": "updated_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "version_tipo_version_slug_idx": {
+          "name": "version_tipo_version_slug_idx",
+          "columns": [
+            {
+              "expression": "version_tipo_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "version_slug",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "_modelos_repuesto_v_parent_id_modelos_repuesto_id_fk": {
+          "name": "_modelos_repuesto_v_parent_id_modelos_repuesto_id_fk",
+          "tableFrom": "_modelos_repuesto_v",
+          "tableTo": "modelos_repuesto",
+          "columnsFrom": [
+            "parent_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "_modelos_repuesto_v_version_marca_id_marcas_id_fk": {
+          "name": "_modelos_repuesto_v_version_marca_id_marcas_id_fk",
+          "tableFrom": "_modelos_repuesto_v",
+          "tableTo": "marcas",
+          "columnsFrom": [
+            "version_marca_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "_modelos_repuesto_v_version_tipo_id_tipos_equipo_id_fk": {
+          "name": "_modelos_repuesto_v_version_tipo_id_tipos_equipo_id_fk",
+          "tableFrom": "_modelos_repuesto_v",
+          "tableTo": "tipos_equipo",
+          "columnsFrom": [
+            "version_tipo_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "_modelos_repuesto_v_version_seo_og_image_id_media_id_fk": {
+          "name": "_modelos_repuesto_v_version_seo_og_image_id_media_id_fk",
+          "tableFrom": "_modelos_repuesto_v",
+          "tableTo": "media",
+          "columnsFrom": [
+            "version_seo_og_image_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "_modelos_repuesto_v_version_actualizado_por_id_users_id_fk": {
+          "name": "_modelos_repuesto_v_version_actualizado_por_id_users_id_fk",
+          "tableFrom": "_modelos_repuesto_v",
+          "tableTo": "users",
+          "columnsFrom": [
+            "version_actualizado_por_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public._modelos_repuesto_v_rels": {
+      "name": "_modelos_repuesto_v_rels",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "order": {
+          "name": "order",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "parent_id": {
+          "name": "parent_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "path": {
+          "name": "path",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "media_id": {
+          "name": "media_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "_modelos_repuesto_v_rels_order_idx": {
+          "name": "_modelos_repuesto_v_rels_order_idx",
+          "columns": [
+            {
+              "expression": "order",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "_modelos_repuesto_v_rels_parent_idx": {
+          "name": "_modelos_repuesto_v_rels_parent_idx",
+          "columns": [
+            {
+              "expression": "parent_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "_modelos_repuesto_v_rels_path_idx": {
+          "name": "_modelos_repuesto_v_rels_path_idx",
+          "columns": [
+            {
+              "expression": "path",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "_modelos_repuesto_v_rels_media_id_idx": {
+          "name": "_modelos_repuesto_v_rels_media_id_idx",
+          "columns": [
+            {
+              "expression": "media_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "_modelos_repuesto_v_rels_parent_fk": {
+          "name": "_modelos_repuesto_v_rels_parent_fk",
+          "tableFrom": "_modelos_repuesto_v_rels",
+          "tableTo": "_modelos_repuesto_v",
+          "columnsFrom": [
+            "parent_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "_modelos_repuesto_v_rels_media_fk": {
+          "name": "_modelos_repuesto_v_rels_media_fk",
+          "tableFrom": "_modelos_repuesto_v_rels",
+          "tableTo": "media",
+          "columnsFrom": [
+            "media_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
     "public.marcas": {
       "name": "marcas",
       "schema": "",
@@ -2823,122 +3450,6 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.equipos_nuevos_atributos": {
-      "name": "equipos_nuevos_atributos",
-      "schema": "",
-      "columns": {
-        "_order": {
-          "name": "_order",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "_parent_id": {
-          "name": "_parent_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "id": {
-          "name": "id",
-          "type": "varchar",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "atributo_id": {
-          "name": "atributo_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "valor": {
-          "name": "valor",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": true
-        }
-      },
-      "indexes": {
-        "equipos_nuevos_atributos_order_idx": {
-          "name": "equipos_nuevos_atributos_order_idx",
-          "columns": [
-            {
-              "expression": "_order",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "equipos_nuevos_atributos_parent_id_idx": {
-          "name": "equipos_nuevos_atributos_parent_id_idx",
-          "columns": [
-            {
-              "expression": "_parent_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "equipos_nuevos_atributos_atributo_idx": {
-          "name": "equipos_nuevos_atributos_atributo_idx",
-          "columns": [
-            {
-              "expression": "atributo_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        }
-      },
-      "foreignKeys": {
-        "equipos_nuevos_atributos_atributo_id_atributos_ficha_id_fk": {
-          "name": "equipos_nuevos_atributos_atributo_id_atributos_ficha_id_fk",
-          "tableFrom": "equipos_nuevos_atributos",
-          "tableTo": "atributos_ficha",
-          "columnsFrom": [
-            "atributo_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "set null",
-          "onUpdate": "no action"
-        },
-        "equipos_nuevos_atributos_parent_id_fk": {
-          "name": "equipos_nuevos_atributos_parent_id_fk",
-          "tableFrom": "equipos_nuevos_atributos",
-          "tableTo": "equipos_nuevos",
-          "columnsFrom": [
-            "_parent_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
     "public.equipos_nuevos_ficha_tecnica": {
       "name": "equipos_nuevos_ficha_tecnica",
       "schema": "",
@@ -3139,12 +3650,6 @@
           "primaryKey": false,
           "notNull": false
         },
-        "_order": {
-          "name": "_order",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": false
-        },
         "nombre": {
           "name": "nombre",
           "type": "varchar",
@@ -3236,6 +3741,12 @@
           "primaryKey": false,
           "notNull": false
         },
+        "_order": {
+          "name": "_order",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
         "actualizado_por_id": {
           "name": "actualizado_por_id",
           "type": "integer",
@@ -3263,21 +3774,6 @@
           "columns": [
             {
               "expression": "_equipos_nuevos_equipos_order",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "equipos_nuevos__order_idx": {
-          "name": "equipos_nuevos__order_idx",
-          "columns": [
-            {
-              "expression": "_order",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -3353,6 +3849,21 @@
           "columns": [
             {
               "expression": "slug",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "equipos_nuevos__order_idx": {
+          "name": "equipos_nuevos__order_idx",
+          "columns": [
+            {
+              "expression": "_order",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -3617,6 +4128,789 @@
         "equipos_nuevos_rels_media_fk": {
           "name": "equipos_nuevos_rels_media_fk",
           "tableFrom": "equipos_nuevos_rels",
+          "tableTo": "media",
+          "columnsFrom": [
+            "media_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public._equipos_nuevos_v_version_ficha_tecnica": {
+      "name": "_equipos_nuevos_v_version_ficha_tecnica",
+      "schema": "",
+      "columns": {
+        "_order": {
+          "name": "_order",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "_parent_id": {
+          "name": "_parent_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "etiqueta": {
+          "name": "etiqueta",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "valor": {
+          "name": "valor",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "destacar": {
+          "name": "destacar",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": false
+        },
+        "icono": {
+          "name": "icono",
+          "type": "enum__equipos_nuevos_v_version_ficha_tecnica_icono",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "_uuid": {
+          "name": "_uuid",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "_equipos_nuevos_v_version_ficha_tecnica_order_idx": {
+          "name": "_equipos_nuevos_v_version_ficha_tecnica_order_idx",
+          "columns": [
+            {
+              "expression": "_order",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "_equipos_nuevos_v_version_ficha_tecnica_parent_id_idx": {
+          "name": "_equipos_nuevos_v_version_ficha_tecnica_parent_id_idx",
+          "columns": [
+            {
+              "expression": "_parent_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "_equipos_nuevos_v_version_ficha_tecnica_parent_id_fk": {
+          "name": "_equipos_nuevos_v_version_ficha_tecnica_parent_id_fk",
+          "tableFrom": "_equipos_nuevos_v_version_ficha_tecnica",
+          "tableTo": "_equipos_nuevos_v",
+          "columnsFrom": [
+            "_parent_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public._equipos_nuevos_v_version_destacados": {
+      "name": "_equipos_nuevos_v_version_destacados",
+      "schema": "",
+      "columns": {
+        "_order": {
+          "name": "_order",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "_parent_id": {
+          "name": "_parent_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "texto": {
+          "name": "texto",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "_uuid": {
+          "name": "_uuid",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "_equipos_nuevos_v_version_destacados_order_idx": {
+          "name": "_equipos_nuevos_v_version_destacados_order_idx",
+          "columns": [
+            {
+              "expression": "_order",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "_equipos_nuevos_v_version_destacados_parent_id_idx": {
+          "name": "_equipos_nuevos_v_version_destacados_parent_id_idx",
+          "columns": [
+            {
+              "expression": "_parent_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "_equipos_nuevos_v_version_destacados_parent_id_fk": {
+          "name": "_equipos_nuevos_v_version_destacados_parent_id_fk",
+          "tableFrom": "_equipos_nuevos_v_version_destacados",
+          "tableTo": "_equipos_nuevos_v",
+          "columnsFrom": [
+            "_parent_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public._equipos_nuevos_v": {
+      "name": "_equipos_nuevos_v",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "parent_id": {
+          "name": "parent_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version__equipos_nuevos_equipos_order": {
+          "name": "version__equipos_nuevos_equipos_order",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_nombre": {
+          "name": "version_nombre",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "version_marca_id": {
+          "name": "version_marca_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "version_tipo_id": {
+          "name": "version_tipo_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "version_codigo": {
+          "name": "version_codigo",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_entradilla": {
+          "name": "version_entradilla",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_descripcion": {
+          "name": "version_descripcion",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_ficha_tecnica_pdf_id": {
+          "name": "version_ficha_tecnica_pdf_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_vista360": {
+          "name": "version_vista360",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_seo_meta_title": {
+          "name": "version_seo_meta_title",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_seo_meta_description": {
+          "name": "version_seo_meta_description",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_seo_og_image_id": {
+          "name": "version_seo_og_image_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_mostrar_en_web": {
+          "name": "version_mostrar_en_web",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": true
+        },
+        "version_slug": {
+          "name": "version_slug",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "version_orden": {
+          "name": "version_orden",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_peso_operativo_kg": {
+          "name": "version_peso_operativo_kg",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version__order": {
+          "name": "version__order",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_actualizado_por_id": {
+          "name": "version_actualizado_por_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_updated_at": {
+          "name": "version_updated_at",
+          "type": "timestamp(3) with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_created_at": {
+          "name": "version_created_at",
+          "type": "timestamp(3) with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp(3) with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp(3) with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "_equipos_nuevos_v_parent_idx": {
+          "name": "_equipos_nuevos_v_parent_idx",
+          "columns": [
+            {
+              "expression": "parent_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "_equipos_nuevos_v_version_version__equipos_nuevos_equipo_idx": {
+          "name": "_equipos_nuevos_v_version_version__equipos_nuevos_equipo_idx",
+          "columns": [
+            {
+              "expression": "version__equipos_nuevos_equipos_order",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "_equipos_nuevos_v_version_version_marca_idx": {
+          "name": "_equipos_nuevos_v_version_version_marca_idx",
+          "columns": [
+            {
+              "expression": "version_marca_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "_equipos_nuevos_v_version_version_tipo_idx": {
+          "name": "_equipos_nuevos_v_version_version_tipo_idx",
+          "columns": [
+            {
+              "expression": "version_tipo_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "_equipos_nuevos_v_version_version_ficha_tecnica_pdf_idx": {
+          "name": "_equipos_nuevos_v_version_version_ficha_tecnica_pdf_idx",
+          "columns": [
+            {
+              "expression": "version_ficha_tecnica_pdf_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "_equipos_nuevos_v_version_seo_version_seo_og_image_idx": {
+          "name": "_equipos_nuevos_v_version_seo_version_seo_og_image_idx",
+          "columns": [
+            {
+              "expression": "version_seo_og_image_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "_equipos_nuevos_v_version_version_slug_idx": {
+          "name": "_equipos_nuevos_v_version_version_slug_idx",
+          "columns": [
+            {
+              "expression": "version_slug",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "_equipos_nuevos_v_version_version__order_idx": {
+          "name": "_equipos_nuevos_v_version_version__order_idx",
+          "columns": [
+            {
+              "expression": "version__order",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "_equipos_nuevos_v_version_version_actualizado_por_idx": {
+          "name": "_equipos_nuevos_v_version_version_actualizado_por_idx",
+          "columns": [
+            {
+              "expression": "version_actualizado_por_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "_equipos_nuevos_v_version_version_updated_at_idx": {
+          "name": "_equipos_nuevos_v_version_version_updated_at_idx",
+          "columns": [
+            {
+              "expression": "version_updated_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "_equipos_nuevos_v_version_version_created_at_idx": {
+          "name": "_equipos_nuevos_v_version_version_created_at_idx",
+          "columns": [
+            {
+              "expression": "version_created_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "_equipos_nuevos_v_created_at_idx": {
+          "name": "_equipos_nuevos_v_created_at_idx",
+          "columns": [
+            {
+              "expression": "created_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "_equipos_nuevos_v_updated_at_idx": {
+          "name": "_equipos_nuevos_v_updated_at_idx",
+          "columns": [
+            {
+              "expression": "updated_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "version_tipo_version_slug_1_idx": {
+          "name": "version_tipo_version_slug_1_idx",
+          "columns": [
+            {
+              "expression": "version_tipo_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "version_slug",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "_equipos_nuevos_v_parent_id_equipos_nuevos_id_fk": {
+          "name": "_equipos_nuevos_v_parent_id_equipos_nuevos_id_fk",
+          "tableFrom": "_equipos_nuevos_v",
+          "tableTo": "equipos_nuevos",
+          "columnsFrom": [
+            "parent_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "_equipos_nuevos_v_version_marca_id_marcas_maquinaria_id_fk": {
+          "name": "_equipos_nuevos_v_version_marca_id_marcas_maquinaria_id_fk",
+          "tableFrom": "_equipos_nuevos_v",
+          "tableTo": "marcas_maquinaria",
+          "columnsFrom": [
+            "version_marca_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "_equipos_nuevos_v_version_tipo_id_tipos_maquinaria_id_fk": {
+          "name": "_equipos_nuevos_v_version_tipo_id_tipos_maquinaria_id_fk",
+          "tableFrom": "_equipos_nuevos_v",
+          "tableTo": "tipos_maquinaria",
+          "columnsFrom": [
+            "version_tipo_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "_equipos_nuevos_v_version_ficha_tecnica_pdf_id_documentos_id_fk": {
+          "name": "_equipos_nuevos_v_version_ficha_tecnica_pdf_id_documentos_id_fk",
+          "tableFrom": "_equipos_nuevos_v",
+          "tableTo": "documentos",
+          "columnsFrom": [
+            "version_ficha_tecnica_pdf_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "_equipos_nuevos_v_version_seo_og_image_id_media_id_fk": {
+          "name": "_equipos_nuevos_v_version_seo_og_image_id_media_id_fk",
+          "tableFrom": "_equipos_nuevos_v",
+          "tableTo": "media",
+          "columnsFrom": [
+            "version_seo_og_image_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "_equipos_nuevos_v_version_actualizado_por_id_users_id_fk": {
+          "name": "_equipos_nuevos_v_version_actualizado_por_id_users_id_fk",
+          "tableFrom": "_equipos_nuevos_v",
+          "tableTo": "users",
+          "columnsFrom": [
+            "version_actualizado_por_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public._equipos_nuevos_v_rels": {
+      "name": "_equipos_nuevos_v_rels",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "order": {
+          "name": "order",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "parent_id": {
+          "name": "parent_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "path": {
+          "name": "path",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "media_id": {
+          "name": "media_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "_equipos_nuevos_v_rels_order_idx": {
+          "name": "_equipos_nuevos_v_rels_order_idx",
+          "columns": [
+            {
+              "expression": "order",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "_equipos_nuevos_v_rels_parent_idx": {
+          "name": "_equipos_nuevos_v_rels_parent_idx",
+          "columns": [
+            {
+              "expression": "parent_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "_equipos_nuevos_v_rels_path_idx": {
+          "name": "_equipos_nuevos_v_rels_path_idx",
+          "columns": [
+            {
+              "expression": "path",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "_equipos_nuevos_v_rels_media_id_idx": {
+          "name": "_equipos_nuevos_v_rels_media_id_idx",
+          "columns": [
+            {
+              "expression": "media_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "_equipos_nuevos_v_rels_parent_fk": {
+          "name": "_equipos_nuevos_v_rels_parent_fk",
+          "tableFrom": "_equipos_nuevos_v_rels",
+          "tableTo": "_equipos_nuevos_v",
+          "columnsFrom": [
+            "parent_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "_equipos_nuevos_v_rels_media_fk": {
+          "name": "_equipos_nuevos_v_rels_media_fk",
+          "tableFrom": "_equipos_nuevos_v_rels",
           "tableTo": "media",
           "columnsFrom": [
             "media_id"
@@ -4137,6 +5431,602 @@
         "equipos_usados_rels_media_fk": {
           "name": "equipos_usados_rels_media_fk",
           "tableFrom": "equipos_usados_rels",
+          "tableTo": "media",
+          "columnsFrom": [
+            "media_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public._equipos_usados_v": {
+      "name": "_equipos_usados_v",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "parent_id": {
+          "name": "parent_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_nombre": {
+          "name": "version_nombre",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "version_categoria_id": {
+          "name": "version_categoria_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "version_marca_usada_id": {
+          "name": "version_marca_usada_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_modelo": {
+          "name": "version_modelo",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_anio": {
+          "name": "version_anio",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_horometro": {
+          "name": "version_horometro",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_ubicacion": {
+          "name": "version_ubicacion",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_peso_operativo": {
+          "name": "version_peso_operativo",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_potencia": {
+          "name": "version_potencia",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_motor": {
+          "name": "version_motor",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_serial": {
+          "name": "version_serial",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_descripcion_corta": {
+          "name": "version_descripcion_corta",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_descripcion": {
+          "name": "version_descripcion",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_ficha_tecnica_pdf_id": {
+          "name": "version_ficha_tecnica_pdf_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_seo_meta_title": {
+          "name": "version_seo_meta_title",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_seo_meta_description": {
+          "name": "version_seo_meta_description",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_seo_og_image_id": {
+          "name": "version_seo_og_image_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_slug": {
+          "name": "version_slug",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_mostrar_en_web": {
+          "name": "version_mostrar_en_web",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": true
+        },
+        "version_disponible": {
+          "name": "version_disponible",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": true
+        },
+        "version_fecha_publicacion": {
+          "name": "version_fecha_publicacion",
+          "type": "timestamp(3) with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_pestana_portada": {
+          "name": "version_pestana_portada",
+          "type": "enum__equipos_usados_v_version_pestana_portada",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'categoria'"
+        },
+        "version_marca": {
+          "name": "version_marca",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_actualizado_por_id": {
+          "name": "version_actualizado_por_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_updated_at": {
+          "name": "version_updated_at",
+          "type": "timestamp(3) with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_created_at": {
+          "name": "version_created_at",
+          "type": "timestamp(3) with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp(3) with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp(3) with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "_equipos_usados_v_parent_idx": {
+          "name": "_equipos_usados_v_parent_idx",
+          "columns": [
+            {
+              "expression": "parent_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "_equipos_usados_v_version_version_categoria_idx": {
+          "name": "_equipos_usados_v_version_version_categoria_idx",
+          "columns": [
+            {
+              "expression": "version_categoria_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "_equipos_usados_v_version_version_marca_usada_idx": {
+          "name": "_equipos_usados_v_version_version_marca_usada_idx",
+          "columns": [
+            {
+              "expression": "version_marca_usada_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "_equipos_usados_v_version_version_ficha_tecnica_pdf_idx": {
+          "name": "_equipos_usados_v_version_version_ficha_tecnica_pdf_idx",
+          "columns": [
+            {
+              "expression": "version_ficha_tecnica_pdf_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "_equipos_usados_v_version_seo_version_seo_og_image_idx": {
+          "name": "_equipos_usados_v_version_seo_version_seo_og_image_idx",
+          "columns": [
+            {
+              "expression": "version_seo_og_image_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "_equipos_usados_v_version_version_slug_idx": {
+          "name": "_equipos_usados_v_version_version_slug_idx",
+          "columns": [
+            {
+              "expression": "version_slug",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "_equipos_usados_v_version_version_actualizado_por_idx": {
+          "name": "_equipos_usados_v_version_version_actualizado_por_idx",
+          "columns": [
+            {
+              "expression": "version_actualizado_por_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "_equipos_usados_v_version_version_updated_at_idx": {
+          "name": "_equipos_usados_v_version_version_updated_at_idx",
+          "columns": [
+            {
+              "expression": "version_updated_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "_equipos_usados_v_version_version_created_at_idx": {
+          "name": "_equipos_usados_v_version_version_created_at_idx",
+          "columns": [
+            {
+              "expression": "version_created_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "_equipos_usados_v_created_at_idx": {
+          "name": "_equipos_usados_v_created_at_idx",
+          "columns": [
+            {
+              "expression": "created_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "_equipos_usados_v_updated_at_idx": {
+          "name": "_equipos_usados_v_updated_at_idx",
+          "columns": [
+            {
+              "expression": "updated_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "version_categoria_version_slug_idx": {
+          "name": "version_categoria_version_slug_idx",
+          "columns": [
+            {
+              "expression": "version_categoria_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "version_slug",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "_equipos_usados_v_parent_id_equipos_usados_id_fk": {
+          "name": "_equipos_usados_v_parent_id_equipos_usados_id_fk",
+          "tableFrom": "_equipos_usados_v",
+          "tableTo": "equipos_usados",
+          "columnsFrom": [
+            "parent_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "_equipos_usados_v_version_categoria_id_categorias_usada_id_fk": {
+          "name": "_equipos_usados_v_version_categoria_id_categorias_usada_id_fk",
+          "tableFrom": "_equipos_usados_v",
+          "tableTo": "categorias_usada",
+          "columnsFrom": [
+            "version_categoria_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "_equipos_usados_v_version_marca_usada_id_marcas_usada_id_fk": {
+          "name": "_equipos_usados_v_version_marca_usada_id_marcas_usada_id_fk",
+          "tableFrom": "_equipos_usados_v",
+          "tableTo": "marcas_usada",
+          "columnsFrom": [
+            "version_marca_usada_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "_equipos_usados_v_version_ficha_tecnica_pdf_id_documentos_id_fk": {
+          "name": "_equipos_usados_v_version_ficha_tecnica_pdf_id_documentos_id_fk",
+          "tableFrom": "_equipos_usados_v",
+          "tableTo": "documentos",
+          "columnsFrom": [
+            "version_ficha_tecnica_pdf_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "_equipos_usados_v_version_seo_og_image_id_media_id_fk": {
+          "name": "_equipos_usados_v_version_seo_og_image_id_media_id_fk",
+          "tableFrom": "_equipos_usados_v",
+          "tableTo": "media",
+          "columnsFrom": [
+            "version_seo_og_image_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "_equipos_usados_v_version_actualizado_por_id_users_id_fk": {
+          "name": "_equipos_usados_v_version_actualizado_por_id_users_id_fk",
+          "tableFrom": "_equipos_usados_v",
+          "tableTo": "users",
+          "columnsFrom": [
+            "version_actualizado_por_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public._equipos_usados_v_rels": {
+      "name": "_equipos_usados_v_rels",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "order": {
+          "name": "order",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "parent_id": {
+          "name": "parent_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "path": {
+          "name": "path",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "media_id": {
+          "name": "media_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "_equipos_usados_v_rels_order_idx": {
+          "name": "_equipos_usados_v_rels_order_idx",
+          "columns": [
+            {
+              "expression": "order",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "_equipos_usados_v_rels_parent_idx": {
+          "name": "_equipos_usados_v_rels_parent_idx",
+          "columns": [
+            {
+              "expression": "parent_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "_equipos_usados_v_rels_path_idx": {
+          "name": "_equipos_usados_v_rels_path_idx",
+          "columns": [
+            {
+              "expression": "path",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "_equipos_usados_v_rels_media_id_idx": {
+          "name": "_equipos_usados_v_rels_media_id_idx",
+          "columns": [
+            {
+              "expression": "media_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "_equipos_usados_v_rels_parent_fk": {
+          "name": "_equipos_usados_v_rels_parent_fk",
+          "tableFrom": "_equipos_usados_v_rels",
+          "tableTo": "_equipos_usados_v",
+          "columnsFrom": [
+            "parent_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "_equipos_usados_v_rels_media_fk": {
+          "name": "_equipos_usados_v_rels_media_fk",
+          "tableFrom": "_equipos_usados_v_rels",
           "tableTo": "media",
           "columnsFrom": [
             "media_id"
@@ -4823,12 +6713,6 @@
           "primaryKey": false,
           "notNull": false
         },
-        "_order": {
-          "name": "_order",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": false
-        },
         "nombre": {
           "name": "nombre",
           "type": "varchar",
@@ -4896,6 +6780,12 @@
           "primaryKey": false,
           "notNull": false
         },
+        "_order": {
+          "name": "_order",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
         "actualizado_por_id": {
           "name": "actualizado_por_id",
           "type": "integer",
@@ -4923,21 +6813,6 @@
           "columns": [
             {
               "expression": "_tipos_maquinaria_tipos_order",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "tipos_maquinaria__order_idx": {
-          "name": "tipos_maquinaria__order_idx",
-          "columns": [
-            {
-              "expression": "_order",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -5013,6 +6888,21 @@
           "columns": [
             {
               "expression": "slug",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "tipos_maquinaria__order_idx": {
+          "name": "tipos_maquinaria__order_idx",
+          "columns": [
+            {
+              "expression": "_order",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -5658,160 +7548,6 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.atributos_ficha": {
-      "name": "atributos_ficha",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "serial",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "_order": {
-          "name": "_order",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "titulo": {
-          "name": "titulo",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "nombre": {
-          "name": "nombre",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "icono": {
-          "name": "icono",
-          "type": "enum_atributos_ficha_icono",
-          "typeSchema": "public",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "'otro'"
-        },
-        "unidad": {
-          "name": "unidad",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "tipo_valor": {
-          "name": "tipo_valor",
-          "type": "enum_atributos_ficha_tipo_valor",
-          "typeSchema": "public",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "'numero'"
-        },
-        "actualizado_por_id": {
-          "name": "actualizado_por_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp(3) with time zone",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp(3) with time zone",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        }
-      },
-      "indexes": {
-        "atributos_ficha__order_idx": {
-          "name": "atributos_ficha__order_idx",
-          "columns": [
-            {
-              "expression": "_order",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "atributos_ficha_actualizado_por_idx": {
-          "name": "atributos_ficha_actualizado_por_idx",
-          "columns": [
-            {
-              "expression": "actualizado_por_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "atributos_ficha_updated_at_idx": {
-          "name": "atributos_ficha_updated_at_idx",
-          "columns": [
-            {
-              "expression": "updated_at",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "atributos_ficha_created_at_idx": {
-          "name": "atributos_ficha_created_at_idx",
-          "columns": [
-            {
-              "expression": "created_at",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        }
-      },
-      "foreignKeys": {
-        "atributos_ficha_actualizado_por_id_users_id_fk": {
-          "name": "atributos_ficha_actualizado_por_id_users_id_fk",
-          "tableFrom": "atributos_ficha",
-          "tableTo": "users",
-          "columnsFrom": [
-            "actualizado_por_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "set null",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
     "public.categorias_usada": {
       "name": "categorias_usada",
       "schema": "",
@@ -5846,12 +7582,6 @@
           "primaryKey": false,
           "notNull": false,
           "default": true
-        },
-        "orden": {
-          "name": "orden",
-          "type": "numeric",
-          "primaryKey": false,
-          "notNull": false
         },
         "imagen_id": {
           "name": "imagen_id",
@@ -5889,6 +7619,12 @@
           "primaryKey": false,
           "notNull": false,
           "default": true
+        },
+        "orden": {
+          "name": "orden",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
         },
         "actualizado_por_id": {
           "name": "actualizado_por_id",
@@ -20620,12 +22356,6 @@
           "primaryKey": false,
           "notNull": false
         },
-        "atributos_ficha_id": {
-          "name": "atributos_ficha_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false
-        },
         "categorias_usada_id": {
           "name": "categorias_usada_id",
           "type": "integer",
@@ -20921,21 +22651,6 @@
           "columns": [
             {
               "expression": "categorias_maquinaria_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "payload_locked_documents_rels_atributos_ficha_id_idx": {
-          "name": "payload_locked_documents_rels_atributos_ficha_id_idx",
-          "columns": [
-            {
-              "expression": "atributos_ficha_id",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -21354,19 +23069,6 @@
           "tableTo": "categorias_maquinaria",
           "columnsFrom": [
             "categorias_maquinaria_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        },
-        "payload_locked_documents_rels_atributos_ficha_fk": {
-          "name": "payload_locked_documents_rels_atributos_ficha_fk",
-          "tableFrom": "payload_locked_documents_rels",
-          "tableTo": "atributos_ficha",
-          "columnsFrom": [
-            "atributos_ficha_id"
           ],
           "columnsTo": [
             "id"
@@ -24680,8 +26382,30 @@
         "otro"
       ]
     },
+    "public.enum__equipos_nuevos_v_version_ficha_tecnica_icono": {
+      "name": "enum__equipos_nuevos_v_version_ficha_tecnica_icono",
+      "schema": "public",
+      "values": [
+        "peso",
+        "potencia",
+        "motor",
+        "capacidad",
+        "alcance",
+        "profundidad",
+        "velocidad",
+        "otro"
+      ]
+    },
     "public.enum_equipos_usados_pestana_portada": {
       "name": "enum_equipos_usados_pestana_portada",
+      "schema": "public",
+      "values": [
+        "categoria",
+        "aditamentos"
+      ]
+    },
+    "public.enum__equipos_usados_v_version_pestana_portada": {
+      "name": "enum__equipos_usados_v_version_pestana_portada",
       "schema": "public",
       "values": [
         "categoria",
@@ -24703,28 +26427,6 @@
         "plantilla1",
         "aditamentos",
         "kit"
-      ]
-    },
-    "public.enum_atributos_ficha_icono": {
-      "name": "enum_atributos_ficha_icono",
-      "schema": "public",
-      "values": [
-        "peso",
-        "potencia",
-        "motor",
-        "capacidad",
-        "alcance",
-        "profundidad",
-        "velocidad",
-        "otro"
-      ]
-    },
-    "public.enum_atributos_ficha_tipo_valor": {
-      "name": "enum_atributos_ficha_tipo_valor",
-      "schema": "public",
-      "values": [
-        "numero",
-        "texto"
       ]
     },
     "public.enum_marcas_lubricante_destino": {
@@ -25178,6 +26880,6 @@
     "tables": {},
     "columns": {}
   },
-  "id": "5c84c25e-4e17-45f7-b654-981d9bbdcdc2",
+  "id": "47857184-8869-4f6e-8247-e2694b792601",
   "prevId": "00000000-0000-0000-0000-000000000000"
 }

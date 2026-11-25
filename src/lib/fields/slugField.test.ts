@@ -24,6 +24,26 @@ describe("slugEditable", () => {
   it("lo deja cambiar con el permiso", () => {
     assert.equal(llamar({ id: 1, rol: "editor", puedeEditarSlugs: true }, { id: 9 }), true);
   });
+
+  // Restaurar una versión manda la ficha entera, con su slug (#575).
+  const conDatos = (enviado: unknown, deHermanos = true) =>
+    slugEditable({
+      req: { user: { id: 1, rol: "editor", puedeEditarSlugs: false } },
+      doc: { id: 9, slug: "excavadora-zx130" },
+      ...(deHermanos ? { siblingData: { slug: enviado } } : { data: { slug: enviado } }),
+    } as unknown as Args);
+
+  it("sin el permiso, mandar el MISMO slug que ya tiene no es cambiarlo", () => {
+    assert.equal(conDatos("excavadora-zx130"), true);
+    assert.equal(conDatos("excavadora-zx130", false), true);
+  });
+
+  it("sin el permiso, cualquier slug DISTINTO sigue bloqueado", () => {
+    assert.equal(conDatos("otra-direccion"), false);
+    assert.equal(conDatos(""), false);
+    assert.equal(conDatos(undefined), false);
+    assert.equal(conDatos(null), false);
+  });
 });
 
 /** El acceso de `update` de un campo con nombre, buscado en la lista. */

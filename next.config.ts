@@ -140,7 +140,11 @@ const nextConfig: NextConfig = {
        */
       { key: "Strict-Transport-Security", value: "max-age=31536000" },
       /*
-       * POLÍTICA DE CONTENIDO — FASE 1: SOLO OBSERVA, NO BLOQUEA.
+       * POLÍTICA DE CONTENIDO. DESDE EL 2026-11-24 TAMBIÉN SE APLICA (ver «FASE
+       * 2» al final de esta función). Lo que sigue se escribió para la fase 1 y
+       * se conserva porque explica cada directiva.
+       *
+       * FASE 1: SOLO OBSERVA, NO BLOQUEA.
        *
        * `Report-Only` significa exactamente eso: el navegador avisa por consola
        * de lo que la política prohibiría, pero **no impide nada**. En esta fase
@@ -183,13 +187,20 @@ const nextConfig: NextConfig = {
        *    y solo tras aceptar las cookies: el script de `googletagmanager.com`
        *    y sus envíos a `google-analytics.com` y `analytics.google.com`.
        * 9. Panel, subida directa (tanda 22, 2026-11-23): el navegador sube las
-       *    imágenes y los documentos a `https://vercel.com/api/blob` (leído en
+       *    imágenes y los documentos a `https://vercel.com/api/blob/` (leído en
        *    `@vercel/blob`, la subida de cliente de §10.39). Faltaba en
        *    `connect-src`: con la política aplicada, el panel no podría subir.
+       *    CON LA BARRA FINAL: una fuente con ruta y sin barra solo casa con
+       *    esa ruta exacta, y el navegador pide `/api/blob/?pathname=…` (lo
+       *    vio el agente C subiendo una imagen y un PDF en un preview).
        * 10. Previews (tanda 22): Vercel inyecta su barra de comentarios
        *    (`vercel.live`) SOLO en los previews. Se admite solo ahí, para que
        *    la consola de un preview enseñe únicamente lo que también fallaría
        *    en el sitio publicado. Lista de la documentación de Vercel.
+       * 11. Panel, vista previa en vivo (tanda 21, tarea 3, fase 2, punto 5): el
+       *    formulario de «Equipos usados» pinta la ficha en un `iframe` del MISMO
+       *    origen (`/vista-previa/…`). Sin `'self'` en `frame-src`, la política
+       *    aplicada lo bloqueaba (lo vio el agente C en el preview del #579).
        */
       {
         key: "Content-Security-Policy-Report-Only",
@@ -200,8 +211,8 @@ const nextConfig: NextConfig = {
           `img-src 'self' data: blob: https://*.public.blob.vercel-storage.com https://*.google-analytics.com https://*.googletagmanager.com${enPreview ? " https://vercel.live https://vercel.com" : ""}`,
           `font-src 'self' data: https://*.public.blob.vercel-storage.com${enPreview ? " https://vercel.live https://assets.vercel.com" : ""}`,
           "media-src 'self' https://*.public.blob.vercel-storage.com",
-          `frame-src https://challenges.cloudflare.com https://www.youtube-nocookie.com${enPreview ? " https://vercel.live" : ""}`,
-          `connect-src 'self' https://challenges.cloudflare.com https://api.mapbox.com https://events.mapbox.com https://*.public.blob.vercel-storage.com https://vercel.com/api/blob https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com${enPreview ? " https://vercel.live wss://ws-us3.pusher.com" : ""}`,
+          `frame-src 'self' https://challenges.cloudflare.com https://www.youtube-nocookie.com${enPreview ? " https://vercel.live" : ""}`,
+          `connect-src 'self' https://challenges.cloudflare.com https://api.mapbox.com https://events.mapbox.com https://*.public.blob.vercel-storage.com https://vercel.com/api/blob/ https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com${enPreview ? " https://vercel.live wss://ws-us3.pusher.com" : ""}`,
           "worker-src 'self' blob:",
           "child-src blob:",
           "object-src 'none'",
@@ -214,6 +225,33 @@ const nextConfig: NextConfig = {
 
     const indexable = process.env.NEXT_PUBLIC_PERMITIR_INDEXACION?.trim().toLowerCase() === "true";
 
+    /*
+     * FASE 2: LA POLÍTICA SE APLICA (Juan Pablo, tanda 22, 2026-11-24). La
+     * MISMA política de arriba va además como `Content-Security-Policy`, así
+     * que el navegador SÍ bloquea lo que no admite. Primero entró solo en
+     * `/admin` (#573) y después en todo el sitio.
+     *
+     * Qué se probó antes, con la consola delante:
+     * - Panel, con sesión (agente C): inicio, listas, fichas, subida de imagen
+     *   y de PDF, vista previa de un documento, texto enriquecido y guardar.
+     * - Sitio público, en un preview a 390 y 1440 (agente A): portada, Contáctanos,
+     *   Servicio técnico, Nosotros y una ficha de usada, con el mapa de Mapbox,
+     *   un vídeo de YouTube, los vídeos y animaciones del Blob, Turnstile con
+     *   las claves de prueba y un envío del formulario.
+     *
+     * SIN PROBAR: Google Analytics. Ni el preview ni producción tenían
+     * `NEXT_PUBLIC_GA4_ID`, así que nada de Google se cargó. EL DÍA QUE SE PONGA
+     * EL IDENTIFICADOR hay que aceptar las cookies con la consola abierta y
+     * comprobar que no sale ningún «Refused to…» (nota 8 de la política).
+     * Tampoco Turnstile con claves reales, que aún no existen.
+     *
+     * SI ALGO DEJA DE CARGAR tras un cambio de esta política, de Payload o de un
+     * servicio de terceros, lo primero es la consola: un bloqueo sale como
+     * «Refused to…». Para volver atrás basta quitar esta regla: la de solo
+     * informe sigue en todo el sitio.
+     */
+    const politica = seguridad.find((c) => c.key === "Content-Security-Policy-Report-Only")?.value;
+
     return [
       {
         source: "/:path*",
@@ -221,6 +259,14 @@ const nextConfig: NextConfig = {
           ? seguridad
           : [...seguridad, { key: "X-Robots-Tag", value: "noindex, nofollow, noarchive" }],
       },
+      ...(politica
+        ? [
+            {
+              source: "/:path*",
+              headers: [{ key: "Content-Security-Policy", value: politica }],
+            },
+          ]
+        : []),
     ];
   },
 };

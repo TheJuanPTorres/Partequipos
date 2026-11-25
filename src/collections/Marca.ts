@@ -32,6 +32,8 @@ export const Marca: CollectionConfig = {
    * La web lo usa cuando D cambie sus consultas (§6.3).
    */
   orderable: true,
+  // Se abre YA ordenada por el arrastre: así se puede arrastrar sin pulsar antes el icono ⇅.
+  defaultSort: "_order",
   access: {
     read: lecturaContenido,
     create: escrituraContenido,

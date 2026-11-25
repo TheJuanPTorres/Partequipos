@@ -2,7 +2,7 @@
  * «Marcas de la banda» (2026-11-05, dirección): en la portada, la sección «Marcas de repuestos»
  * pinta los logos ELEGIDOS en el panel («inicio» → «Marcas de repuestos» → «Marcas de la banda»),
  * en el orden en que se arrastraron. Con la lista vacía, como siempre: todas las marcas de
- * repuestos con logo, por orden alfabético.
+ * repuestos con logo, en el orden por arrastre del panel (el de «Marcas de repuestos»).
  *
  * LOGOS LIBRES (2026-11-08, dirección): la lista admite dos clases de fila (bloques
  * `src/collections/bloques/bandaLogos.ts`): una MARCA de repuestos existente o un LOGO LIBRE de un

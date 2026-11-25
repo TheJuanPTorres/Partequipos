@@ -186,7 +186,8 @@ export function FichaProducto({
 
           <ListaDatos datos={datos} clase={`${estilos.datos} texto-destacado`} apilado />
 
-          <div className={`${estilos.botones} ${estilos.noImprimir}`}>
+          {/* El WhatsApp flotante no tapa los botones de la tarjeta (tanda 24, t7). */}
+          <div className={`${estilos.botones} ${estilos.noImprimir}`} data-evita-flotante="">
             <BotonFormulario
               href={`#${ANCLA_COTIZAR}`}
               className={`${estilos.boton} ${estilos.botonGrande}`}

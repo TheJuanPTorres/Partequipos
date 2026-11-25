@@ -26,7 +26,7 @@
  * `derivacion.mjs`). Vistas por defecto: 360, 390, 430, 768, 820, 1024, 1180, 1280, 1366, 1440,
  * 1920, 2560 y 3840 al 100 %, y 1366 y 1440 al 80, 125, 150 y 200 %. Para medir menos,
  * `DESBORDES_VISTAS=390,1440@200` (ancho@zoom). Rutas por defecto: `RUTAS`, abajo (las plantillas
- * principales). Escribe `desbordes.json`, `desbordes.md` y una captura por fallo (con el
+ * principales). Con `DESBORDES_CAPTURAS=1`, una captura de cada página y vista. Escribe `desbordes.json`, `desbordes.md` y una captura por fallo (con el
  * elemento marcado en rojo) en la carpeta; sale con 1 si hay algún ✗. Es pesado: va con el turno
  * de MEDICION y, con todas las vistas y rutas, se parte en tandas (por rutas o por vistas).
  */
@@ -322,6 +322,11 @@ for (const vista of vistas) {
       await pagina.waitForTimeout(800);
       fila.fallos.push(...(await pagina.evaluate(medir)));
       fila.fallos.push(...(await pagina.evaluate(tapados, "arriba")));
+      // Con `DESBORDES_CAPTURAS=1`, además, la vista de arriba de cada página (antes y después).
+      if (process.env.DESBORDES_CAPTURAS) {
+        const nombre = `${ruta.replace(/\W+/g, "-").replace(/^-|-$/g, "") || "portada"}-${vista.nombre.replace("@", "z")}.png`;
+        await pagina.screenshot({ path: path.join(carpeta, nombre) });
+      }
       await pagina.evaluate(() => scrollTo(0, document.documentElement.scrollHeight));
       await pagina.waitForTimeout(600);
       fila.fallos.push(...(await pagina.evaluate(tapados, "abajo")));

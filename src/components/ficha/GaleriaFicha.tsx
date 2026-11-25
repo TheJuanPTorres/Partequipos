@@ -222,7 +222,8 @@ export function GaleriaFicha({
               </li>
             ))}
           </ul>
-          <div className={estilos.controlesVisor}>
+          {/* El WhatsApp flotante esquiva los controles y las miniaturas (tanda 24, t7). */}
+          <div className={estilos.controlesVisor} data-evita-flotante="">
             {total > 1 ? (
               <button
                 type="button"
@@ -250,7 +251,12 @@ export function GaleriaFicha({
         </div>
 
         {total > 1 ? (
-          <div className={estilos.miniaturas} role="group" aria-label="Elegir foto">
+          <div
+            className={estilos.miniaturas}
+            role="group"
+            aria-label="Elegir foto"
+            data-evita-flotante=""
+          >
             {conFlechas ? (
               <button
                 type="button"

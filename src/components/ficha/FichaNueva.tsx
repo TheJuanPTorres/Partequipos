@@ -175,7 +175,8 @@ export function FichaNueva({
   const hayIzquierda = fotos.length > 0;
   const botones =
     pdf || experto ? (
-      <div className={`${estilos.botones} ${nueva.botones}`}>
+      // El WhatsApp flotante no tapa los botones de la tarjeta (tanda 24, t6).
+      <div className={`${estilos.botones} ${nueva.botones}`} data-evita-flotante="">
         {pdf ? (
           <BotonVisorPdf
             titulo={`Ficha técnica: ${nombre}`}

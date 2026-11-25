@@ -6,6 +6,7 @@ import { useEffect, useId, useRef, useState, type ChangeEvent, type FormEvent } 
 import { Campo, claseControl } from "@/components/forms/Campo";
 import { Turnstile } from "@/components/forms/Turnstile";
 import { enviarEvento } from "@/lib/analitica/navegador";
+import { errorEnVivo } from "@/lib/formularios/validacionVivo";
 import {
   MAX_PDF_BYTES,
   MAX_PDF_MB,
@@ -60,7 +61,11 @@ export function FormularioHojaDeVida({
 
   useEffect(() => {
     if (hecho) confirmacion.current?.focus();
-    else if (mensaje) resumen.current?.focus();
+    else if (mensaje) {
+      // Foco al PRIMER campo con error (t8); si el fallo no es de un campo, al resumen.
+      const primero = formulario.current?.querySelector<HTMLElement>('[aria-invalid="true"]');
+      (primero ?? resumen.current)?.focus();
+    }
   }, [hecho, mensaje]);
 
   useEffect(() => {
@@ -93,6 +98,23 @@ export function FormularioHojaDeVida({
     }
     setArchivo(elegido);
     setErrores((previos) => ({ ...previos, hojaDeVida: undefined }));
+  }
+
+  /** Validación en vivo (t8): al salir de Nombre, Correo o Teléfono; se retira sola al corregir. */
+  function revisar(e: FormEvent<HTMLFormElement>, soloSiYaMarcado: boolean) {
+    const el = e.target as HTMLInputElement;
+    const n = el.name;
+    if (n !== "nombre" && n !== "correo" && n !== "telefono") return;
+    const aviso =
+      n === "telefono"
+        ? el.value.trim().length === 0
+          ? "Escribe tu teléfono."
+          : null
+        : errorEnVivo(n, el.value);
+    const marcado = Boolean(errores[n]);
+    if (soloSiYaMarcado && (!marcado || aviso !== null)) return;
+    if (!soloSiYaMarcado && aviso === null && !marcado) return;
+    setErrores((previos) => ({ ...previos, [n]: aviso ?? undefined }));
   }
 
   function quitarArchivo() {
@@ -175,9 +197,9 @@ export function FormularioHojaDeVida({
               />
             </svg>
           ) : null}
-          <p className="font-medium">Hoja de vida enviada</p>
+          <p className="text-lg font-medium">¡Recibimos tu hoja de vida!</p>
           <p className="mt-1 text-sm">{hecho}</p>
-          {f3 && alCerrar ? (
+          {alCerrar ? (
             <button type="button" onClick={alCerrar} data-cerrar="">
               Cerrar
             </button>
@@ -200,152 +222,162 @@ export function FormularioHojaDeVida({
         </div>
       ) : null}
 
-      <form ref={formulario} onSubmit={alEnviar} className="mt-6 space-y-4" noValidate>
+      <form
+        ref={formulario}
+        onSubmit={alEnviar}
+        onBlur={(e) => revisar(e, false)}
+        onInput={(e) => revisar(e, true)}
+        className="mt-6 space-y-4"
+        noValidate
+      >
         <input type="hidden" name="origen" value={origen} />
 
-        <div className="grid gap-4 sm:grid-cols-2">
-          <Campo id={campo("nombre")} etiqueta="Nombre" obligatorio error={errores.nombre}>
-            {(p) => (
-              <input
-                {...p}
-                name="nombre"
-                type="text"
-                autoComplete="name"
-                placeholder="Nombre"
-                className={claseControl}
-              />
-            )}
-          </Campo>
-          <Campo id={campo("telefono")} etiqueta="Teléfono" obligatorio error={errores.telefono}>
-            {(p) => (
-              <input
-                {...p}
-                name="telefono"
-                type="tel"
-                autoComplete="tel"
-                placeholder="Teléfono"
-                className={claseControl}
-              />
-            )}
-          </Campo>
-          <Campo id={campo("correo")} etiqueta="Correo" obligatorio error={errores.correo}>
-            {(p) => (
-              <input
-                {...p}
-                name="correo"
-                type="email"
-                autoComplete="email"
-                placeholder="Correo electrónico"
-                className={claseControl}
-              />
-            )}
-          </Campo>
-          <Campo id={campo("vacante")} etiqueta="Vacante" obligatorio error={errores.vacante}>
-            {(p) => (
-              <input
-                {...p}
-                name="vacante"
-                type="text"
-                value={vacante}
-                readOnly
-                placeholder="Vacante"
-                className={claseControl}
-              />
-            )}
-          </Campo>
-        </div>
-
-        <Campo id={campo("mensaje")} etiqueta="Mensaje" error={errores.mensaje}>
-          {(p) => (
-            <textarea
-              {...p}
-              name="mensaje"
-              rows={4}
-              placeholder="Mensaje (opcional)"
-              className={claseControl}
-            />
-          )}
-        </Campo>
-
-        {/*
-         * El PDF: botón propio «Adjuntar PDF». El `<input type="file">` nativo queda oculto pero
-         * accesible (sigue en el orden de tabulación y anuncia su nombre; su foco se pinta en el
-         * botón). Al elegir, se ve el nombre del archivo, con «Quitar».
-         */}
-        <section data-campo="" data-archivo="">
-          <p id={campo("hojaDeVida-titulo")} data-titulo-archivo="">
-            Hoja de vida (PDF, máximo {MAX_PDF_MB} MB)
-            <span className="text-red-700">
-              {" *"}
-              <span className="sr-only">(obligatorio)</span>
-            </span>
-          </p>
-          <div data-adjuntar-fila="">
-            <input
-              ref={entradaArchivo}
-              id={campo("hojaDeVida")}
-              name="hojaDeVida"
-              type="file"
-              accept="application/pdf,.pdf"
-              className="sr-only"
-              aria-labelledby={campo("hojaDeVida-titulo")}
-              aria-invalid={errores.hojaDeVida ? true : undefined}
-              aria-describedby={errores.hojaDeVida ? campo("hojaDeVida-error") : undefined}
-              onChange={alElegirArchivo}
-            />
-            <label htmlFor={campo("hojaDeVida")} data-adjuntar="">
-              <IconPaperclip aria-hidden="true" size={18} stroke={2} />
-              {archivo ? "Cambiar PDF" : "Adjuntar PDF"}
-            </label>
-            {archivo ? (
-              <span data-archivo-elegido="">
-                <span data-nombre-archivo="">{archivo.name}</span>
-                <button type="button" data-quitar="" onClick={quitarArchivo}>
-                  Quitar<span className="sr-only"> el archivo {archivo.name}</span>
-                </button>
-              </span>
-            ) : (
-              <span data-sin-archivo="">Ningún archivo seleccionado</span>
-            )}
+        {/* Mientras se envía, los campos se bloquean sin perder lo escrito (`inert`, no `disabled`). */}
+        <div className="space-y-4" inert={enviando} aria-busy={enviando}>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Campo id={campo("nombre")} etiqueta="Nombre" obligatorio error={errores.nombre}>
+              {(p) => (
+                <input
+                  {...p}
+                  name="nombre"
+                  type="text"
+                  autoComplete="name"
+                  placeholder="Nombre"
+                  className={claseControl}
+                />
+              )}
+            </Campo>
+            <Campo id={campo("telefono")} etiqueta="Teléfono" obligatorio error={errores.telefono}>
+              {(p) => (
+                <input
+                  {...p}
+                  name="telefono"
+                  type="tel"
+                  autoComplete="tel"
+                  placeholder="Teléfono"
+                  className={claseControl}
+                />
+              )}
+            </Campo>
+            <Campo id={campo("correo")} etiqueta="Correo" obligatorio error={errores.correo}>
+              {(p) => (
+                <input
+                  {...p}
+                  name="correo"
+                  type="email"
+                  autoComplete="email"
+                  placeholder="Correo electrónico"
+                  className={claseControl}
+                />
+              )}
+            </Campo>
+            <Campo id={campo("vacante")} etiqueta="Vacante" obligatorio error={errores.vacante}>
+              {(p) => (
+                <input
+                  {...p}
+                  name="vacante"
+                  type="text"
+                  value={vacante}
+                  readOnly
+                  placeholder="Vacante"
+                  className={claseControl}
+                />
+              )}
+            </Campo>
           </div>
-          <span aria-live="polite" className="sr-only">
-            {archivo ? `Archivo elegido: ${archivo.name}` : ""}
-          </span>
-          {errores.hojaDeVida ? (
-            <p id={campo("hojaDeVida-error")} role="alert" data-error="">
-              {errores.hojaDeVida}
-            </p>
-          ) : null}
-        </section>
 
-        <section data-campo="" data-autorizacion="">
-          <label htmlFor={campo("autorizacion")}>
-            <input
-              id={campo("autorizacion")}
-              name="autorizacion"
-              type="checkbox"
-              required
-              aria-invalid={errores.autorizacion ? true : undefined}
-              aria-describedby={errores.autorizacion ? campo("autorizacion-error") : undefined}
-            />
-            <span>
-              Autorizo el tratamiento de mis datos personales según la{" "}
-              <a href={RUTA_POLITICA_DATOS} target="_blank" rel="noopener">
-                política de tratamiento de datos
-                <span className="sr-only"> (se abre en otra pestaña)</span>
-              </a>
-              . <span className="text-red-700">*</span>
-              <span className="sr-only">(obligatorio)</span>
+          <Campo id={campo("mensaje")} etiqueta="Mensaje" error={errores.mensaje}>
+            {(p) => (
+              <textarea
+                {...p}
+                name="mensaje"
+                rows={4}
+                placeholder="Mensaje (opcional)"
+                className={claseControl}
+              />
+            )}
+          </Campo>
+
+          {/*
+           * El PDF: botón propio «Adjuntar PDF». El `<input type="file">` nativo queda oculto pero
+           * accesible (sigue en el orden de tabulación y anuncia su nombre; su foco se pinta en el
+           * botón). Al elegir, se ve el nombre del archivo, con «Quitar».
+           */}
+          <section data-campo="" data-archivo="">
+            <p id={campo("hojaDeVida-titulo")} data-titulo-archivo="">
+              Hoja de vida (PDF, máximo {MAX_PDF_MB} MB)
+              <span className="text-red-700">
+                {" *"}
+                <span className="sr-only">(obligatorio)</span>
+              </span>
+            </p>
+            <div data-adjuntar-fila="">
+              <input
+                ref={entradaArchivo}
+                id={campo("hojaDeVida")}
+                name="hojaDeVida"
+                type="file"
+                accept="application/pdf,.pdf"
+                className="sr-only"
+                aria-labelledby={campo("hojaDeVida-titulo")}
+                aria-invalid={errores.hojaDeVida ? true : undefined}
+                aria-describedby={errores.hojaDeVida ? campo("hojaDeVida-error") : undefined}
+                onChange={alElegirArchivo}
+              />
+              <label htmlFor={campo("hojaDeVida")} data-adjuntar="">
+                <IconPaperclip aria-hidden="true" size={18} stroke={2} />
+                {archivo ? "Cambiar PDF" : "Adjuntar PDF"}
+              </label>
+              {archivo ? (
+                <span data-archivo-elegido="">
+                  <span data-nombre-archivo="">{archivo.name}</span>
+                  <button type="button" data-quitar="" onClick={quitarArchivo}>
+                    Quitar<span className="sr-only"> el archivo {archivo.name}</span>
+                  </button>
+                </span>
+              ) : (
+                <span data-sin-archivo="">Ningún archivo seleccionado</span>
+              )}
+            </div>
+            <span aria-live="polite" className="sr-only">
+              {archivo ? `Archivo elegido: ${archivo.name}` : ""}
             </span>
-          </label>
-          {errores.autorizacion ? (
-            <p id={campo("autorizacion-error")} role="alert" data-error="">
-              {errores.autorizacion}
-            </p>
-          ) : null}
-        </section>
+            {errores.hojaDeVida ? (
+              <p id={campo("hojaDeVida-error")} role="alert" data-error="">
+                {errores.hojaDeVida}
+              </p>
+            ) : null}
+          </section>
 
-        {siteKey ? <Turnstile siteKey={siteKey} reinicio={reinicio} /> : null}
+          <section data-campo="" data-autorizacion="">
+            <label htmlFor={campo("autorizacion")}>
+              <input
+                id={campo("autorizacion")}
+                name="autorizacion"
+                type="checkbox"
+                required
+                aria-invalid={errores.autorizacion ? true : undefined}
+                aria-describedby={errores.autorizacion ? campo("autorizacion-error") : undefined}
+              />
+              <span>
+                Autorizo el tratamiento de mis datos personales según la{" "}
+                <a href={RUTA_POLITICA_DATOS} target="_blank" rel="noopener">
+                  política de tratamiento de datos
+                  <span className="sr-only"> (se abre en otra pestaña)</span>
+                </a>
+                . <span className="text-red-700">*</span>
+                <span className="sr-only">(obligatorio)</span>
+              </span>
+            </label>
+            {errores.autorizacion ? (
+              <p id={campo("autorizacion-error")} role="alert" data-error="">
+                {errores.autorizacion}
+              </p>
+            ) : null}
+          </section>
+
+          {siteKey ? <Turnstile siteKey={siteKey} reinicio={reinicio} /> : null}
+        </div>
 
         <div className="flex flex-wrap items-center gap-4 pt-2">
           <button

@@ -66,6 +66,7 @@ export function VentanaFormulario({
 }) {
   const dialogo = useRef<HTMLDialogElement>(null);
   const empezoFuera = useRef(false);
+  const contenido = useRef<HTMLDivElement>(null);
 
   // Las mejoras F1–F4 (`animacionesVentana.ts`): las encendidas en el código y, solo fuera del sitio
   // publicado, recortadas por `?anim=`. En el servidor y al hidratar, todas las encendidas.
@@ -84,8 +85,59 @@ export function VentanaFormulario({
   useEffect(() => {
     const d = dialogo.current;
     if (!d) return;
-    if (abierta && !d.open) d.showModal();
-    else if (!abierta && d.open) d.close();
+    if (abierta) {
+      d.removeAttribute("data-cerrando");
+      if (!d.open) d.showModal();
+      return;
+    }
+    if (!d.open) return;
+    // Se cierra con la misma suavidad con que se abre (fundido y escala al revés); con «reducir
+    // movimiento», de golpe.
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      d.close();
+      return;
+    }
+    d.setAttribute("data-cerrando", "");
+    const t = setTimeout(() => {
+      d.removeAttribute("data-cerrando");
+      d.close();
+    }, 180);
+    return () => clearTimeout(t);
+  }, [abierta]);
+
+  // ALTURA ANIMADA: cuando el contenido cambia de alto (llega el formulario, aparecen errores, la
+  // confirmación sustituye a los campos) la ventana crece o se encoge con una transición, sin saltos.
+  // En móvil (pantalla completa) y con «reducir movimiento» no se anima: queda a su altura natural.
+  useEffect(() => {
+    const d = dialogo.current;
+    const c = contenido.current;
+    if (!abierta || !d || !c) return;
+    const movil = matchMedia("(max-width: 767px)");
+    const reducido = matchMedia("(prefers-reduced-motion: reduce)");
+    let primera = true;
+    const observador = new ResizeObserver(() => {
+      if (movil.matches || reducido.matches) {
+        d.style.height = "";
+        return;
+      }
+      if (primera) {
+        // La primera medida se pone sin transición: no es un cambio, es el punto de partida.
+        d.style.transition = "none";
+        d.style.height = `${c.offsetHeight}px`;
+        requestAnimationFrame(() => {
+          d.style.transition = "";
+        });
+        primera = false;
+        return;
+      }
+      d.style.height = `${c.offsetHeight}px`;
+    });
+    observador.observe(c);
+    return () => {
+      observador.disconnect();
+      d.style.height = "";
+      d.style.transition = "";
+    };
   }, [abierta]);
 
   // Mientras está abierta, el catálogo de detrás no anima su cambio (`ventanaAbierta.ts`).
@@ -98,7 +150,11 @@ export function VentanaFormulario({
       aria-label={nombreAccesible ?? titulo}
       data-ventana-contacto=""
       data-anim={activas.join(" ")}
-      // Esc o `close()`: el estado se entera y el foco vuelve al botón.
+      // Esc: se cierra por el estado, para que lleve su animación de salida; el foco vuelve al botón.
+      onCancel={(e) => {
+        e.preventDefault();
+        alCerrar();
+      }}
       onClose={alCerrar}
       // Cierra al tocar el fondo, pero no si la pulsación empezó dentro (arrastrar texto).
       onPointerDown={(e) => {
@@ -108,7 +164,7 @@ export function VentanaFormulario({
         if (e.target === e.currentTarget && empezoFuera.current) alCerrar();
       }}
     >
-      <div className={estilos.contenido}>
+      <div ref={contenido} className={estilos.contenido}>
         <div className={estilos.cabecera}>
           <h2 className={estilos.titulo}>{titulo}</h2>
           <button type="button" className={estilos.cerrar} onClick={alCerrar}>

@@ -276,8 +276,20 @@ function tapados(donde) {
       el.closest("[aria-hidden='true'], [inert]")
     )
       continue;
-    const r = el.getBoundingClientRect();
-    if (r.width < 1 || r.height < 1 || getComputedStyle(el).visibility === "hidden") continue;
+    // Solo la parte VISIBLE: una miniatura desplazada fuera de su fila no está bajo el botón.
+    const b = el.getBoundingClientRect();
+    const r = { left: b.left, right: b.right, top: b.top, bottom: b.bottom };
+    for (let a = el.parentElement; a && a !== document.body; a = a.parentElement) {
+      const e = getComputedStyle(a);
+      if (e.overflowX === "visible" && e.overflowY === "visible") continue;
+      const c = a.getBoundingClientRect();
+      r.left = Math.max(r.left, c.left);
+      r.right = Math.min(r.right, c.right);
+      r.top = Math.max(r.top, c.top);
+      r.bottom = Math.min(r.bottom, c.bottom);
+    }
+    if (r.right - r.left < 1 || r.bottom - r.top < 1) continue;
+    if (getComputedStyle(el).visibility === "hidden") continue;
     const w = Math.min(r.right, f.right) - Math.max(r.left, f.left);
     const h = Math.min(r.bottom, f.bottom) - Math.max(r.top, f.top);
     if (w > 2 && h > 2) {
@@ -290,6 +302,7 @@ function tapados(donde) {
         tipo: "tapado",
         detalle: `<${el.tagName.toLowerCase()}> «${texto.slice(0, 50)}» bajo el WhatsApp (${donde})`,
         selector: `[data-qa-desborde="${el.dataset.qaDesborde}"]`,
+        donde,
       });
     }
   }
@@ -335,7 +348,14 @@ for (const vista of vistas) {
       for (const f of fila.fallos) if (f.selector && !porTipo.has(f.tipo)) porTipo.set(f.tipo, f);
       for (const [tipo, f] of porTipo) {
         const el = pagina.locator(f.selector).first();
+        // Lo tapado, en la posición donde se midió (arriba o abajo del todo); lo demás, a la vista.
         if (f.tipo !== "tapado") await el.scrollIntoViewIfNeeded().catch(() => {});
+        else
+          await pagina.evaluate(
+            (abajo) => scrollTo(0, abajo ? document.documentElement.scrollHeight : 0),
+            f.donde === "abajo",
+          );
+        await pagina.waitForTimeout(300);
         await el
           .evaluate((e) => {
             e.style.outline = "3px solid #ff0000";

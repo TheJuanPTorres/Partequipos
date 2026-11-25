@@ -22,6 +22,8 @@ type Props = {
     "aria-invalid": boolean | undefined;
     "aria-describedby": string | undefined;
     required: boolean | undefined;
+    /** El botón flotante de WhatsApp sube lo justo si cae sobre el campo (`WhatsAppFlotante`). */
+    "data-evita-flotante": "";
   }) => ReactNode;
 };
 
@@ -58,6 +60,7 @@ export function Campo({ id, etiqueta, error, obligatorio, ayuda, children }: Pro
           "aria-invalid": error ? true : undefined,
           "aria-describedby": describedBy || undefined,
           required: obligatorio || undefined,
+          "data-evita-flotante": "",
         })}
       </div>
 

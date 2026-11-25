@@ -66,7 +66,9 @@ export const CategoriaTecnica: CollectionConfig = {
    * las páginas de repuestos» (`ordenMarca`); la migración parte de ese orden (vacíos al final,
    * por nombre). Desde el #516 la web ya no lee `ordenMarca`: el campo va OCULTO hasta su borrado
    * con migración (2026-11-19, dirección).
-   * «Posición en la portada» (`ordenPortada`) se queda: además decide si sale en la portada.
+   * La PORTADA también sigue este orden (tanda 24, Juan Pablo, 2026-11-25: «un solo orden»): la
+   * casilla «En la portada» decide si sale, y «Posición en la portada» (`ordenPortada`) va OCULTA
+   * hasta su borrado en la limpieza (PR 11).
    */
   orderable: true,
   // Se abre YA ordenada por el arrastre: así se puede arrastrar sin pulsar antes el icono ⇅.
@@ -262,11 +264,27 @@ export const CategoriaTecnica: CollectionConfig = {
         },
       },
       /*
-       * Fase E: QUÉ categorías salen en la sección 5 de la portada y en qué
-       * orden. Un solo campo para las dos cosas: vacío, no sale. Así el orden
-       * de ux-9 (Blades, Llantas, Lubricantes, Filtración) no depende del nombre.
+       * QUÉ categorías salen en «Venta de repuestos» de la portada (tanda 24, 2026-11-25): la
+       * casilla. El ORDEN es el de arrastrar en la lista, el mismo de toda la web. La migración
+       * `…_categorias_en_portada` la marca en las que tenían «Posición en la portada».
        */
       {
+        name: "enPortada",
+        type: "checkbox",
+        label: "En la portada",
+        defaultValue: false,
+        admin: {
+          position: "sidebar",
+          description:
+            "Marcada: sale en «Venta de repuestos» de la portada, en el orden de la lista de Categorías técnicas (arrastrando).",
+        },
+      },
+      /*
+       * Fase E: el número que decidía qué categorías salían en la portada y en qué orden. Desde
+       * el 2026-11-25 la web no lo lee (casilla «En la portada» y orden por arrastre): OCULTO sin
+       * tocar el esquema, hasta su borrado en la limpieza (PR 11).
+       */
+      ocultoSinUso({
         name: "ordenPortada",
         type: "number",
         min: 1,
@@ -276,7 +294,7 @@ export const CategoriaTecnica: CollectionConfig = {
           description:
             "Vacío: no sale en la portada. 1, 2, 3… es el orden de las tarjetas de «Venta de repuestos».",
         },
-      },
+      }),
       /*
        * Páginas de marca de repuestos: las categorías son COMUNES a todas las
        * marcas (decisión de dirección, 2026-10-13). Aquí solo el ORDEN: vacío,
@@ -494,7 +512,7 @@ export const CategoriaTecnica: CollectionConfig = {
         fondoHero: "cabecera",
         imagenPortada: "tarjeta",
       },
-      avanzado: ["ordenPortada"],
+      avanzado: ["enPortada", "ordenPortada"],
     },
   ),
 };

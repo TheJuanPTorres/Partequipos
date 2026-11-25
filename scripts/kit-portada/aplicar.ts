@@ -332,7 +332,7 @@ async function aplicar(): Promise<void> {
     }
   }
   for (const c of cats) {
-    if (typeof c.ordenPortada === "number" && !conPieza.has(c.id)) {
+    if (c.enPortada === true && !conPieza.has(c.id)) {
       log(`⚠ ${c.slug} sale en la portada y se queda sin pieza (usa su «Imagen de la tarjeta»)`);
     }
   }

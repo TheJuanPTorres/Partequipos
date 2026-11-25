@@ -100,6 +100,39 @@
   }
 }
 
+/*
+ * SALIDA (t8, fase 2): simétrica a la entrada, fundido y escala al revés (`VentanaFormulario` pone
+ * `data-cerrando` y cierra a los 180 ms). La altura sigue al contenido con una transición.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  .ventana {
+    transition: height 260ms cubic-bezier(0.33, 0, 0.2, 1);
+  }
+
+  .ventana[open][data-cerrando],
+  .ventana[data-anim~="F1"][open][data-cerrando] {
+    animation: sale 180ms cubic-bezier(0.4, 0, 1, 1) forwards;
+  }
+
+  .ventana[open][data-cerrando]::backdrop,
+  .ventana[data-anim~="F1"][open][data-cerrando]::backdrop {
+    animation: saleFondo 180ms cubic-bezier(0.4, 0, 1, 1) forwards;
+  }
+}
+
+@keyframes sale {
+  to {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+}
+
+@keyframes saleFondo {
+  to {
+    opacity: 0;
+  }
+}
+
 @keyframes aparece {
   from {
     opacity: 0;

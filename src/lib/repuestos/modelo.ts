@@ -10,15 +10,18 @@ const texto = (v: string | null | undefined) => v?.trim() ?? "";
 
 /**
  * Las categorías de la página de un modelo: las que su tipo eligió en
- * «Categorías en las páginas de sus modelos», en ESE orden. Una que ya no
- * existe (o sin nombre) no sale. `todas` son las categorías técnicas.
+ * «Categorías en las páginas de sus modelos», en el ORDEN POR ARRASTRE de la
+ * lista de categorías técnicas, el mismo de todo el sitio (tanda 24, Juan Pablo y
+ * dirección, 2026-11-25; antes iban en el orden en que se eligieron en el tipo).
+ * Una que ya no existe (o sin nombre) no sale. `todas` son las categorías técnicas,
+ * ya en su orden (`getCategoriasParaMarca`).
  */
 export function categoriasDelTipo(
   tipo: Pick<TiposEquipo, "categoriasModelo">,
   todas: CategoriasTecnica[],
 ): CategoriasTecnica[] {
-  const ids = (tipo.categoriasModelo ?? []).map((c) => (typeof c === "number" ? c : c.id));
-  return ids.flatMap((id) => todas.filter((c) => c.id === id && texto(c.nombre)));
+  const ids = new Set((tipo.categoriasModelo ?? []).map((c) => (typeof c === "number" ? c : c.id)));
+  return todas.filter((c) => ids.has(c.id) && texto(c.nombre));
 }
 
 type Nombres = {

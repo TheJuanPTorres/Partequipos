@@ -177,9 +177,19 @@ function panelDe(
 ): PanelMenu {
   return {
     elementos: apartadosVisibles(filas, desplegable).flatMap((a) =>
-      // Un enlace fijo, igual en los tres desplegables: tal cual se escribió en el panel.
+      // Un enlace fijo, igual en los tres desplegables: tal cual se escribió en el panel. A otro
+      // sitio (https://), en pestaña nueva y con su aviso, como los enlaces de la barra.
       a.tipo === TIPO_ENLACE
-        ? [{ tipo: "enlace" as const, enlace: { etiqueta: a.nombre, href: a.enlace } }]
+        ? [
+            {
+              tipo: "enlace" as const,
+              enlace: {
+                etiqueta: a.nombre,
+                href: a.enlace,
+                ...(/^https?:\/\//i.test(a.enlace) ? { externo: true as const } : {}),
+              },
+            },
+          ]
         : piezas(a),
     ),
   };

@@ -774,6 +774,11 @@ describe("megamenú: apartados del panel (tanda 24, tarea 1)", () => {
       "verTodo:Todo",
       "enlace:Tienda",
     ]);
+    // Un enlace fijo a otro sitio se marca para abrirse en pestaña nueva; uno del sitio, no.
+    assert.deepEqual(partesDe(panelRepuestosReal(d)).finales, [
+      { etiqueta: "Política", href: "/politica/" },
+      { etiqueta: "Tienda", href: "https://example.com/", externo: true },
+    ]);
     assert.deepEqual(nivel1(panelMaquinariaReal(d)), [
       "grupo:Usada",
       "enlace:Aditamentos",

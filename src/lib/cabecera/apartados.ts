@@ -114,13 +114,22 @@ export function apartadosVisibles(
   return salen;
 }
 
-/** Validación de la lista en el panel: una lista automática no puede ir dos veces. */
+/** Validación de la lista en el panel: ni una lista automática dos veces ni dos nombres iguales. */
 export function validarApartados(filas: unknown, desplegable: Desplegable): true | string {
   if (!Array.isArray(filas)) return true;
   const etiquetas = new Map<string, string>(
     TIPOS_APARTADO[desplegable].map((t) => [t.value, t.label]),
   );
   const vistos = new Set<string>();
+  // Dos apartados con el mismo nombre se confundirían al desplegarlos (y para quien lee el menú).
+  const nombres = new Set<string>();
+  for (const fila of filas as ApartadoMenu[]) {
+    const nombre = fila?.nombre?.trim().toLocaleLowerCase("es") ?? "";
+    if (nombre && nombres.has(nombre)) {
+      return `Hay dos apartados que se llaman «${fila.nombre?.trim()}»: cambia el nombre de uno.`;
+    }
+    if (nombre) nombres.add(nombre);
+  }
   for (const fila of filas as ApartadoMenu[]) {
     const tipo = fila?.tipo ?? "";
     if (!tipo || tipo === TIPO_ENLACE) continue;

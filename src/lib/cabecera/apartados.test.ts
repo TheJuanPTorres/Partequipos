@@ -74,5 +74,11 @@ describe("apartados del menú principal (tanda 24, tarea 1)", () => {
     assert.match(String(validarApartados(repetida, "repuestos")), /dos veces/);
     assert.equal(validarApartados(repetida.slice(0, 3), "repuestos"), true);
     assert.equal(validarApartados(null, "repuestos"), true);
+    // Dos apartados con el mismo nombre (aunque cambien mayúsculas o espacios), tampoco.
+    const mismoNombre = [
+      { tipo: "marcas", nombre: "Marcas" },
+      { tipo: "enlace", nombre: " marcas ", enlace: "/b/" },
+    ];
+    assert.match(String(validarApartados(mismoNombre, "repuestos")), /se llaman/);
   });
 });

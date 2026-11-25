@@ -441,7 +441,7 @@ export function ContenidoMenu({ panel, alElegir }: { panel: PanelMenu; alElegir:
         if (el.tipo === "grupo") {
           return (
             <Acordeon
-              key={`grupo-${el.grupo.titulo}`}
+              key={`grupo-${i}-${el.grupo.titulo}`}
               grupo={el.grupo}
               nivel={1}
               alElegir={alElegir}
@@ -451,14 +451,29 @@ export function ContenidoMenu({ panel, alElegir }: { panel: PanelMenu; alElegir:
         return (
           // Un enlace suelto con el recuadro de los acordeones de nivel 1.
           <div key={`enlace-${i}`} className={estilos.acordeon} data-nivel={1}>
-            <Link
-              href={el.enlace.href}
-              className={`${estilos.titulo} ${estilos.tituloEnlace}`}
-              onClick={alElegir}
-            >
-              <IconChevronRight aria-hidden="true" focusable="false" stroke={2.5} />
-              {el.enlace.etiqueta}
-            </Link>
+            {el.enlace.externo ? (
+              // Un enlace fijo a otro sitio: pestaña nueva, icono y aviso, como las marcas externas.
+              <a
+                href={el.enlace.href}
+                className={`${estilos.titulo} ${estilos.tituloEnlace}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`${el.enlace.etiqueta} (${AVISO_OTRA_PESTANA})`}
+                onClick={alElegir}
+              >
+                <IconExternalLink aria-hidden="true" focusable="false" stroke={2} />
+                {el.enlace.etiqueta}
+              </a>
+            ) : (
+              <Link
+                href={el.enlace.href}
+                className={`${estilos.titulo} ${estilos.tituloEnlace}`}
+                onClick={alElegir}
+              >
+                <IconChevronRight aria-hidden="true" focusable="false" stroke={2.5} />
+                {el.enlace.etiqueta}
+              </Link>
+            )}
           </div>
         );
       })}

@@ -111,7 +111,9 @@ escritorio y para el menú móvil (pintan lo mismo).
 - **Sin apartados visibles**, el desplegable no abre un panel vacío: su entrada
   de la barra queda como enlace.
 - **No cambia:** los textos interiores de cada lista («Ver todas las marcas»,
-  «Por marca», «Por tipo de máquina»), que siguen en el código, ni un enlace
-  fijo a otro sitio, que se abre en la misma pestaña (como la política).
+  «Por marca», «Por tipo de máquina»), que siguen en el código.
+- **Un enlace fijo a otro sitio** (https://) se abre en pestaña nueva, con el
+  icono y el aviso de las marcas externas del menú. Dos apartados no pueden
+  llamarse igual (el panel lo rechaza).
 
 Lógica en `src/lib/cabecera/apartados.ts` y `src/lib/megamenu.ts`.

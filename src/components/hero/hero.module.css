@@ -1148,3 +1148,81 @@
     bottom: auto;
   }
 }
+
+/* --------------------------------------------- ventanas bajas o muy estrechas */
+
+/*
+ * NADA CORTADO NI TAPADO CON ZOOM (2026-11-25, regla de Juan Pablo). Dos casos que la composición
+ * de móvil no aguantaba:
+ *
+ * 1. VENTANA ANCHA Y BAJA (un móvil tumbado, o un portátil al 200 %: 720 × 450): el título crece
+ *    con el ancho (12vw) y la tarjeta solo con el alto (85vh), así que el título y la máquina
+ *    bajaban por debajo de la tarjeta, y el texto circular pisaba el título. La tarjeta mide al
+ *    menos lo que ocupan el título (74 px + hasta tres líneas de 12vw × 1,4), un mínimo de máquina
+ *    y lo de abajo (el texto circular llega a 354 px del borde inferior). En un móvil de pie no
+ *    cambia nada: ahí manda 85vh (a 360 × 740, 629 px frente a 624; a 390 × 844, 717 frente a 639).
+ */
+@media (max-width: 767px) {
+  .hero {
+    --hero-alto-min: max(85vh, calc(440px + 51vw));
+  }
+}
+
+/*
+ * 2. VENTANA MUY ESTRECHA (un móvil al 200 %: 195 px): el párrafo del vidrio pasa de 10 líneas y,
+ *    anclado sobre los controles, los tapaba junto con el título. Aquí todo va EN FLUJO, uno bajo
+ *    otro: título, máquina, vidrio y controles; la tarjeta crece lo que haga falta. El texto
+ *    circular, decorativo, no se pinta: no tiene sitio.
+ */
+@media (max-width: 319px) {
+  .hero {
+    --hero-alto-min: 0px;
+    --hero-texto-arriba: 28px;
+    --hero-texto-abajo: 0px;
+    --hero-maquina-lado: 12px;
+    --hero-maquina-aire: 12px;
+    --hero-vidrio-relleno: 14px;
+    --hero-gap: 12px;
+    --hero-flechas-margen-abajo: 16px;
+  }
+
+  .tarjeta {
+    justify-content: flex-start;
+  }
+
+  .capaTexto {
+    position: relative;
+    width: 100%;
+    inset: auto;
+  }
+
+  .capaMaquina {
+    height: 48cqi;
+    flex: none;
+  }
+
+  .vidrio {
+    position: relative;
+    top: auto;
+    right: auto;
+    bottom: auto;
+    order: 1;
+    width: calc(100% - 24px);
+    max-width: none;
+    /* El «+» debajo del párrafo: al lado no cabe una palabra larga. */
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .parrafo {
+    overflow-wrap: anywhere;
+  }
+
+  .fila {
+    order: 2;
+  }
+
+  .circular {
+    display: none;
+  }
+}

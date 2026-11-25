@@ -589,6 +589,8 @@ for (const c of p.categorias) {
       tituloPortada: c.titulo,
       enlace: c.enlace,
       ordenPortada: c.orden,
+      // Desde el 2026-11-25 sale en la portada por la casilla (el orden es el de arrastrar).
+      enPortada: typeof c.orden === "number",
       icono: c.icono,
     },
   });

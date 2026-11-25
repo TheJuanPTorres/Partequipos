@@ -32,7 +32,13 @@
   --hero-radio: 30px;
 
   /* --- Tarjeta. El relleno 50/30/30 es SOLO ≤1024 px; en escritorio son 10 px. --- */
-  --hero-alto-min: 86vh;
+  /*
+   * Con SUELO en píxeles (2026-11-25): en una ventana baja (un portátil con zoom: 1152 × 520) el
+   * 86 % del alto no llega para el título, el vidrio y los controles, y el vidrio se metía bajo
+   * el título. 560 px es lo que ocupan en escritorio un título de una línea (47 + 168), el aire
+   * de la máquina y el vidrio con su hueco de abajo (285). Con 650 px de alto o más manda 86vh.
+   */
+  --hero-alto-min: max(86vh, 560px);
   --hero-relleno: 10px;
   --hero-gap: 20px;
 
@@ -887,6 +893,9 @@
   .hero {
     /* Home V2 a 1010 (2026-10-16): título de 70 px a 103 px del borde; antes, 65 y 50. */
     --hero-titulo-tam: 70px;
+    /* En tablet, el suelo es 640 px: título de dos líneas (103 + 196) y, debajo, el texto
+       circular con su hueco (322). Una tablet tumbada (1024 × 768) sigue en 86vh (660). */
+    --hero-alto-min: max(86vh, 640px);
     --hero-relleno: 50px 30px 30px;
     --hero-texto-arriba: 103px;
     --hero-maquina-ancho: 631px;

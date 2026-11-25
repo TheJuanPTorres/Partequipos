@@ -13,6 +13,7 @@ import {
   soloPersonal,
 } from "../lib/seguridad/acceso";
 import { VERSIONES_SIN_BORRADORES, versionesRecientesPrimero } from "../lib/borradores";
+import { VISTA_PREVIA_MODELO } from "../lib/vistaPrevia/enVivo";
 import { avisoField } from "../lib/fields/avisoField";
 import { validarSerieDelModelo } from "../lib/repuestos/series";
 import { conPestanas } from "../lib/fields/pestanasFicha";
@@ -38,6 +39,8 @@ export const ModeloRepuesto: CollectionConfig = {
     useAsTitle: "nombre",
     group: "Repuestos",
     // El código («320D») es como busca un comercial; el nombre solo no basta.
+    // Vista previa en vivo (tanda 21, tarea 3, fase 2, punto 5): la ficha se pinta mientras se escribe.
+    livePreview: VISTA_PREVIA_MODELO,
   },
   access: {
     read: lecturaContenido,

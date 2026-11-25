@@ -5,9 +5,17 @@
  * en Filtros Donaldson. LAS SIGLAS se respetan en mayúsculas (aprobación de Juan Pablo, #421):
  * una palabra de dos o más letras escrita toda en mayúsculas («(GETS)») no se baja. Espacios de
  * sobra fuera; sin nombre, sin hueco doble.
+ *
+ * SIN «repuesto de repuestos» (2026-11-24, Juan Pablo): si el nombre ya empieza por «Repuestos»
+ * («Repuestos Motor Diesel», «Repuestos para motor»), esa palabra y su «de» o «para» se quitan:
+ * «Elige el repuesto de motor diesel que necesitas». Solo al principio: «Kits de repuestos» se
+ * queda igual.
  */
 export function tituloEligeRepuesto(nombre: string, minusculas: boolean): string {
-  const limpio = nombre.trim().replace(/\s+/g, " ");
+  const limpio = nombre
+    .trim()
+    .replace(/\s+/g, " ")
+    .replace(/^repuestos?(?: (?:de|para))?(?: |$)/i, "");
   const n = minusculas ? limpio.split(" ").map(enMinusculasSalvoSigla).join(" ") : limpio;
   return n ? `Elige el repuesto de ${n} que necesitas` : "Elige el repuesto que necesitas";
 }

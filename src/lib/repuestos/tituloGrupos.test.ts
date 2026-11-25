@@ -39,3 +39,30 @@ test("espacios de sobra y nombre vacío", () => {
   );
   assert.equal(tituloEligeRepuesto("  ", true), "Elige el repuesto que necesitas");
 });
+
+test("sin «repuesto de repuestos»: el «Repuestos» inicial del nombre se quita", () => {
+  assert.equal(
+    tituloEligeRepuesto("Repuestos Motor Diesel", true),
+    "Elige el repuesto de motor diesel que necesitas",
+  );
+  assert.equal(
+    tituloEligeRepuesto("Repuestos para Motor", true),
+    "Elige el repuesto de motor que necesitas",
+  );
+  assert.equal(
+    tituloEligeRepuesto("REPUESTOS DE TRANSMISIÓN", false),
+    "Elige el repuesto de TRANSMISIÓN que necesitas",
+  );
+  assert.equal(tituloEligeRepuesto("Repuestos", true), "Elige el repuesto que necesitas");
+});
+
+test("«repuestos» en medio del nombre, o una palabra que solo empieza igual, no se toca", () => {
+  assert.equal(
+    tituloEligeRepuesto("Kits de Repuestos", true),
+    "Elige el repuesto de kits de repuestos que necesitas",
+  );
+  assert.equal(
+    tituloEligeRepuesto("Repuestosa Diesel", true),
+    "Elige el repuesto de repuestosa diesel que necesitas",
+  );
+});

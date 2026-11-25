@@ -7,6 +7,7 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 import type { CollectionConfig, Field } from "payload";
 
 import { CAMPOS_MENU, type ColeccionDelMenu } from "../../lib/megamenuCampos";
+import { ORDEN_ARRASTRE, type ColeccionOrdenable } from "../../lib/ordenArrastre";
 import { cambiaElMenu } from "./megamenuHooks";
 
 describe("megamenú: cuándo hay que revalidar el sitio", () => {
@@ -46,14 +47,16 @@ describe("megamenú: cuándo hay que revalidar el sitio", () => {
       nombre: "Filtración",
       slug: "filtros",
       icono: "filtro",
-      ordenMarca: 1,
+      _order: "a1",
       imagen: 5,
     };
     const ct = "categorias-tecnicas";
     assert.equal(cambiaElMenu("update", { ...cat, imagen: 6 }, cat, ct), true);
     assert.equal(cambiaElMenu("update", { ...cat, imagen: null }, cat, ct), true);
     assert.equal(cambiaElMenu("update", { ...cat, icono: "motor" }, cat, ct), false);
-    assert.equal(cambiaElMenu("update", { ...cat, ordenMarca: 2 }, cat, ct), true);
+    // Arrastrar en el panel (el `_order`) refresca el menú; el `ordenMarca` oculto, ya no.
+    assert.equal(cambiaElMenu("update", { ...cat, _order: "a2" }, cat, ct), true);
+    assert.equal(cambiaElMenu("update", { ...cat, ordenMarca: 2 }, cat, ct), false);
     // La foto de un tipo no sale en el menú: no revalida todo el sitio.
     assert.equal(cambiaElMenu("update", { ...cat, imagen: 6 }, cat, "tipos-equipo"), false);
   });
@@ -217,6 +220,28 @@ describe("megamenú: la lista de campos (CAMPOS_MENU) no se separa de nada", () 
       if (colecciones.includes(slug))
         assert.ok(!/select: \{/.test(trozo), `«${slug}» lleva un select a mano`);
     }
+  });
+
+  /*
+   * 2026-11-25 (tanda 24): las categorías técnicas, las marcas y los tipos de repuestos no
+   * llevaban su clave de orden en la lista, así que arrastrar en el panel NO refrescaba el menú
+   * (ni la banda de marcas de la portada, en la misma caché del marco) hasta otro despliegue.
+   */
+  it("cada colección ordenable de la lista lleva su clave de orden por arrastre", () => {
+    for (const slug of colecciones) {
+      if (!(slug in ORDEN_ARRASTRE)) continue;
+      const clave = ORDEN_ARRASTRE[slug as ColeccionOrdenable];
+      assert.ok(
+        (CAMPOS_MENU[slug] as readonly string[]).includes(clave),
+        `«${slug}»: falta «${clave}» en CAMPOS_MENU (arrastrar no refrescaría el menú)`,
+      );
+    }
+  });
+
+  it("el guardarraíl de la clave de orden falla cuando debe", () => {
+    const sinClave = { marcas: ["nombre", "slug"] } as Record<string, readonly string[]>;
+    assert.equal(sinClave.marcas!.includes(ORDEN_ARRASTRE.marcas), false);
+    assert.equal(cambiaElMenu("update", { _order: "a2" }, { _order: "a1" }, "marcas"), true);
   });
 
   it("el guardarraíl falla cuando debe: un campo inventado no existe en su colección", async () => {

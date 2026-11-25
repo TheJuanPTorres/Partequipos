@@ -75,7 +75,7 @@ export async function PaginaModeloRepuesto({
   const ruta = rutas.modelo(marca.slug, seg, modelo.slug);
 
   const logo = logoConAlt(marca);
-  // Las categorías elegidas en el tipo, en su orden.
+  // Las categorías elegidas en el tipo, en el orden por arrastre de todo el sitio.
   const delTipo = categoriasDelTipo(tipo, categorias);
 
   const breadcrumbs = [

@@ -127,6 +127,51 @@ async function casos(): Promise<Caso[]> {
       })),
     });
   }
+  /*
+   * Los mismos listados en sus OTROS sitios (tanda 24, 2026-11-25): el megamenú y la página de
+   * tipo. Comparten par con el índice: el intercambio se hace una vez (`intercambiar`).
+   */
+  {
+    const marcas = (await docs("marcas", "_order")).map((m) => ({
+      id: m.id,
+      clave: s(m._order),
+      marca: barra(rutas.marca(s(m.slug))),
+    }));
+    lista.push({
+      nombre: "Repuestos: marcas (megamenú)",
+      ...COLECCION("marcas"),
+      pagina: "/",
+      zona: "header",
+      elementos: marcas,
+    });
+    const cats = (await docs("categorias-tecnicas", "_order"))
+      .filter((c) => !c.padre)
+      .map((c) => ({
+        id: c.id,
+        clave: s(c._order),
+        marca: barra(rutas.categoriaRepuestos(s(c.slug))),
+      }));
+    lista.push({
+      nombre: "Repuestos: categorías técnicas (megamenú)",
+      ...COLECCION("categorias-tecnicas"),
+      pagina: "/",
+      zona: "header",
+      elementos: cats,
+    });
+    // «Nuestras categorías de repuestos» de una página de tipo (todas las normales, en su orden).
+    const slugMarca = new Map((await docs("marcas", "_order")).map((m) => [m.id, s(m.slug)]));
+    const tipo = (await docs("tipos-equipo", "_tipos-equipo_tipos_order")).find(
+      (t) => !t.slugPadre && slugMarca.get(idDe(t.marca) ?? -1),
+    );
+    if (tipo)
+      lista.push({
+        nombre: "Repuestos: categorías técnicas (página de tipo)",
+        ...COLECCION("categorias-tecnicas"),
+        pagina: rutas.tipo(slugMarca.get(idDe(tipo.marca) ?? -1)!, s(tipo.slug)),
+        zona: "main",
+        elementos: cats,
+      });
+  }
   const slugMarcaRepuestos = new Map(
     (await docs("marcas", "_order")).map((m) => [m.id, s(m.slug)]),
   );
@@ -411,12 +456,32 @@ for (const c of lista) {
     lineas.set(c, `FALLO  ${c.nombre}: ya hoy no sale en el orden del panel`);
     continue;
   }
+  // Un elemento ya intercambiado con OTRO compañero en otro sitio: dos intercambios se pisarían.
+  const usado = pares.find(
+    (p) =>
+      p.c.tabla === c.tabla &&
+      p.c.columna === c.columna &&
+      [p.a.id, p.b.id].some((id) => id === a.id || id === b.id) &&
+      !(p.a.id === a.id && p.b.id === b.id),
+  );
+  if (usado) {
+    lineas.set(c, `—      ${c.nombre}: comparte elemento con «${usado.c.nombre}»; no se prueba`);
+    continue;
+  }
   pares.push({ c, a, b });
 }
 
+/**
+ * Cada par se intercambia UNA vez aunque salga en varios sitios (el índice y el menú comparten
+ * categorías): dos intercambios lo dejarían como estaba y el caso daría un falso fallo.
+ */
+const unicos = [
+  ...new Map(pares.map((p) => [`${p.c.tabla}.${p.c.columna}:${p.a.id}:${p.b.id}`, p])).values(),
+];
+
 let fallos = [...lineas.values()].filter((l) => l.startsWith("FALLO")).length;
 try {
-  for (const { c, a, b } of pares) {
+  for (const { c, a, b } of unicos) {
     await ponerClave(c, a.id, b.clave);
     await ponerClave(c, b.id, a.clave);
   }
@@ -430,7 +495,7 @@ try {
     }
   }
   if (FASE === "intercambiar") {
-    const guardadas: Guardada[] = pares.flatMap(({ c, a, b }) => [
+    const guardadas: Guardada[] = unicos.flatMap(({ c, a, b }) => [
       { tabla: c.tabla, columna: c.columna, id: a.id, clave: a.clave },
       { tabla: c.tabla, columna: c.columna, id: b.id, clave: b.clave },
     ]);
@@ -443,14 +508,14 @@ try {
 } catch (e) {
   // Un fallo a mitad de una fase «intercambiar» también devuelve.
   if (FASE === "intercambiar")
-    for (const { c, a, b } of pares) {
+    for (const { c, a, b } of unicos) {
       await ponerClave(c, a.id, a.clave);
       await ponerClave(c, b.id, b.clave);
     }
   throw e;
 } finally {
   if (FASE !== "intercambiar") {
-    for (const { c, a, b } of pares) {
+    for (const { c, a, b } of unicos) {
       await ponerClave(c, a.id, a.clave);
       await ponerClave(c, b.id, b.clave);
     }

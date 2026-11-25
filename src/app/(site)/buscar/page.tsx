@@ -181,7 +181,7 @@ export default async function BuscarPage({ searchParams }: Props) {
           autoComplete="off"
           maxLength={LONGITUD_MAXIMA}
         />
-        <button type="submit" className={`${estilos.boton} texto-etiqueta`}>
+        <button type="submit" data-evita-flotante="" className={`${estilos.boton} texto-etiqueta`}>
           <IconSearch aria-hidden="true" focusable="false" stroke={1.75} />
           Buscar
         </button>

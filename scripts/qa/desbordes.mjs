@@ -336,9 +336,18 @@ for (const vista of vistas) {
       fila.fallos.push(...(await pagina.evaluate(medir)));
       fila.fallos.push(...(await pagina.evaluate(tapados, "arriba")));
       // Con `DESBORDES_CAPTURAS=1`, además, la vista de arriba de cada página (antes y después).
+      // Con un selector (`DESBORDES_CAPTURAS='main section[class*=principal]'`), la captura es de
+      // ese elemento (la tarjeta de la ficha, aunque quede más abajo).
       if (process.env.DESBORDES_CAPTURAS) {
         const nombre = `${ruta.replace(/\W+/g, "-").replace(/^-|-$/g, "") || "portada"}-${vista.nombre.replace("@", "z")}.png`;
-        await pagina.screenshot({ path: path.join(carpeta, nombre) });
+        const sel = process.env.DESBORDES_CAPTURAS;
+        const el = sel === "1" ? null : pagina.locator(sel).first();
+        if (el && (await el.count())) {
+          await el.scrollIntoViewIfNeeded();
+          await pagina.waitForTimeout(300);
+          await el.screenshot({ path: path.join(carpeta, nombre) });
+          await pagina.evaluate(() => scrollTo(0, 0));
+        } else await pagina.screenshot({ path: path.join(carpeta, nombre) });
       }
       await pagina.evaluate(() => scrollTo(0, document.documentElement.scrollHeight));
       await pagina.waitForTimeout(600);

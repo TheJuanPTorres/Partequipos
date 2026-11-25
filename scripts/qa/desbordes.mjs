@@ -151,6 +151,9 @@ function medir() {
     const r = el.getBoundingClientRect();
     for (let a = el.parentElement; a && a !== document.body; a = a.parentElement) {
       const e = getComputedStyle(a);
+      // Un contenedor con desplazamiento propio (`auto`/`scroll`): lo de dentro se alcanza
+      // desplazándolo (la tira de marcas de la portada). Lo decide él, no los de fuera.
+      if (/auto|scroll/.test(`${e.overflowX} ${e.overflowY}`)) break;
       const cortaY = e.overflowY === "hidden" || e.overflowY === "clip";
       const cortaX = e.overflowX === "hidden" || e.overflowX === "clip";
       if (!cortaY && !cortaX) continue;

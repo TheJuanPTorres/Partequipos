@@ -245,7 +245,8 @@
   animation: kenBurns calc(var(--hero-pase) + var(--hero-fundido)) linear forwards;
 }
 
-.hero[data-pausado] .fondo {
+.hero[data-pausado] .fondo,
+.hero[data-oculta] .fondo {
   animation-play-state: paused;
 }
 
@@ -532,7 +533,18 @@
   text-transform: none;
 }
 
-.hero[data-pausado] .circular svg {
+/* Una capa por texto, en el mismo círculo que gira: solo se ve la de la diapositiva activa. */
+.circular text {
+  opacity: 0;
+  transition: opacity var(--hero-fundido) var(--hero-curva);
+}
+
+.circular text[data-activo] {
+  opacity: 1;
+}
+
+.hero[data-pausado] .circular svg,
+.hero[data-oculta] .circular svg {
   animation-play-state: paused;
 }
 
@@ -694,7 +706,8 @@
   animation: progreso var(--hero-pase) linear forwards;
 }
 
-.hero[data-pausado] .punto::after {
+.hero[data-pausado] .punto::after,
+.hero[data-oculta] .punto::after {
   animation-play-state: paused;
 }
 
@@ -840,7 +853,8 @@
     animation: none;
   }
 
-  .capaFondo {
+  .capaFondo,
+  .circular text {
     transition: none;
   }
 }

@@ -36,7 +36,7 @@ describe("avisos de Payload en inglés", () => {
   it("traduce los conocidos y deja pasar el resto", () => {
     assert.equal(
       traducirAviso('To reorder the rows you must first sort them by the "Order" column'),
-      "Para cambiar el orden arrastrando, ordena antes la lista por la columna «Orden».",
+      "La lista está ordenada por otra columna. Pulsa el icono ⇅ de la izquierda para volver al orden personalizado.",
     );
     assert.equal(traducirAviso("Guardado"), "Guardado");
     const nodo = { tipo: "react" };

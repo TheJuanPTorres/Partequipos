@@ -75,6 +75,11 @@ async function ordenDeLaConfiguracion(): Promise<{
   return { arrastre, listado };
 }
 
+/** Las colecciones ordenables (en su lista) que no se abren ordenadas por `_order`. */
+function sinOrdenPorDefecto(lista: CollectionConfig[]): string[] {
+  return lista.filter((c) => c.orderable && c.defaultSort !== "_order").map((c) => c.slug);
+}
+
 function ficheros(dir: string): string[] {
   return fs.readdirSync(dir, { withFileTypes: true }).flatMap((e) => {
     const p = path.join(dir, e.name);
@@ -169,6 +174,22 @@ describe("orden por arrastre en la web", () => {
     // Una colección ordenable en su lista Y por un join tendría dos órdenes: el de la lista no se
     // pintaría (tanda 21: se quitó el de «Equipos nuevos» y «Tipos de maquinaria nueva»).
     assert.deepEqual(Object.fromEntries([...listado].sort()), {});
+  });
+
+  it("toda colección ordenable se abre ya ordenada por su arrastre (tanda 23, «Categorías de maquinaria usada»)", async () => {
+    // Sin `defaultSort: "_order"`, la lista se abre sin orden y Payload no deja arrastrar hasta pulsar
+    // el icono ⇅ (`OrderableTable`): Juan Pablo se atascó ahí.
+    assert.deepEqual(sinOrdenPorDefecto(await colecciones()), []);
+    // Comprobación del guardián: una ordenable sin `defaultSort`, o con otro, falla.
+    assert.deepEqual(
+      sinOrdenPorDefecto([
+        { slug: "a", orderable: true, fields: [] },
+        { slug: "b", orderable: true, defaultSort: "nombre", fields: [] },
+        { slug: "c", orderable: true, defaultSort: "_order", fields: [] },
+        { slug: "d", fields: [] },
+      ] as CollectionConfig[]),
+      ["a", "b"],
+    );
   });
 
   it("toda consulta pública de una colección ordenable ordena por su arrastre", () => {

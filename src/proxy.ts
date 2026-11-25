@@ -3,6 +3,7 @@ import type { NextRequest } from "next/server";
 
 import { crearCacheMapa } from "@/lib/redirects/cacheMapa";
 import { resumenDeRuta, type EntradaMapa } from "@/lib/redirects/mapaConClave";
+import { entradaListaOrdenable } from "@/lib/panel/entradaOrdenable";
 import { aRutaCanonica, normalizarRuta, separarAncla } from "@/lib/redirects/normalizar";
 
 /**
@@ -87,6 +88,13 @@ function obtenerMapa(origin: string): Promise<Map<string, RedirectEntry>> {
 }
 
 export async function proxy(request: NextRequest) {
+  // Panel: solo las listas (`/admin/collections/:slug`, ver el matcher). Las ordenables se abren por
+  // su arrastre (`entradaOrdenable.ts`); el panel nunca pasa por el mapa de redirecciones.
+  if (request.nextUrl.pathname.startsWith("/admin/")) {
+    const destino = entradaListaOrdenable(new URL(request.nextUrl.href));
+    return destino ? NextResponse.redirect(destino, 307) : NextResponse.next();
+  }
+
   const ruta = normalizarRuta(request.nextUrl.pathname);
 
   try {
@@ -128,5 +136,8 @@ export const config = {
      *  - archivos con extensión (favicon.ico, robots.txt, sitemap.xml, .png…)
      */
     "/((?!api|admin|_next/static|_next/image|.*\\.[\\w]+$).*)",
+    // Del panel, SOLO la entrada a las listas (tanda 23: las ordenables se abren por su arrastre).
+    "/admin/collections/:slug",
+    "/admin/collections/:slug/",
   ],
 };

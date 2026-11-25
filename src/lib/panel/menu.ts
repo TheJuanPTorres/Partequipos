@@ -49,6 +49,7 @@ export const ORDEN_DE_ENTRADAS = [
   "categorias-usada",
   "marcas-usada",
   "ficha-producto",
+  "atributos-ficha",
   // Repuestos
   "modelos-repuesto",
   "marcas",
@@ -100,6 +101,7 @@ export const ETIQUETAS_DEL_MENU: Record<string, string> = {
   "categorias-usada": "Categorías (usadas)",
   "marcas-usada": "Marcas (usadas)",
   "ficha-producto": "Textos de las fichas",
+  "atributos-ficha": "Atributos de ficha",
   "modelos-repuesto": "Modelos",
   marcas: "Marcas",
   "tipos-equipo": "Tipos de equipo",

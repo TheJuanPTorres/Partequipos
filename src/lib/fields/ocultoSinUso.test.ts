@@ -88,6 +88,7 @@ const RUTAS_OCULTAS: [keyof typeof OCULTOS, string][] = [
   ["paginas-indice", "blog.disenoArticulo"],
   // Órdenes con número que la web ya no lee: manda el orden arrastrando (tanda 21, PR-4).
   ["categorias-tecnicas", "ordenMarca"],
+  ["categorias-tecnicas", "ordenPortada"],
   ["categorias-usada", "orden"],
 ];
 

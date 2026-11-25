@@ -16,7 +16,7 @@
  * `revalidar=<origen del preview>` vacía la caché de ese preview al terminar.
  *
  * Qué toca, y nada más: la «Foto en la portada» de las categorías técnicas que salen en la portada
- * (`ordenPortada`), y los ficheros nuevos `…-portada-recorte.webp`. Ni la «Imagen de la tarjeta»
+ * («En la portada»), y los ficheros nuevos `…-portada-recorte.webp`. Ni la «Imagen de la tarjeta»
  * ni los originales se tocan. La pieza nunca se corta (`recorteCuadrado`): si una foto ya está
  * llena (la pieza toca un borde), no se sube nada y la «Foto en la portada» pasa a ser la propia
  * foto sin recortar.
@@ -129,7 +129,7 @@ const guardar = () => {
 type Categoria = {
   id: Id;
   slug: string;
-  ordenPortada?: number | null;
+  enPortada?: boolean | null;
   imagen?: unknown;
   imagenPortada?: unknown;
 };
@@ -139,14 +139,15 @@ const categorias = (
   (
     await payload.find({
       collection: "categorias-tecnicas",
-      where: { ordenPortada: { exists: true } },
+      // «En la portada» (desde el 2026-11-25; antes, «Posición en la portada»).
+      where: { enPortada: { equals: true } },
       depth: 0,
       limit: 0,
       pagination: false,
       overrideAccess: true,
     })
   ).docs as unknown as Categoria[]
-).filter((c) => typeof c.ordenPortada === "number");
+).filter((c) => c.enPortada === true);
 
 async function revalidar() {
   if (!REVALIDAR) return;

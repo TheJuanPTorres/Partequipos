@@ -199,21 +199,32 @@ function medir() {
   // 3. Solape entre textos (aviso). Con la parte VISIBLE de cada uno (lo que corta un antepasado
   // no se ve, así que no pisa nada), solo entre elementos con texto (un botón vacío encima de
   // toda una tarjeta no es un solape) y sin lo fijo (el WhatsApp va en «tapado»).
+  // Una caja por LÍNEA (`getClientRects`): un enlace que se parte en dos líneas no «pisa» el texto
+  // que sigue en la segunda (Nosotros, «Partequipos Express (Miami)» y «Partequipos Perú»).
   const recorteVisible = (el) => {
-    const r = el.getBoundingClientRect();
-    let v = { left: r.left, right: r.right, top: r.top, bottom: r.bottom };
+    let corte = { left: -Infinity, right: Infinity, top: -Infinity, bottom: Infinity };
     for (let a = el.parentElement; a && a !== document.body; a = a.parentElement) {
       const e = getComputedStyle(a);
       if (e.overflowX === "visible" && e.overflowY === "visible") continue;
       const c = a.getBoundingClientRect();
-      v = {
-        left: Math.max(v.left, c.left),
-        right: Math.min(v.right, c.right),
-        top: Math.max(v.top, c.top),
-        bottom: Math.min(v.bottom, c.bottom),
+      corte = {
+        left: Math.max(corte.left, c.left),
+        right: Math.min(corte.right, c.right),
+        top: Math.max(corte.top, c.top),
+        bottom: Math.min(corte.bottom, c.bottom),
       };
     }
-    return { ...v, width: v.right - v.left, height: v.bottom - v.top };
+    return [...el.getClientRects()]
+      .map((r) => {
+        const v = {
+          left: Math.max(r.left, corte.left),
+          right: Math.min(r.right, corte.right),
+          top: Math.max(r.top, corte.top),
+          bottom: Math.min(r.bottom, corte.bottom),
+        };
+        return { ...v, width: v.right - v.left, height: v.bottom - v.top };
+      })
+      .filter((r) => r.width > 2 && r.height > 2);
   };
   const fijo = (el) => {
     for (let a = el; a; a = a.parentElement)
@@ -226,20 +237,22 @@ function medir() {
       (el.textContent ?? "").trim().length > 0 &&
       !fijo(el),
   );
-  const cajas = hojas
-    .map((el) => [el, recorteVisible(el)])
-    .filter(([, r]) => r.width > 2 && r.height > 2);
+  const cajas = hojas.map((el) => [el, recorteVisible(el)]).filter(([, rs]) => rs.length > 0);
+  const pisan = (as, bs) =>
+    as.some((a) =>
+      bs.some((b) => {
+        const w = Math.min(a.right, b.right) - Math.max(a.left, b.left);
+        const h = Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top);
+        return w > 2 && h > 2 && w * h > 0.3 * Math.min(a.width * a.height, b.width * b.height);
+      }),
+    );
   for (let i = 0; i < cajas.length; i++) {
     for (let j = i + 1; j < cajas.length; j++) {
       const [ea, a] = cajas[i];
       const [eb, b] = cajas[j];
-      const w = Math.min(a.right, b.right) - Math.max(a.left, b.left);
-      const h = Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top);
-      if (w <= 2 || h <= 2) continue;
       if (ea.contains(eb) || eb.contains(ea)) continue;
       if (ea.closest("[data-qa-solape]") || eb.closest("[data-qa-solape]")) continue;
-      const menor = Math.min(a.width * a.height, b.width * b.height);
-      if (w * h > 0.3 * menor) {
+      if (pisan(a, b)) {
         fallos.push({
           tipo: "solape",
           aviso: true,

@@ -1157,12 +1157,14 @@
  *
  * 1. VENTANA ANCHA Y BAJA (un móvil tumbado, o un portátil al 200 %: 720 × 450): el título crece
  *    con el ancho (12vw) y la tarjeta solo con el alto (85vh), así que el título y la máquina
- *    bajaban por debajo de la tarjeta. La tarjeta mide al menos lo que ocupan el título (dos
- *    líneas), el hueco del vidrio y los controles. En un móvil de pie no cambia nada: ahí manda 85vh.
+ *    bajaban por debajo de la tarjeta, y el texto circular pisaba el título. La tarjeta mide al
+ *    menos lo que ocupan el título (74 px + dos líneas de 12vw × 1,4), un mínimo de máquina y lo
+ *    de abajo (el texto circular llega a 354 px del borde inferior). En un móvil de pie no cambia
+ *    nada: ahí manda 85vh (a 390 × 844, 717 px frente a 573).
  */
 @media (max-width: 767px) {
   .hero {
-    --hero-alto-min: max(85vh, calc(374px + 40vw));
+    --hero-alto-min: max(85vh, calc(440px + 34vw));
   }
 }
 
@@ -1207,6 +1209,13 @@
     order: 1;
     width: calc(100% - 24px);
     max-width: none;
+    /* El «+» debajo del párrafo: al lado no cabe una palabra larga. */
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .parrafo {
+    overflow-wrap: anywhere;
   }
 
   .fila {

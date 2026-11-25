@@ -74,10 +74,11 @@
 /*
  * REPARTO EN ESCRITORIO (dirección, 2026-11-12): a la izquierda, la galería; a
  * la derecha, ARRIBA y de arriba abajo, las migas y el título, las
- * características, la descripción y los botones. La derecha nunca es más alta
- * que la foto: la descripción y los botones (`.envoltura`) no aportan su alto a
- * la fila, así que la fila la marca la galería y la descripción se recorta en lo
- * que quede, con «Leer más» (`DescripcionPlegable`). En el HTML la derecha va
+ * características, la descripción y los botones. La foto marca el alto MÍNIMO de
+ * la fila (Juan Pablo, tanda 24: un mínimo, nunca un máximo): la descripción y los
+ * botones (`.envoltura`) solo aportan a la fila su mínimo, así que la descripción
+ * se recorta en lo que deje la foto, con «Leer más» (`DescripcionPlegable`), y si
+ * el título, las características y los botones no caben, la tarjeta crece. En el HTML la derecha va
  * primero (el <h1> antes que la galería): la rejilla la coloca.
  */
 section.principal[data-con-izquierda] {
@@ -229,11 +230,16 @@ section.principal[data-con-izquierda] {
     contain: size;
     /*
      * Lo mínimo, pieza a pieza: 2 líneas de texto, el sitio de «Leer más» (1 línea y 8 px), los
-     * huecos (1,5 internos: el de «Leer más» va a medias) y los botones (60 px). Si el mínimo no
-     * cuadra con sus piezas, los botones se salen por debajo y pasan de la foto (medido a 1920).
+     * huecos (1,5 internos: el de «Leer más» va a medias) y los botones con su alto REAL
+     * (`--alto-botones`, lo mide `DescripcionPlegable`; 60 px, una fila, hasta que lo mide). Si
+     * el mínimo no cuadra con sus piezas, los botones se salen por debajo y la tarjeta los corta
+     * (BUG-005: en dos filas, «Habla con un experto» quedaba fuera). La foto es un MÍNIMO: si
+     * esto no cabe a su lado, la tarjeta crece.
      */
-    contain-intrinsic-block-size: calc(3lh + 68px + var(--espacio-interno) * 1.5);
-    min-height: calc(3lh + 68px + var(--espacio-interno) * 1.5);
+    contain-intrinsic-block-size: calc(
+      3lh + 8px + var(--alto-botones, 60px) + var(--espacio-interno) * 1.5
+    );
+    min-height: calc(3lh + 8px + var(--alto-botones, 60px) + var(--espacio-interno) * 1.5);
   }
 
   .principal[data-con-izquierda] .envoltura:not([data-abierto]) .descripcion {

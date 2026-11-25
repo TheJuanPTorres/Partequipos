@@ -182,6 +182,7 @@
     "lanzamiento:urls": "tsx scripts/lanzamiento/comprobar-urls.ts",
     "qa:vuelo-pie": "npx -y -p puppeteer-core@24.43.1 node scripts/qa/vuelo-pie.mjs",
     "qa:huecos": "npx -y -p playwright-core@1.63.0 node scripts/qa/huecos-secciones.mjs",
+    "qa:desbordes": "npx -y -p playwright-core@1.63.0 node scripts/qa/desbordes.mjs",
     "qa:hero-pausa": "npx -y -p playwright-core@1.63.0 node scripts/qa/hero-pausa.mjs",
     "qa:menu-animacion": "npx -y -p playwright-core@1.63.0 node scripts/qa/menu-animacion.mjs"
   },

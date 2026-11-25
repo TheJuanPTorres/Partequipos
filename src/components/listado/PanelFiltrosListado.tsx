@@ -180,12 +180,12 @@ export function PanelFiltrosListado({
         {enVivo ? (
           // Con JavaScript cada cambio se aplica al momento (`ZonaCatalogo`); sin él, el botón de siempre.
           <noscript>
-            <button type="submit" className={estilos.aplicar}>
+            <button type="submit" data-evita-flotante="" className={estilos.aplicar}>
               Aplicar filtros
             </button>
           </noscript>
         ) : (
-          <button type="submit" className={estilos.aplicar}>
+          <button type="submit" data-evita-flotante="" className={estilos.aplicar}>
             Aplicar filtros
           </button>
         )}

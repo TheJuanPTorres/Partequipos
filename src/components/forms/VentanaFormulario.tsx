@@ -2,6 +2,7 @@
 
 import { IconX } from "@tabler/icons-react";
 import { lazy, Suspense, useEffect, useMemo, useRef, useSyncExternalStore } from "react";
+import { createPortal } from "react-dom";
 
 import { useDatosContacto } from "@/components/forms/ContextoContacto";
 
@@ -37,6 +38,13 @@ export type ConfigHojaDeVida = { vacante: string; origen: string };
  * anuncio del título (`aria-labelledby`). Se añade el cierre con la X y al
  * tocar fuera. El formulario solo existe mientras la ventana está abierta, así
  * que cada apertura empieza limpia.
+ *
+ * VA EN UN PORTAL, FUERA DE LA PÁGINA (t8, 2026-11-25): el catálogo de los listados está dentro de un
+ * `<ViewTransition>` de React (`TransicionCatalogo`). Al volver la respuesta del envío, la
+ * transición que lo contiene animaba el «cambio» del catálogo —el diálogo era su descendiente— y
+ * el navegador pintaba la página sin el fondo oscuro ni la capa superior durante ~280 ms: la
+ * ventana parecía desaparecer y volver de golpe (medido en el preview: fotogramas con la página de
+ * detrás sin oscurecer). Colgada de `body`, ningún cambio del formulario toca esa transición.
  */
 export function VentanaFormulario({
   abierta,
@@ -79,7 +87,7 @@ export function VentanaFormulario({
     else if (!abierta && d.open) d.close();
   }, [abierta]);
 
-  return (
+  const ventana = (
     <dialog
       ref={dialogo}
       className={estilos.ventana}
@@ -129,4 +137,6 @@ export function VentanaFormulario({
       </div>
     </dialog>
   );
+  // Solo existe tras el primer clic (`BotonFormulario` la monta entonces): `document` ya está.
+  return typeof document === "undefined" ? null : createPortal(ventana, document.body);
 }

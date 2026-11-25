@@ -520,6 +520,7 @@ export function FormularioSolicitud({
            */}
           <button
             type="submit"
+            data-evita-flotante=""
             disabled={enviando}
             data-enviando={f3 && enviando ? "" : undefined}
             className={`${emergente ? "" : "w-full sm:w-auto "}rounded bg-gray-900 px-5 py-2.5 font-medium text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-gray-400`}
@@ -540,6 +541,7 @@ export function FormularioSolicitud({
             <a
               href={whatsappContexto.href}
               data-whatsapp-boton=""
+              data-evita-flotante=""
               rel="noopener noreferrer"
               target="_blank"
               className={

@@ -97,15 +97,16 @@
    * RECOGE hacia la barra, mientras su contenido se funde (`.caja`). Antes el contenido se fundía
    * y el fondo blanco se quedaba entero hasta desaparecer de golpe. Son transiciones CSS de un
    * valor a otro: si el ratón vuelve a mitad del cierre (o se va a mitad de la apertura), siguen
-   * desde donde estaban, sin salto. Al abrir, salida suave; al cerrar, entrada suave. Los lados
-   * y el fondo del recorte van holgados: las curvas de arriba salen 20 px por cada lado.
+   * desde donde estaban, sin salto. Al abrir, salida suave; al cerrar, entrada suave. Los lados del recorte
+   * van holgados: las curvas de arriba salen 20 px por cada lado. Abajo, en %: así el valor a mitad
+   * de la transición es un porcentaje y se puede medir (`qa:menu-animacion`).
    */
   clip-path: inset(0 -40px 100% -40px);
   transition: clip-path 0.22s cubic-bezier(0.4, 0, 1, 1);
 }
 
 .marco[data-abierto="si"] .lienzo {
-  clip-path: inset(0 -40px -40px -40px);
+  clip-path: inset(0 -40px 0% -40px);
   transition: clip-path 0.28s cubic-bezier(0.22, 1, 0.36, 1);
 }
 

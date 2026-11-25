@@ -56,8 +56,15 @@ import estilos from "./hero.module.css";
  *   cada diapositiva puede llevar un texto circular decorativo.
  *
  * EL TIEMPO LO MARCA LA LÍNEA DE PROGRESO: cuando su animación CSS termina,
- * pasa la diapositiva. Así la pausa (botón, ratón o foco dentro) detiene a la
- * vez la línea, el Ken Burns y el pase, sin dos relojes que se desincronicen.
+ * pasa la diapositiva. Así la pausa detiene a la vez la línea, el Ken Burns,
+ * el pase y el texto circular, sin dos relojes que se desincronicen.
+ *
+ * UN SOLO ESTADO DE PAUSA, Y SOLO LO CAMBIA EL BOTÓN (Juan Pablo, 2026-11-25,
+ * BUG-003): nada se detiene solo. Antes el ratón o el foco dentro del hero
+ * también pausaban, así que al pulsar «Reproducir» (con el foco en el botón y
+ * el ratón encima) todo seguía parado; y las flechas y los puntos pausaban el
+ * pase. Ahora cambian de diapositiva y el carrusel sigue. Con la pestaña
+ * oculta las animaciones se detienen (`data-oculta`) y al volver siguen solas.
  *
  * CARGA DE IMÁGENES: el fondo de la primera diapositiva es el LCP y es el único
  * que se precarga. Los demás NO están en el HTML ni se piden al abrir
@@ -127,8 +134,12 @@ function IconoMas() {
  * repetido alrededor de un círculo, girando despacio. Decorativo: oculto al
  * lector. El giro lo para la pausa del hero y «reducir movimiento» (CSS).
  * `textLength` reparte el texto en la vuelta entera, sea cual sea su largo.
+ *
+ * UN SOLO CÍRCULO PARA TODO EL CARRUSEL: el giro no se reinicia al cambiar de
+ * diapositiva. Cada texto distinto es una capa del mismo dibujo y solo se ve
+ * la de la diapositiva activa (fundido de opacidad); sin texto, ninguna.
  */
-function TextoCircular({ texto }: { texto: string }) {
+function TextoCircular({ textos, activo }: { textos: string[]; activo: string | null }) {
   const id = useId();
   const radio = 40;
   return (
@@ -141,11 +152,13 @@ function TextoCircular({ texto }: { texto: string }) {
           />
         </defs>
         {/* Letra en unidades del dibujo: escala con el círculo a cualquier tamaño y zoom. */}
-        <text fontSize="16">
-          <textPath href={`#${id}`} textLength={String(Math.floor(2 * Math.PI * radio) - 2)}>
-            {`${texto} `}
-          </textPath>
-        </text>
+        {textos.map((texto) => (
+          <text key={texto} fontSize="16" data-activo={texto === activo ? "" : undefined}>
+            <textPath href={`#${id}`} textLength={String(Math.floor(2 * Math.PI * radio) - 2)}>
+              {`${texto} `}
+            </textPath>
+          </text>
+        ))}
       </svg>
     </div>
   );
@@ -264,8 +277,8 @@ export function HeroPortada({ diapositivas, conNav = false }: Props) {
   const [listas, setListas] = useState<ReadonlySet<number>>(() => new Set([0]));
   /** Cambio que espera a que llegue la foto de su destino, y su temporizador de respaldo. */
   const pendiente = useRef<{ destino: number; porUsuario: boolean; espera: number } | null>(null);
-  /** Ratón o foco dentro: el pase espera (no cuenta como pausa del usuario). */
-  const [dentro, setDentro] = useState(false);
+  /** Hubo una pausa en esta diapositiva: al reanudar, la foto siguiente se pide ya. */
+  const huboPausa = useRef(false);
   /*
    * El anuncio solo se escribe DESPUÉS de una acción del usuario: con texto
    * desde el principio, el lector lo leería al cargar, y el título ya está.
@@ -276,10 +289,15 @@ export function HeroPortada({ diapositivas, conNav = false }: Props) {
   const gesto = useRef<{ x: number; y: number } | null>(null);
   const idTitulo = useId();
   const reducido = useMovimientoReducido();
-  const { pausado, alternar, pausar } = usePausa();
+  const { pausado, alternar } = usePausa();
   const total = diapositivas.length;
   const hayVarias = total > 1;
   const hayEnlaces = diapositivas.some((s) => s.enlace);
+  /** Los textos circulares distintos del carrusel: cada uno, una capa del mismo círculo. */
+  const circulares = useMemo(
+    () => [...new Set(diapositivas.flatMap((s) => (s.textoCircular ? [s.textoCircular] : [])))],
+    [diapositivas],
+  );
   const d = diapositivas[activo];
   /*
    * FUENTES PROPIAS DEL TÍTULO (2026-10-17): se DECLARAN las del hero, pero el
@@ -347,12 +365,11 @@ export function HeroPortada({ diapositivas, conNav = false }: Props) {
       setActivo(siguiente);
       setCambiado(true);
       if (porUsuario) {
-        // Quien toca, toma el control: el pase se detiene (como Swiper en ux-9).
-        pausar();
+        // Flechas, puntos, teclado y gesto cambian de diapositiva SIN detener el pase.
         setAnuncio(`Diapositiva ${siguiente + 1} de ${total}: ${diapositivas[siguiente]!.titulo}`);
       }
     },
-    [activo, diapositivas, pausar, total],
+    [activo, diapositivas, total],
   );
 
   const ir = useCallback(
@@ -392,16 +409,41 @@ export function HeroPortada({ diapositivas, conNav = false }: Props) {
 
   /* La foto de la SIGUIENTE se pide `ANTICIPO_MS` antes de que le toque, con el pase en marcha. */
   useEffect(() => {
-    if (!hayVarias || pausado || dentro) return;
+    if (!hayVarias) return;
+    if (pausado) {
+      huboPausa.current = true;
+      return;
+    }
     // En la primera, la línea de progreso arranca al pintarse la página (CSS), antes de
     // hidratar: se descuenta lo que ya lleva desde la navegación (medido: ~2 s en móvil).
     const yaLleva = activo === 0 && !cambiado ? performance.now() : 0;
-    const t = window.setTimeout(
-      () => cargar((activo + 1) % total),
-      Math.max(PASE_MS - ANTICIPO_MS - yaLleva, 0),
-    );
+    // Tras una pausa no se sabe cuánto le queda a la línea: la foto se pide ya.
+    const espera = huboPausa.current ? 0 : Math.max(PASE_MS - ANTICIPO_MS - yaLleva, 0);
+    const t = window.setTimeout(() => cargar((activo + 1) % total), espera);
     return () => window.clearTimeout(t);
-  }, [activo, cambiado, cargar, dentro, hayVarias, pausado, total]);
+  }, [activo, cambiado, cargar, hayVarias, pausado, total]);
+
+  /* Diapositiva nueva: su línea empieza de cero, así que el anticipo vuelve a contar entero. */
+  useEffect(() => {
+    huboPausa.current = false;
+  }, [activo]);
+
+  /*
+   * PESTAÑA OCULTA: las animaciones se detienen para no gastar, y al volver siguen solas desde
+   * donde iban. No toca la pausa del usuario: si había pausado, sigue pausado. El atributo se
+   * escribe en el DOM (no es estado): React no lo conoce y no lo quita al repintar.
+   */
+  useEffect(() => {
+    const el = raiz.current;
+    if (!el) return;
+    const alCambiar = () => el.toggleAttribute("data-oculta", document.hidden);
+    alCambiar();
+    document.addEventListener("visibilitychange", alCambiar);
+    return () => {
+      document.removeEventListener("visibilitychange", alCambiar);
+      el.removeAttribute("data-oculta");
+    };
+  }, []);
 
   /** Al acercarse a una flecha o a un punto, se pide ya la foto de su destino. */
   const anticipar = (destino: number) => cargar((destino + total) % total);
@@ -559,19 +601,14 @@ export function HeroPortada({ diapositivas, conNav = false }: Props) {
       data-con-nav={conNav ? "" : undefined}
       aria-roledescription={hayVarias ? "carrusel" : undefined}
       aria-labelledby={idTitulo}
-      // Todo lo que se mueve solo se detiene aquí: línea, Ken Burns, pase y texto circular.
-      data-pausado={pausado || dentro ? "" : undefined}
+      // Todo lo que se mueve solo se detiene aquí, y SOLO con el botón de pausa: línea, Ken
+      // Burns, pase y texto circular.
+      data-pausado={pausado ? "" : undefined}
       // Un párrafo largo ensancha el vidrio en escritorio, como en el diseño (uno para todas).
       data-vidrio-largo={
         diapositivas.some((s) => (s.parrafo?.length ?? 0) > PARRAFO_LARGO) ? "" : undefined
       }
       onKeyDown={alPulsar}
-      onMouseEnter={() => setDentro(true)}
-      onMouseLeave={() => setDentro(false)}
-      onFocus={() => setDentro(true)}
-      onBlur={(e) => {
-        if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setDentro(false);
-      }}
     >
       <div
         className={estilos.tarjeta}
@@ -670,9 +707,9 @@ export function HeroPortada({ diapositivas, conNav = false }: Props) {
           </p>
         ) : null}
 
-        {/* TEXTO CIRCULAR: decorativo; gira despacio y se para con la pausa. */}
-        {d.textoCircular ? (
-          <TextoCircular key={`circular-${activo}`} texto={d.textoCircular} />
+        {/* TEXTO CIRCULAR: decorativo; gira despacio, sin reiniciarse, y se para con la pausa. */}
+        {circulares.length > 0 ? (
+          <TextoCircular textos={circulares} activo={d.textoCircular ?? null} />
         ) : null}
 
         {/* Con una diapositiva no hay controles; la fila conserva su alto. */}

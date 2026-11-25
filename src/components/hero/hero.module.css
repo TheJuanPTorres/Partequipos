@@ -659,6 +659,20 @@
   list-style: none;
 }
 
+/*
+ * LOS CONTROLES NO SE METEN BAJO EL VIDRIO (2026-11-25, regla de Juan Pablo: nada tapado). Desde
+ * 768 px el vidrio va abajo a la derecha, a la altura de los controles: con 7 diapositivas, a
+ * 768 y 820 tapaba los puntos 4 a 7 y no se podían pulsar. La fila de controles se queda en lo
+ * que hay a la izquierda del vidrio y, si los puntos no caben, bajan a una segunda línea.
+ */
+@media (min-width: 768px) {
+  .flechas {
+    max-width: calc(100% - var(--hero-flechas-izquierda) - var(--hero-vidrio-ancho) - 16px);
+    flex-wrap: wrap;
+    row-gap: 6px;
+  }
+}
+
 .punto {
   position: relative;
   display: grid;

@@ -258,6 +258,9 @@ oficial, no lo pongas.
 - Las **categorías técnicas** son las mismas en todas las marcas: su
   **icono**, su **enlace** y su **posición en las páginas de marca** se
   editan en cada categoría (**Repuestos → Categorías técnicas**).
+  **«Título de la sección de tipos»** cambia el título que va encima de las
+  tarjetas de su página; vacío, el sitio escribe «Elige el repuesto de … que
+  necesitas» con el nombre de la categoría.
 - Lo común a todas las páginas de marca (títulos de las secciones, el
   contacto y los testimonios) está en
   **Repuestos → Textos de las páginas de repuestos**. Un título vacío

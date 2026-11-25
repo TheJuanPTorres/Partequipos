@@ -212,7 +212,7 @@ export const TipoEquipo: CollectionConfig = {
         filterOptions: { padre: { exists: false } },
         admin: {
           description:
-            "Las categorías de repuestos que se muestran en la página de cada modelo de este tipo, en este orden. Vacío: no se muestra ninguna.",
+            "Las categorías de repuestos que se muestran en la página de cada modelo de este tipo. Salen en el orden de Repuestos → Categorías técnicas (arrastrando), el mismo de todo el sitio. Vacío: no se muestra ninguna.",
         },
       },
       /*

@@ -6,13 +6,24 @@ import {
   claveDeEnlace,
   construirMegamenu,
   logoDeMenu,
-  panelMaquinaria,
+  panelMaquinaria as panelMaquinariaReal,
   panelConTarjetas,
-  panelLubricantes,
-  panelRepuestos,
+  panelLubricantes as panelLubricantesReal,
+  panelRepuestos as panelRepuestosReal,
+  partesDe,
   type DatosMegamenu,
   type GrupoMenu,
+  type PanelMenu,
 } from "./megamenu";
+
+// Las pruebas de siempre leen el panel por clases de pieza («Ver todo», acordeones y enlaces
+// sueltos): `partesDe`. El orden entre ellas, en «apartados del panel», al final.
+const panelMaquinaria = (d: DatosMegamenu) => partesDe(panelMaquinariaReal(d));
+const panelRepuestos = (d: DatosMegamenu) => partesDe(panelRepuestosReal(d));
+const panelLubricantes = (d: DatosMegamenu) => {
+  const p = panelLubricantesReal(d);
+  return p ? partesDe(p) : null;
+};
 
 // Las listas llegan en el orden del panel (arrastrando, `getMegamenu.ts`); el menú lo conserva: por
 // eso Yanmar va antes que Case y los tipos de Case no van por nombre (2026-11-19).
@@ -290,7 +301,7 @@ describe("megamenú: maquinaria", () => {
 describe("megamenú: repuestos", () => {
   it("sin categorías ni política, solo «Repuestos por marca»: las marcas con sus tipos", () => {
     const p = panelRepuestos(DATOS);
-    assert.equal(p.verTodo.href, "/repuestos-maquinaria-pesada-colombia/");
+    assert.equal(p.verTodo?.href, "/repuestos-maquinaria-pesada-colombia/");
     assert.deepEqual(titulos(p.grupos), ["Repuestos por marca"]);
     const cat = p.grupos[0]!.grupos[0]!;
     assert.equal(cat.titulo, "Caterpillar");
@@ -337,11 +348,6 @@ describe("megamenú: repuestos por categoría técnica y política de garantías
       { id: 3, nombre: "Accesorios", slug: "accesorios", imagen: 9 },
       { id: 4, nombre: "Sin página", slug: "", imagen: null },
     ],
-    politicaRepuestos: {
-      mostrar: true,
-      texto: "Política de garantías y repuestos",
-      enlace: "/politica-de-garantia-de-repuestos/",
-    },
   };
 
   it("el apartado de categorías: «Ver todas» y una TARJETA con foto por categoría, en su orden", () => {
@@ -372,8 +378,10 @@ describe("megamenú: repuestos por categoría técnica y política de garantías
         href: "/repuestos-maquinaria-pesada-colombia/categoria-repuestos-para-maquinaria-pesada/accesorios/",
       },
     ]);
-    assert.equal(panelConTarjetas(p), true);
-    assert.equal(panelConTarjetas({ ...p, grupos: [p.grupos[0]!] }), false);
+    const real = panelRepuestosReal(conTodo);
+    assert.equal(panelConTarjetas(real), true);
+    const sinTarjetas = real.elementos.filter((e) => e.tipo !== "grupo" || !e.grupo.tarjetas);
+    assert.equal(panelConTarjetas({ elementos: sinTarjetas }), false);
   });
 
   it("la política, al final, como enlace suelto; desmarcada o sin texto o enlace, no sale", () => {
@@ -383,11 +391,16 @@ describe("megamenú: repuestos por categoría técnica y política de garantías
         href: "/politica-de-garantia-de-repuestos/",
       },
     ]);
-    const sin = (politicaRepuestos: DatosMegamenu["politicaRepuestos"]) =>
-      panelRepuestos({ ...conTodo, politicaRepuestos }).finales;
-    assert.equal(sin({ ...conTodo.politicaRepuestos, mostrar: false }), undefined);
-    assert.equal(sin({ ...conTodo.politicaRepuestos, texto: " " }), undefined);
-    assert.equal(sin(null), undefined);
+    const politica = { tipo: "enlace", nombre: "Política", enlace: "/politica/", mostrar: true };
+    const con = (fila: { tipo: string; nombre: string; enlace: string | null; mostrar: boolean }) =>
+      panelRepuestos({
+        ...conTodo,
+        apartados: { repuestos: [{ tipo: "marcas", nombre: "Marcas" }, fila] },
+      }).finales;
+    assert.deepEqual(con(politica), [{ etiqueta: "Política", href: "/politica/" }]);
+    assert.equal(con({ ...politica, mostrar: false }), undefined);
+    assert.equal(con({ ...politica, nombre: " " }), undefined);
+    assert.equal(con({ ...politica, enlace: null }), undefined);
   });
 
   it("sin ninguna categoría con página, el apartado no sale", () => {
@@ -503,8 +516,8 @@ describe("megamenú: lubricantes con bandera y marca de otra web (Dispel, 2026-1
   });
 
   it("«Ver todos los lubricantes» va a la categoría Lubricantes si tiene el selector; si no, a la general", () => {
-    assert.equal(panelLubricantes(conSelector([1, 2]))!.verTodo.href, PAGINA_SELECTOR);
-    assert.equal(panelLubricantes(conSelector([1, 2], false))!.verTodo.href, "/lubricantes/");
+    assert.equal(panelLubricantes(conSelector([1, 2]))!.verTodo?.href, PAGINA_SELECTOR);
+    assert.equal(panelLubricantes(conSelector([1, 2], false))!.verTodo?.href, "/lubricantes/");
   });
 
   it("con enlace, el enlace gana a la página del selector", () => {
@@ -650,5 +663,166 @@ describe("megamenú: logos de marca (petición del cliente, 2026-10-06)", () => 
     assert.equal(hitachi.logo?.url, REP.url);
     assert.equal(hitachi.logo?.oscuro, true);
     assert.equal(dynapac.logo?.url, LOGO.url);
+  });
+});
+
+describe("megamenú: apartados del panel (tanda 24, tarea 1)", () => {
+  const completo: DatosMegamenu = {
+    ...DATOS,
+    categoriasTecnicas: [{ id: 1, nombre: "Tren de rodaje", slug: "tren-de-rodaje" }],
+    marcasLubricante: [
+      { id: 1, nombre: "Eni", slug: "lubricantes-eni" },
+      { id: 2, nombre: "Otra", slug: "lubricantes-otra" },
+    ],
+  };
+  /** Lo que se pinta en el nivel 1, en orden: la clase de pieza y su texto. */
+  const nivel1 = (p: PanelMenu) =>
+    p.elementos.map((e) => `${e.tipo}:${e.tipo === "grupo" ? e.grupo.titulo : e.enlace.etiqueta}`);
+
+  const DE_SIEMPRE = {
+    maquinaria: [
+      "verTodo:Ver toda la maquinaria pesada",
+      "grupo:Maquinaria pesada nueva",
+      "grupo:Maquinaria pesada usada",
+      "enlace:Aditamentos para maquinaria pesada",
+    ],
+    repuestos: [
+      "verTodo:Ver todos los repuestos",
+      "grupo:Repuestos por marca",
+      "grupo:Repuestos por categoría técnica",
+      "enlace:Política de garantías y repuestos",
+    ],
+    lubricantes: [
+      "verTodo:Ver todos los lubricantes",
+      "grupo:Lubricantes Eni",
+      "grupo:Lubricantes Otra",
+    ],
+  };
+
+  it("sin el dato, o con las listas vacías, el menú de siempre", () => {
+    const casos: DatosMegamenu[] = [
+      completo,
+      { ...completo, apartados: null },
+      { ...completo, apartados: { maquinaria: [], repuestos: null, lubricantes: [] } },
+    ];
+    for (const d of casos) {
+      assert.deepEqual(nivel1(panelMaquinariaReal(d)), DE_SIEMPRE.maquinaria);
+      assert.deepEqual(nivel1(panelRepuestosReal(d)), DE_SIEMPRE.repuestos);
+      assert.deepEqual(nivel1(panelLubricantesReal(d)!), DE_SIEMPRE.lubricantes);
+    }
+  });
+
+  it("lo sembrado por la migración pinta lo mismo que el menú de siempre, pieza a pieza", () => {
+    // Las filas de la migración `…_menu_apartados`, escritas aquí como en su SQL.
+    const sembrado: DatosMegamenu = {
+      ...completo,
+      apartados: {
+        maquinaria: [
+          { tipo: "ver-todo", nombre: "Ver toda la maquinaria pesada", mostrar: true },
+          { tipo: "nueva", nombre: "Maquinaria pesada nueva", mostrar: true },
+          { tipo: "usada", nombre: "Maquinaria pesada usada", mostrar: true },
+          { tipo: "aditamentos", nombre: "Aditamentos para maquinaria pesada", mostrar: true },
+        ],
+        repuestos: [
+          { tipo: "ver-todo", nombre: "Ver todos los repuestos", mostrar: true },
+          { tipo: "marcas", nombre: "Repuestos por marca", mostrar: true },
+          { tipo: "categorias", nombre: "Repuestos por categoría técnica", mostrar: true },
+          {
+            tipo: "enlace",
+            nombre: "Política de garantías y repuestos",
+            enlace: "/politica-de-garantia-de-repuestos/",
+            mostrar: true,
+          },
+        ],
+        lubricantes: [
+          { tipo: "ver-todo", nombre: "Ver todos los lubricantes", mostrar: true },
+          { tipo: "marcas", nombre: "Marcas de lubricantes", mostrar: true },
+        ],
+      },
+    };
+    assert.deepEqual(panelMaquinariaReal(sembrado), panelMaquinariaReal(completo));
+    assert.deepEqual(panelRepuestosReal(sembrado), panelRepuestosReal(completo));
+    assert.deepEqual(panelLubricantesReal(sembrado), panelLubricantesReal(completo));
+    assert.deepEqual(construirMegamenu(sembrado), construirMegamenu(completo));
+  });
+
+  it("se pinta en el orden del panel, con el nombre del panel, y sin los ocultos", () => {
+    const d: DatosMegamenu = {
+      ...completo,
+      apartados: {
+        repuestos: [
+          { tipo: "enlace", nombre: "Política", enlace: "/politica/", mostrar: true },
+          { tipo: "categorias", nombre: "Por categoría", mostrar: true },
+          { tipo: "marcas", nombre: "Por marca", mostrar: false },
+          { tipo: "ver-todo", nombre: "Todo", mostrar: true },
+          { tipo: "enlace", nombre: "Tienda", enlace: "https://example.com/", mostrar: true },
+        ],
+        maquinaria: [
+          { tipo: "usada", nombre: "Usada" },
+          { tipo: "aditamentos", nombre: "Aditamentos" },
+          { tipo: "nueva", nombre: "Nueva" },
+        ],
+        lubricantes: [
+          { tipo: "marcas", nombre: "Marcas" },
+          { tipo: "ver-todo", nombre: "Todos" },
+        ],
+      },
+    };
+    assert.deepEqual(nivel1(panelRepuestosReal(d)), [
+      "enlace:Política",
+      "grupo:Por categoría",
+      "verTodo:Todo",
+      "enlace:Tienda",
+    ]);
+    // Un enlace fijo a otro sitio se marca para abrirse en pestaña nueva; uno del sitio, no.
+    assert.deepEqual(partesDe(panelRepuestosReal(d)).finales, [
+      { etiqueta: "Política", href: "/politica/" },
+      { etiqueta: "Tienda", href: "https://example.com/", externo: true },
+    ]);
+    assert.deepEqual(nivel1(panelMaquinariaReal(d)), [
+      "grupo:Usada",
+      "enlace:Aditamentos",
+      "grupo:Nueva",
+    ]);
+    assert.deepEqual(nivel1(panelLubricantesReal(d)!), [
+      "grupo:Lubricantes Eni",
+      "grupo:Lubricantes Otra",
+      "verTodo:Todos",
+    ]);
+    // El contenido de cada lista automática no cambia con el nombre ni con el orden.
+    assert.deepEqual(
+      partesDe(panelMaquinariaReal(d)).grupos[1]!.grupos,
+      partesDe(panelMaquinariaReal(completo)).grupos[0]!.grupos,
+    );
+  });
+
+  it("no salen: un tipo de otro desplegable, una lista automática repetida ni uno desconocido", () => {
+    const d: DatosMegamenu = {
+      ...completo,
+      apartados: {
+        repuestos: [
+          { tipo: "marcas", nombre: "Marcas" },
+          { tipo: "marcas", nombre: "Marcas otra vez" },
+          { tipo: "usada", nombre: "De maquinaria" },
+          { tipo: "inventado", nombre: "X" },
+          { tipo: null, nombre: "Sin tipo" },
+        ],
+      },
+    };
+    assert.deepEqual(nivel1(panelRepuestosReal(d)), ["grupo:Marcas"]);
+  });
+
+  it("con todos los apartados ocultos no hay panel: la entrada de la cabecera queda como enlace", () => {
+    const ocultos: DatosMegamenu = {
+      ...completo,
+      apartados: {
+        repuestos: [{ tipo: "marcas", nombre: "Marcas", mostrar: false }],
+        lubricantes: [{ tipo: "ver-todo", nombre: "Todos", mostrar: false }],
+      },
+    };
+    const m = construirMegamenu(ocultos);
+    assert.equal(m["/repuestos-maquinaria-pesada-colombia/"], undefined);
+    assert.equal(m["/lubricantes/"], undefined);
+    assert.ok(m["/maquinaria-pesada/"]);
   });
 });

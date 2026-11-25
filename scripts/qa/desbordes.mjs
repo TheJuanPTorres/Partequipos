@@ -5,13 +5,15 @@
  *
  * - ✗ **barra horizontal**: la página es más ancha que la ventana; dice qué cajas se salen.
  * - ✗ **cortado**: un texto, un enlace, un botón o un campo que un antepasado con
- *   `overflow: hidden`/`clip` corta EN PARTE (de arriba abajo, o de lado si no es un carrusel).
+ *   `overflow: hidden`/`clip` corta EN PARTE (de arriba abajo, o de lado si no es un carrusel:
+ *   marcado con `aria-roledescription` o colocado con `transform`, como los testimonios).
  *   Lo que queda oculto ENTERO no cuenta (diapositivas fuera de vista, acordeones cerrados), ni lo
  *   que se puede desplazar (`auto`/`scroll`), ni un recorte a propósito: `text-overflow:
  *   ellipsis`, `line-clamp` o un antepasado con `data-qa-recorte` (la descripción plegada con
  *   «Leer más»).
  * - ✗ **tapado**: un enlace, botón o campo debajo del WhatsApp flotante, arriba del todo y abajo
- *   del todo de la página (en medio, al desplazar, pasa por debajo y sale).
+ *   del todo de la página (en medio, al desplazar, pasa por debajo y sale); un texto, solo abajo
+ *   del todo o en una página que no se desplaza (ahí no hay forma de sacarlo de debajo).
  * - ⚠ **solape**: dos textos que se pisan (más del 30 % del menor). Aviso: hay que mirarlo.
  *
  * El zoom del navegador se emula como lo hace Chrome: la ventana en píxeles CSS es ancho/zoom y
@@ -165,9 +167,13 @@ function medir() {
         r.right > caja.left && r.left < caja.right && r.bottom > caja.top && r.top < caja.bottom;
       if (!seCruza) break; // Oculto entero: a propósito (fuera de vista, plegado).
       const enY = cortaY && (r.top < caja.top - 1 || r.bottom > caja.bottom + 1);
-      const carrusel = a.closest(
-        "[aria-roledescription='carrusel'], [aria-roledescription='carousel']",
-      );
+      // Un carrusel: marcado como tal, o lo que se coloca con `transform` dentro del que corta
+      // (las tarjetas de testimonios, la pista de la galería). Lo de los lados asoma a propósito.
+      let movido = false;
+      for (let m = el; m && m !== a; m = m.parentElement)
+        if (getComputedStyle(m).transform !== "none") movido = true;
+      const carrusel =
+        movido || a.closest("[aria-roledescription='carrusel'], [aria-roledescription='carousel']");
       const enX = cortaX && !carrusel && (r.left < caja.left - 1 || r.right > caja.right + 1);
       if ((enY || enX) && !intencionado(el, a)) {
         const px = enY
@@ -183,9 +189,39 @@ function medir() {
     }
   }
 
-  // 3. Solape entre textos (aviso).
-  const hojas = vistos.filter((el) => !vistos.some((o) => o !== el && el.contains(o)));
-  const cajas = hojas.map((el) => [el, el.getBoundingClientRect()]);
+  // 3. Solape entre textos (aviso). Con la parte VISIBLE de cada uno (lo que corta un antepasado
+  // no se ve, así que no pisa nada), solo entre elementos con texto (un botón vacío encima de
+  // toda una tarjeta no es un solape) y sin lo fijo (el WhatsApp va en «tapado»).
+  const recorteVisible = (el) => {
+    const r = el.getBoundingClientRect();
+    let v = { left: r.left, right: r.right, top: r.top, bottom: r.bottom };
+    for (let a = el.parentElement; a && a !== document.body; a = a.parentElement) {
+      const e = getComputedStyle(a);
+      if (e.overflowX === "visible" && e.overflowY === "visible") continue;
+      const c = a.getBoundingClientRect();
+      v = {
+        left: Math.max(v.left, c.left),
+        right: Math.min(v.right, c.right),
+        top: Math.max(v.top, c.top),
+        bottom: Math.min(v.bottom, c.bottom),
+      };
+    }
+    return { ...v, width: v.right - v.left, height: v.bottom - v.top };
+  };
+  const fijo = (el) => {
+    for (let a = el; a; a = a.parentElement)
+      if (getComputedStyle(a).position === "fixed") return true;
+    return false;
+  };
+  const hojas = vistos.filter(
+    (el) =>
+      !vistos.some((o) => o !== el && el.contains(o)) &&
+      (el.textContent ?? "").trim().length > 0 &&
+      !fijo(el),
+  );
+  const cajas = hojas
+    .map((el) => [el, recorteVisible(el)])
+    .filter(([, r]) => r.width > 2 && r.height > 2);
   for (let i = 0; i < cajas.length; i++) {
     for (let j = i + 1; j < cajas.length; j++) {
       const [ea, a] = cajas[i];
@@ -209,16 +245,28 @@ function medir() {
   return fallos;
 }
 
-/** Lo interactivo debajo del WhatsApp flotante, en la posición de desplazamiento actual. */
+/**
+ * Lo que queda debajo del WhatsApp flotante, en la posición de desplazamiento actual. Controles y
+ * campos (enlaces, botones, entradas), siempre: la regla de §7 es que el WhatsApp no los tapa.
+ * Texto, solo donde no se puede sacar de debajo desplazando: abajo del todo (subir lo baja, nunca
+ * lo pone por encima del botón) o en una página que no se desplaza. Arriba, el texto que pasa por
+ * debajo sale al bajar: no cuenta.
+ */
 function tapados(donde) {
   const flotante = document.querySelector("a[aria-label='Escríbenos por WhatsApp']");
   if (!flotante) return [];
   const f = flotante.getBoundingClientRect();
   if (f.width < 1) return [];
   const fallos = [];
-  for (const el of document.querySelectorAll(
-    "a[href], button, input:not([type=hidden]), select, textarea, [role=button]",
-  )) {
+  const INTERACTIVO = "a[href], button, input:not([type=hidden]), select, textarea, [role=button]";
+  const sinDesplazar = document.documentElement.scrollHeight <= innerHeight + 1;
+  const conTexto = donde === "abajo" || sinDesplazar;
+  const elementos = [...document.querySelectorAll(conTexto ? "body *" : INTERACTIVO)].filter(
+    (el) =>
+      el.matches(INTERACTIVO) ||
+      [...el.childNodes].some((c) => c.nodeType === 3 && c.textContent.trim().length > 1),
+  );
+  for (const el of elementos) {
     if (
       flotante.contains(el) ||
       el.contains(flotante) ||

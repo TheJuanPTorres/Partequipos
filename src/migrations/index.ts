@@ -127,6 +127,7 @@ import * as migration_20261123_223246_orden_listado_nueva from './20261123_22324
 import * as migration_20261124_152709_versiones_productos from './20261124_152709_versiones_productos';
 import * as migration_20261125_043955_atributos_ficha from './20261125_043955_atributos_ficha';
 import * as migration_20261125_153231_categoria_titulo_grupos from './20261125_153231_categoria_titulo_grupos';
+import * as migration_20261125_191535_categorias_en_portada from './20261125_191535_categorias_en_portada';
 
 export const migrations = [
   {
@@ -772,6 +773,11 @@ export const migrations = [
   {
     up: migration_20261125_153231_categoria_titulo_grupos.up,
     down: migration_20261125_153231_categoria_titulo_grupos.down,
-    name: '20261125_153231_categoria_titulo_grupos'
+    name: '20261125_153231_categoria_titulo_grupos',
+  },
+  {
+    up: migration_20261125_191535_categorias_en_portada.up,
+    down: migration_20261125_191535_categorias_en_portada.down,
+    name: '20261125_191535_categorias_en_portada'
   },
 ];

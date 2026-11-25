@@ -949,7 +949,7 @@ export interface TiposEquipo {
       }[]
     | null;
   /**
-   * Las categorías de repuestos que se muestran en la página de cada modelo de este tipo, en este orden. Vacío: no se muestra ninguna.
+   * Las categorías de repuestos que se muestran en la página de cada modelo de este tipo. Salen en el orden de Repuestos → Categorías técnicas (arrastrando), el mismo de todo el sitio. Vacío: no se muestra ninguna.
    */
   categoriasModelo?: (number | CategoriasTecnica)[] | null;
   /**
@@ -1111,6 +1111,10 @@ export interface CategoriasTecnica {
   icono?:
     | ('corte' | 'llanta' | 'lubricante' | 'filtro' | 'motor' | 'rodaje' | 'miscelaneos' | 'componentes' | 'diesel')
     | null;
+  /**
+   * Marcada: sale en «Venta de repuestos» de la portada, en el orden de la lista de Categorías técnicas (arrastrando).
+   */
+  enPortada?: boolean | null;
   /**
    * Vacío: no sale en la portada. 1, 2, 3… es el orden de las tarjetas de «Venta de repuestos».
    */
@@ -3145,6 +3149,7 @@ export interface CategoriasTecnicasSelect<T extends boolean = true> {
         ogImage?: T;
       };
   icono?: T;
+  enPortada?: T;
   ordenPortada?: T;
   slug?: T;
   padre?: T;

@@ -42,12 +42,13 @@ describe("kit de la portada: categorías de repuestos", () => {
       id: 1,
       nombre: "Tren de Rodaje",
       slug: "tren-de-rodaje",
-      ordenPortada: 1,
+      enPortada: true,
       ...over,
     }) as CategoriasTecnica;
 
-  it("solo las de la portada, por su posición; título de portada; foto de portada o, si no, la de la tarjeta", () => {
+  it("solo las de «En la portada», EN EL ORDEN QUE TRAEN (el de arrastrar); título y foto de portada", () => {
     const r = categoriasDePortada([
+      // El número viejo ya no ordena (tanda 24, «un solo orden»): manda el orden de la lista.
       c({ id: 1, nombre: "Filtración", slug: "filtracion", ordenPortada: 2, imagen: media(1) }),
       c({
         id: 2,
@@ -56,13 +57,14 @@ describe("kit de la portada: categorías de repuestos", () => {
         imagen: media(2),
         imagenPortada: media(3),
       }),
-      c({ id: 3, nombre: "Sin portada", slug: "x", ordenPortada: null }),
+      c({ id: 3, nombre: "Sin portada", slug: "x", enPortada: false, ordenPortada: 3 }),
+      c({ id: 4, nombre: "Sin casilla", slug: "y", enPortada: null }),
     ]);
     assert.deepEqual(
       r.map((x) => [x.nombre, x.imagen?.url, x.imagen?.alt]),
       [
-        ["Tren", "/m/3.webp", ""],
         ["Filtración", "/m/1.webp", ""],
+        ["Tren", "/m/3.webp", ""],
       ],
     );
   });
@@ -70,7 +72,7 @@ describe("kit de la portada: categorías de repuestos", () => {
   it("«Ver todos»: el enlace de la tarjeta del panel o la página de la categoría", () => {
     const r = categoriasDePortada([
       c({ id: 1, enlace: "/lubricantes/" }),
-      c({ id: 2, nombre: "Filtración", slug: "filtracion", ordenPortada: 2 }),
+      c({ id: 2, nombre: "Filtración", slug: "filtracion" }),
     ]);
     assert.equal(r[0]?.href, "/lubricantes/");
     assert.match(r[1]?.href ?? "", /\/categoria-repuestos-para-maquinaria-pesada\/filtracion\/?$/);

@@ -206,6 +206,10 @@ export function BarraSeries({
       className={`${mejoras.barraSeries} ${grande ? mejoras.barraGrande : ""} ${className ?? ""}`}
       aria-label={etiqueta}
       data-mejora="R2"
+      // El WhatsApp flotante la esquiva: en móvil, en el listado de nueva, la barra de marcas queda
+      // abajo del todo de la primera pantalla y el botón tapaba un logo (tanda 24, qa:desbordes).
+      // Al bajar, la barra se queda fija ARRIBA y ya no se cruzan.
+      data-evita-flotante=""
     >
       <ul ref={lista} className={mejoras.barraLista}>
         {series.map((s) => (

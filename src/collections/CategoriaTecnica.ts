@@ -60,6 +60,9 @@ export const CategoriaTecnica: CollectionConfig = {
   admin: {
     useAsTitle: "nombre",
     group: "Repuestos",
+    // Variante (a) de la tanda 24: la portada tiene su propio orden y hay que decirlo aquí.
+    description:
+      "Arrastra para ordenar las categorías en el menú, el índice y las páginas de tipo. La portada NO sigue este orden: se cambia en «Posición en la portada» de cada categoría (vacía, no sale en la portada).",
   },
   /*
    * ORDEN POR ARRASTRE (2026-11-19, dirección; informe del panel §6): sustituye a «Posición en
@@ -274,7 +277,7 @@ export const CategoriaTecnica: CollectionConfig = {
         admin: {
           position: "sidebar",
           description:
-            "Vacío: no sale en la portada. 1, 2, 3… es el orden de las tarjetas de «Venta de repuestos».",
+            "Solo la portada. Vacío: no sale en la portada. 1, 2, 3… es el orden de sus tarjetas de «Venta de repuestos», aparte del orden por arrastre de la lista.",
         },
       },
       /*

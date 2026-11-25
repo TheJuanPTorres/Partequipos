@@ -323,7 +323,7 @@ describe("megamenú: repuestos por categoría técnica y política de garantías
         id: 2,
         nombre: "Filtración",
         slug: "filtros-para-maquinaria-pesada",
-        ordenMarca: 1,
+
         // Sin medidas: la tarjeta va sin foto.
         imagen: { url: "/api/media/file/filtro.jpg", width: null, height: null },
       },
@@ -331,11 +331,11 @@ describe("megamenú: repuestos por categoría técnica y política de garantías
         id: 1,
         nombre: "Tren de rodaje",
         slug: "tren-de-rodaje-para-maquinaria-pesada",
-        ordenMarca: 2,
+
         imagen: { url: "/api/media/file/rodaje.jpg", width: 800, height: 600 },
       },
-      { id: 3, nombre: "Accesorios", slug: "accesorios", ordenMarca: null, imagen: 9 },
-      { id: 4, nombre: "Sin página", slug: "", ordenMarca: null, imagen: null },
+      { id: 3, nombre: "Accesorios", slug: "accesorios", imagen: 9 },
+      { id: 4, nombre: "Sin página", slug: "", imagen: null },
     ],
     politicaRepuestos: {
       mostrar: true,
@@ -393,7 +393,7 @@ describe("megamenú: repuestos por categoría técnica y política de garantías
   it("sin ninguna categoría con página, el apartado no sale", () => {
     const p = panelRepuestos({
       ...conTodo,
-      categoriasTecnicas: [{ id: 4, nombre: "X", slug: "", ordenMarca: null }],
+      categoriasTecnicas: [{ id: 4, nombre: "X", slug: "" }],
     });
     assert.deepEqual(titulos(p.grupos), ["Repuestos por marca"]);
   });

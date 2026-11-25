@@ -825,3 +825,17 @@
     transform: translateY(-2px);
   }
 }
+
+/*
+ * LA DIRECCIÓN NO QUEDA BAJO EL WHATSAPP FLOTANTE (2026-11-25, regla de Juan Pablo: nada tapado).
+ * Al fondo de la página no se puede desplazar más, así que lo que caiga bajo el botón (56 px a
+ * 16 del borde, más 8 de aire: los últimos 80 px, a la derecha) se queda tapado. En el teléfono
+ * la dirección ocupa todo el ancho y su última línea llegaba a 68 px del fondo. «Volver arriba»,
+ * que va centrado y no llega a la esquina, baja 12 px más: la dirección acaba justo por encima
+ * del botón (16 de relleno + 36 del enlace + 16 de margen + 12 de hueco = 80).
+ */
+@media (max-width: 767px) {
+  .arriba {
+    margin-top: 16px;
+  }
+}

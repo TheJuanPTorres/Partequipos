@@ -131,7 +131,7 @@ export function panelConTarjetas(panel: PanelMenu): boolean {
 /** Lo que el menú necesita de una categoría técnica (la foto, `depth: 1`: url y medidas). */
 export type CategoriaTecnicaMenu = Pick<
   CategoriasTecnica,
-  "id" | "nombre" | "slug" | "ordenMarca" | "colorMarca"
+  "id" | "nombre" | "slug" | "colorMarca"
 > & {
   imagen?: number | LogoCatalogo | null;
   /** La categoría de la que cuelga (solo su dirección). */

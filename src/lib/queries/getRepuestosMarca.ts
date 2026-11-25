@@ -34,8 +34,8 @@ export const getTiposDeMarcaConImagen = cache(async (marcaId: number): Promise<T
 });
 
 /**
- * Todas las categorías técnicas NORMALES: son COMUNES a las marcas. El orden lo decide
- * `ordenMarca`. Las que cuelgan de otra (Filtros Donaldson) no: salen en su categoría.
+ * Todas las categorías técnicas NORMALES: son COMUNES a las marcas, en el orden por
+ * arrastre del panel (el mismo del índice y del menú). Las que cuelgan de otra (Filtros Donaldson) no: salen en su categoría.
  */
 export const getCategoriasParaMarca = cache(async (): Promise<CategoriasTecnica[]> => {
   const payload = await getPayload({ config });

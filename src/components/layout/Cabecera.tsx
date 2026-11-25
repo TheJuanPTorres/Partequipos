@@ -36,6 +36,7 @@ import {
   RETRASO_CERRAR_MS,
   RETRASO_CERRAR_SIN_M1_MS,
   type Punto,
+  DURACION_CIERRE_MENU_MS,
 } from "@/lib/cabecera/fluidez";
 import { inicioDelPanel, modoCabecera } from "@/lib/cabecera/modo";
 import { activasDe, PARAMETRO_ANIMACIONES } from "@/lib/listado/animaciones";
@@ -233,6 +234,19 @@ export function Cabecera({
   // contar como abierto, sin un efecto que lo cierre.
   const [abiertoEn, setAbiertoEn] = useState<string | null>(null);
   const abierto = abiertoEn === ruta;
+  // El panel del menú móvil sigue montado mientras se recoge: el cierre es el espejo de la
+  // apertura. Si se vuelve a abrir a mitad, deja de «cerrarse» y la transición sigue desde ahí.
+  const [cerrandoMovil, setCerrandoMovil] = useState(false);
+  const [abiertoAntes, setAbiertoAntes] = useState(abierto);
+  if (abiertoAntes !== abierto) {
+    setAbiertoAntes(abierto);
+    setCerrandoMovil(!abierto && !matchMedia("(prefers-reduced-motion: reduce)").matches);
+  }
+  useEffect(() => {
+    if (!cerrandoMovil) return;
+    const t = window.setTimeout(() => setCerrandoMovil(false), DURACION_CIERRE_MENU_MS + 40);
+    return () => window.clearTimeout(t);
+  }, [cerrandoMovil]);
   const boton = useRef<HTMLButtonElement>(null);
   const panel = useRef<HTMLDivElement>(null);
   const cabecera = useRef<HTMLElement>(null);
@@ -575,13 +589,56 @@ export function Cabecera({
     [mostrarMega],
   );
 
+  /*
+   * VOLVER A MITAD DEL CIERRE: mientras el panel se recoge ya no recibe el ratón (va `inert`,
+   * para que el tabulador no entre en él), así que su `onMouseEnter` no avisa. Durante lo que
+   * dura el cierre se mira el puntero: si vuelve a entrar en la caja del panel, se abre otra vez
+   * y la transición sigue desde donde iba. Solo tras salir con el ratón: no al elegir un enlace
+   * ni al cerrar con Escape.
+   */
+  const mostrarRef = useRef(mostrarMega);
+  useEffect(() => {
+    mostrarRef.current = mostrarMega;
+  }, [mostrarMega]);
+  const dejarDeMirar = useRef<(() => void) | null>(null);
+  useEffect(() => () => dejarDeMirar.current?.(), []);
+  const permitirVolver = useCallback((clave: string) => {
+    dejarDeMirar.current?.();
+    let fin = 0;
+    function quitar() {
+      document.removeEventListener("pointermove", alMover);
+      window.clearTimeout(fin);
+      dejarDeMirar.current = null;
+    }
+    function alMover(e: PointerEvent) {
+      if (e.pointerType !== "mouse") return;
+      const caja = paneMega.current[clave]?.getBoundingClientRect();
+      if (!caja) return;
+      const dentro =
+        e.clientX >= caja.left &&
+        e.clientX <= caja.right &&
+        e.clientY >= caja.top &&
+        e.clientY <= caja.bottom;
+      if (!dentro) return;
+      quitar();
+      mostrarRef.current(clave);
+    }
+    fin = window.setTimeout(quitar, DURACION_CIERRE_MENU_MS);
+    document.addEventListener("pointermove", alMover);
+    dejarDeMirar.current = quitar;
+  }, []);
+
   const cerrarMegaLuego = useCallback(() => {
     window.clearTimeout(temporizador.current);
     // Sin panel abierto no hay nada que cerrar (y el que iba a abrirse por M1 ya no se abre).
     if (!abiertaRef.current) return;
     const espera = mejorasRef.current.has("M1") ? RETRASO_CERRAR_MS : RETRASO_CERRAR_SIN_M1_MS;
-    temporizador.current = window.setTimeout(() => setMega(null), espera);
-  }, []);
+    temporizador.current = window.setTimeout(() => {
+      const clave = abiertaRef.current;
+      setMega(null);
+      if (clave) permitirVolver(clave);
+    }, espera);
+  }, [permitirVolver]);
 
   const cerrarMega = useCallback((clave: string | null, foco: "boton" | "siguiente" | null) => {
     window.clearTimeout(temporizador.current);
@@ -890,7 +947,7 @@ export function Cabecera({
         data-modo={modoCabecera({
           esPortada,
           arriba,
-          menuMovilAbierto: abierto,
+          menuMovilAbierto: abierto || cerrandoMovil,
           megaAbierto: megaAbierto !== null,
         })}
         data-encogida={arriba ? "no" : "si"}
@@ -992,7 +1049,14 @@ export function Cabecera({
           </div>
         </div>
 
-        <div ref={panel} id="menu-movil" className={estilos.panel} hidden={!abierto}>
+        <div
+          ref={panel}
+          id="menu-movil"
+          className={estilos.panel}
+          data-abierto={abierto ? "si" : "no"}
+          hidden={!abierto && !cerrandoMovil}
+          inert={!abierto}
+        >
           <nav aria-label="Menú">
             <GrupoHermanos>{listaEnlaces}</GrupoHermanos>
           </nav>

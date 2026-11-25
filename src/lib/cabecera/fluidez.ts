@@ -50,6 +50,16 @@ export const DURACION_MARCO_MS = 260;
 export const DURACION_ACORDEON_MS = 240;
 export const CURVA_MENU = "cubic-bezier(0.33, 0, 0.2, 1)";
 
+/**
+ * APERTURA Y CIERRE DEL PANEL (megamenú y menú móvil; tanda 24, Juan Pablo): el cierre es el espejo
+ * de la apertura, el panel se recoge hacia la barra mientras su contenido se funde. Los tiempos y
+ * las curvas van en el CSS (`megamenu.module.css` y `cabecera.module.css`: 280 ms al abrir, con
+ * salida suave; 220 ms al cerrar, con entrada suave). Aquí, lo que dura el cierre, para lo que
+ * tiene que esperar a que acabe: el panel del menú móvil sigue montado ese tiempo, y si el ratón
+ * vuelve a entrar en el panel del megamenú mientras se cierra, se abre otra vez desde donde iba.
+ */
+export const DURACION_CIERRE_MENU_MS = 220;
+
 export type Punto = { x: number; y: number };
 export type Caja = { left: number; top: number; right: number; bottom: number };
 

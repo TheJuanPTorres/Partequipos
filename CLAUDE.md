@@ -338,6 +338,23 @@ Una tarea no está terminada hasta que cumple **todo** esto:
 7. Desplegada en preview y verificada.
 8. **La prueba de humo pasa en ese preview** (§10.20). Corre sola con cada
    despliegue, en la pestaña Actions.
+9. **Nada se corta, se solapa ni queda tapado** (Juan Pablo, 2026-11-25), ni
+   por el WhatsApp flotante, a 360, 390, 430, 768, 820, 1024, 1180, 1280,
+   1366, 1440, 1920, 2560 y 3840, y con zoom del 80 al 200 % a 1366 y 1440.
+   **Nada de altos fijos con `overflow: hidden` en contenedores con texto o
+   botones**: si algo se iguala a una foto, con `min-height`, nunca con un
+   máximo; en rejillas y flex, `minmax(0, 1fr)` y `min-width: 0`. Se comprueba
+   con `npm run qa:desbordes`, con el turno de MEDICION:
+
+   ```
+   npm run preview:ejecutar -- npm run qa:desbordes -- <preview> <carpeta> [ruta…]
+   ```
+
+   Sin rutas, las plantillas principales (`RUTAS` de `scripts/qa/desbordes.mjs`);
+   `DESBORDES_VISTAS=390,1440@200` mide solo esas vistas (ancho@zoom). Con
+   todas las vistas y rutas tarda más de 15 min: se parte en tandas. Un
+   recorte a propósito (texto plegado con «Leer más») lleva `data-qa-recorte`;
+   un solape a propósito, `data-qa-solape`.
 
 > **ANTES DE PROMOCIONAR A PRODUCCIÓN — regla operativa, no sugerencia:**
 > **si la prueba de humo falla en un preview, ese despliegue NO se promociona.**
@@ -3748,6 +3765,7 @@ fichero, cero dependencias, cero imports, solo marcado.
 | API sin lectura anónima                  | Una colección o global nuevo con `read: () => true` (o sin `read`): la API REST serviría la colección entera sin sesión, con su coste en la base (2026-10-15)                                                                                                                                                                         | `lecturaContenido` / `lecturaFiltrada` (`src/lib/seguridad/acceso.ts`, `lecturaApi.ts`) + `lecturaApi.test.ts`, que evalúa el `read` real de las 26 colecciones y 6 globales                  | CI, en cada push                      |
 | Revalidación tras una importación        | Una importación por script que deja datos viejos o un 404 en caché (la caché de datos sobrevive a los redeploys; 2026-10-18, bulldozers usados en 404): `POST /api/revalidar/` con `REVALIDACION_TOKEN` vacía todas las etiquetas y todas las páginas; el guardarraíl exige solo POST, token antes de revalidar y TODAS las etiquetas | `src/lib/revalidarSitio.test.ts` + `tokenRevalidacion.test.ts`; el paso final de cada runbook de importación                                                                                  | CI, en cada push; el runbook al final |
 | Zod solo en el servidor                  | Un componente con `"use client"` que importa, directa o transitivamente, un módulo con `zod` y lo mete entero en el navegador (~98 KiB)                                                                                                                                                                                               | `src/lib/validation/clienteSinZod.test.ts` (se detiene en los `"use server"`)                                                                                                                 | CI, en cada push                      |
+| Nada cortado ni tapado                   | Un alto fijo con `overflow: hidden` que corta un texto o un botón, una columna `1fr` que saca la página por la derecha, o un botón bajo el WhatsApp flotante (BUG-005)                                                                                                                                                                | `npm run qa:desbordes` (necesita navegador; §7 p.9)                                                                                                                                           | **A mano**, con MEDICION              |
 
 **«Deriva de esquema» se colgó dos veces; está blindada (fase 5).**
 

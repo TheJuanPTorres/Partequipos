@@ -29,6 +29,27 @@ export const VERSIONES_CON_BORRADORES: NonNullable<CollectionConfig["versions"]>
   maxPerDoc: MAXIMO_VERSIONES,
 };
 
+/**
+ * HISTORIAL SIN BORRADORES (tanda 21, tarea 3, fase 2, punto 4) para las fichas de producto: cada
+ * guardado deja una versión (fecha y quién), que se compara campo a campo y se restaura. Sin
+ * borradores: lo que se guarda se publica, como siempre. Las 10 últimas por ficha; el historial,
+ * solo con sesión del personal (`readVersions: soloPersonal`).
+ */
+export const MAXIMO_VERSIONES_PRODUCTO = 10;
+export const VERSIONES_SIN_BORRADORES: NonNullable<CollectionConfig["versions"]> = {
+  drafts: false,
+  maxPerDoc: MAXIMO_VERSIONES_PRODUCTO,
+};
+
+/**
+ * LA LISTA DE VERSIONES, LA MÁS RECIENTE PRIMERO (2026-11-24, dirección). Payload 3.89 pide las
+ * versiones sin orden y el adaptador cae al `defaultSort` de la colección, que no es la fecha: en la
+ * lista salían mezcladas. Si nadie pide otro orden (pulsando una columna), se ordena por
+ * `-updatedAt`, la fecha que pinta la lista. Lo vigila `versionesProducto.test.ts`.
+ */
+export const versionesRecientesPrimero: CollectionBeforeOperationHook = ({ args, operation }) =>
+  operation === "findVersions" && !args.sort ? { ...args, sort: "-updatedAt" } : args;
+
 /** La condición de lo publicado. */
 export const PUBLICADO = { _status: { equals: "published" } } satisfies Where;
 

@@ -45,7 +45,7 @@ export const LISTADOS: Record<string, Listado> = {
     busqueda: ["nombre", "codigo"],
   },
   "modelos-repuesto": {
-    columnas: ["imagenes", "nombre", "codigo", "marca", "tipo", "mostrarEnWeb"],
+    columnas: ["nombre", "estadoWeb", "codigo", "marca", "tipo", "mostrarEnWeb"],
     busqueda: ["nombre", "codigo"],
   },
   marcas: { columnas: ["logo", "nombre"], busqueda: ["nombre"] },
@@ -76,7 +76,8 @@ export const LISTADOS: Record<string, Listado> = {
   paginas: { columnas: ["titulo", "slug", "diseno"], busqueda: ["titulo"] },
 };
 
-const CELDA_MINIATURA = "/components/admin/celdas/CeldaMiniatura";
+export const CELDA_MINIATURA = "/components/admin/celdas/CeldaMiniatura";
+export const CELDA_TITULO_ENLACE = "/components/admin/celdas/CeldaTituloEnlace";
 
 /** Los campos con datos en el primer nivel (los de pestañas, filas y plegables sin nombre, también). */
 export function camposDeDatos(campos: Field[]): Field[] {
@@ -109,6 +110,41 @@ function conMiniatura(campos: Field[], columnas: Set<string>): Field[] {
     return {
       ...c,
       admin: { ...admin, components: { ...admin.components, Cell: CELDA_MINIATURA } },
+    } as Field;
+  });
+}
+
+/**
+ * El TÍTULO (`useAsTitle`) abre la ficha aunque no sea la primera columna (2026-11-24, urgente):
+ * Payload solo enlaza la primera, y en las listas que empiezan por el logo o la imagen el nombre
+ * no abría nada. Solo si el campo no trae ya su celda (la del nombre con miniatura, p. ej.).
+ */
+function conTituloEnlazado(campos: Field[], titulo: string): Field[] {
+  return campos.map((c) => {
+    if (c.type === "tabs") {
+      return {
+        ...c,
+        tabs: c.tabs.map((t) => ({
+          ...t,
+          fields: "name" in t && t.name ? t.fields : conTituloEnlazado(t.fields, titulo),
+        })),
+      };
+    }
+    if (!("name" in c) && "fields" in c && Array.isArray(c.fields)) {
+      return { ...c, fields: conTituloEnlazado(c.fields, titulo) } as Field;
+    }
+    if (!("name" in c) || c.name !== titulo) return c;
+    const admin = ("admin" in c && c.admin) || {};
+    if ((admin as { components?: { Cell?: unknown } }).components?.Cell) return c;
+    return {
+      ...c,
+      admin: {
+        ...admin,
+        components: {
+          ...(admin as { components?: object }).components,
+          Cell: CELDA_TITULO_ENLACE,
+        },
+      },
     } as Field;
   });
 }
@@ -150,7 +186,13 @@ export function conListados(colecciones: CollectionConfig[]): CollectionConfig[]
             }
           : {}),
       },
-      fields: conMiniatura(c.fields, new Set(listado.columnas)),
+      fields: ((campos) => {
+        const titulo = c.admin?.useAsTitle;
+        // Si el título no es la primera columna, enlaza él también.
+        return titulo && listado.columnas.includes(titulo) && listado.columnas[0] !== titulo
+          ? conTituloEnlazado(campos, titulo)
+          : campos;
+      })(conMiniatura(c.fields, new Set(listado.columnas))),
     };
   });
 }

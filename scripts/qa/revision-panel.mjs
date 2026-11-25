@@ -327,6 +327,90 @@ try {
     }
 
     /*
+     * Modo `facil` (2026-11-23, tarea 3, fase 2): la EDICIÓN FÁCIL de las fichas de producto. Por
+     * colección (las de `… facil <col1,col2>`; por defecto nuevas, modelos y usadas), la lista y la
+     * cabecera de la primera ficha, y si salen el resumen «Así se ve hoy en la web», la columna
+     * «Estado», los interruptores y las sugerencias. Solo lee.
+     */
+    if (MODO === "facil") {
+      const colecciones = (process.argv[4] ?? "equipos-nuevos,modelos-repuesto,equipos-usados")
+        .split(",")
+        .filter(Boolean);
+      for (const coleccion of colecciones) {
+        await pagina.goto(`${base}/admin/collections/${coleccion}?limit=5&sort=id`, {
+          waitUntil: "networkidle",
+        });
+        await pagina.waitForTimeout(1500);
+        await pagina.screenshot({
+          path: path.join(salida, `lista-${coleccion}-${ancho.nombre}.png`),
+          fullPage: true,
+        });
+        const lista = await pagina.evaluate(() => ({
+          columnas: [...document.querySelectorAll("table thead th")].map((th) =>
+            th.textContent.trim(),
+          ),
+          celdasNombre: document.querySelectorAll(".pq-celda-nombre").length,
+          estados: [...document.querySelectorAll(".pq-insignia")].map((e) => e.textContent.trim()),
+          interruptores: document.querySelectorAll('[role="switch"]').length,
+        }));
+        // `… facil <colecciones> <id>`: esa ficha en lugar de la primera.
+        const primera = /^\d+$/.test(process.argv[5] ?? "")
+          ? Number(process.argv[5])
+          : await pagina.evaluate(
+              async (r) =>
+                (await (await fetch(r, { credentials: "include" })).json())?.docs?.[0]?.id,
+              `${base}/api/${coleccion}?limit=1&sort=id&depth=0`,
+            );
+        let ficha = null;
+        if (primera) {
+          await pagina.goto(`${base}/admin/collections/${coleccion}/${primera}`, {
+            waitUntil: "networkidle",
+          });
+          await pagina.waitForTimeout(2500);
+          await pagina.screenshot({
+            path: path.join(salida, `ficha-${coleccion}-${ancho.nombre}.png`),
+            fullPage: false,
+          });
+          // Las filas de una lista (los productos de lubricante): su etiqueta, a la vista.
+          const etiquetas = pagina.locator(".pq-etiqueta-producto");
+          if ((await etiquetas.count()) > 0) {
+            await etiquetas.first().scrollIntoViewIfNeeded();
+            await pagina.waitForTimeout(500);
+            await pagina.screenshot({
+              path: path.join(salida, `filas-${coleccion}-${ancho.nombre}.png`),
+              fullPage: false,
+            });
+          }
+          ficha = await pagina.evaluate(() => ({
+            filas: [...document.querySelectorAll(".pq-etiqueta-producto")]
+              .slice(0, 6)
+              .map((e) => e.textContent.trim()),
+            resumen:
+              document.querySelector(".pq-resumen-web__completa strong")?.textContent?.trim() ??
+              null,
+            falta:
+              document.querySelector(".pq-resumen-web__barra-texto span")?.textContent?.trim() ??
+              null,
+            estado:
+              document.querySelector(".pq-resumen-web .pq-insignia")?.textContent?.trim() ?? null,
+            verEnLaWeb: Boolean(document.querySelector(".pq-resumen-web__ver")),
+            sugerencias: [...document.querySelectorAll(".pq-sugerencias")].map((s) =>
+              s.textContent.trim().slice(0, 120),
+            ),
+          }));
+        }
+        hallazgos.push({ pantalla: `facil-${coleccion}`, ancho: ancho.nombre, lista, ficha });
+        decir(
+          `✓ ${coleccion} (${ancho.nombre}): ${lista.celdasNombre} nombres con foto, estados ${[...new Set(lista.estados)].join("/") || "-"}, ${lista.interruptores} interruptores · ficha ${primera ?? "-"}: ${ficha?.estado ?? "-"}, ${ficha?.resumen ?? "sin resumen"}${ficha?.verEnLaWeb ? ", «Ver en la web»" : ""}${ficha?.sugerencias?.length ? ` · sugerencias: ${ficha.sugerencias.join(" | ")}` : ""}`,
+        );
+      }
+      hallazgos.push({ pantalla: "consola", ancho: ancho.nombre, errores });
+      hallazgos.push({ pantalla: "peticiones-fallidas", ancho: ancho.nombre, fallidas });
+      await contexto.close();
+      continue;
+    }
+
+    /*
      * Modo `bloque` (2026-11-23, #558): CAMBIOS EN BLOQUE y DUPLICAR, por efecto (§10.15), a 1440.
      * En usadas y nuevas marca las 2 primeras filas visibles y en la web y disponibles, pulsa cada
      * acción («Sí, hacerlo»), y lee por la API con la sesión que solo cambian esas 2 (las otras 8
@@ -553,11 +637,568 @@ try {
     }
 
     /*
+     * Modo `versiones` (2026-11-24, #575): el HISTORIAL SIN BORRADORES por efecto, a 1440, en
+     * `… versiones <coleccion> <id>` (por defecto, el equipo nuevo 1). Dos guardados con la sesión
+     * del editor (la entradilla con « v» y otra vez como estaba), la pestaña «Versiones», comparar,
+     * y RESTAURAR la versión con « v» y después la de antes: al final la ficha queda como estaba
+     * (si no, se devuelve con la API). Capturas de la lista y de la comparación.
+     */
+    if (MODO === "versiones") {
+      const coleccion = process.argv[4] ?? "equipos-nuevos";
+      const id = Number(process.argv[5] ?? 1);
+      if (ancho.movil) {
+        // En móvil, solo las capturas de la lista y de la última versión: sin guardar ni restaurar.
+        await pagina.goto(`${base}/admin/collections/${coleccion}/${id}/versions`, {
+          waitUntil: "networkidle",
+        });
+        await pagina.waitForTimeout(2000);
+        await pagina.screenshot({
+          path: path.join(salida, `versiones-lista-${coleccion}-movil.png`),
+          fullPage: false,
+        });
+        const enlace = pagina.locator("table tbody tr a").first();
+        if (await enlace.count()) {
+          await enlace.click();
+          await pagina.waitForLoadState("networkidle");
+          await pagina.waitForTimeout(2000);
+          await pagina.screenshot({
+            path: path.join(salida, `versiones-comparar-${coleccion}-movil.png`),
+            fullPage: false,
+          });
+        }
+        hallazgos.push({
+          pantalla: "versiones",
+          ancho: ancho.nombre,
+          coleccion,
+          id,
+          errores,
+          fallidas,
+        });
+        await contexto.close();
+        continue;
+      }
+      // `… versiones <coleccion> <id> <campo de texto>`: en usadas y modelos no hay entradilla.
+      const campo = process.argv[6] && process.argv[6] !== "api" ? process.argv[6] : "entradilla";
+      const api = (ruta, opciones = {}) =>
+        pagina.evaluate(
+          async ([r, o]) => {
+            const res = await fetch(r, { credentials: "include", ...o });
+            return { estado: res.status, cuerpo: await res.json().catch(() => null) };
+          },
+          [`${base}/api${ruta}`, opciones],
+        );
+      const poner = (valor) =>
+        api(`/${coleccion}/${id}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ [campo]: valor }),
+        });
+      const leer = async () => (await api(`/${coleccion}/${id}?depth=0`)).cuerpo?.[campo] ?? null;
+      const versiones = async () =>
+        (
+          await api(
+            `/${coleccion}/versions?where[parent][equals]=${id}&sort=-updatedAt&limit=10&depth=0`,
+          )
+        ).cuerpo?.docs ?? [];
+      const resultado = [];
+      const ok = (texto, bien) => {
+        resultado.push(`${bien ? "✓" : "✗"} ${texto}`);
+        decir(`${bien ? "✓" : "✗"} ${texto}`);
+      };
+      const original = await leer();
+      const conV = `${original ?? ""} v`;
+      const r1 = await poner(conV);
+      const r2 = await poner(original);
+      ok(
+        `dos guardados con la sesión del editor (${r1.estado}, ${r2.estado})`,
+        r1.estado === 200 && r2.estado === 200,
+      );
+      const lista = await versiones();
+      ok(`el historial tiene versiones (${lista.length})`, lista.length >= 2);
+      const vConV = lista.find((v) => v.version?.[campo] === conV);
+      const vOriginal = lista.find((v) => v.version?.[campo] === original);
+      ok("están la versión con « v» y la de antes", Boolean(vConV && vOriginal));
+      // Sin sesión, el historial no se lee.
+      const anonimo = await pagina.evaluate(
+        async (r) => (await fetch(r, { credentials: "omit" })).status,
+        `${base}/api/${coleccion}/versions?limit=1`,
+      );
+      ok(
+        `sin sesión, el historial no se lee (HTTP ${anonimo})`,
+        anonimo === 403 || anonimo === 401,
+      );
+      await pagina.goto(`${base}/admin/collections/${coleccion}/${id}/versions`, {
+        waitUntil: "networkidle",
+      });
+      await pagina.waitForTimeout(2000);
+      await pagina.screenshot({
+        path: path.join(salida, `versiones-lista-${coleccion}-1440.png`),
+        fullPage: false,
+      });
+      const filasVista = await pagina.locator("table tbody tr").count();
+      ok(`la pestaña «Versiones» lista ${filasVista} guardados`, filasVista >= 2);
+      const restaurar = async (v, nombre) => {
+        await pagina.goto(`${base}/admin/collections/${coleccion}/${id}/versions/${v.id}`, {
+          waitUntil: "networkidle",
+        });
+        await pagina.waitForTimeout(2000);
+        if (nombre === "con « v»") {
+          await pagina.screenshot({
+            path: path.join(salida, `versiones-comparar-${coleccion}-1440.png`),
+            fullPage: false,
+          });
+        }
+        await pagina
+          .getByRole("button", { name: /Restaurar/i })
+          .first()
+          .click({ timeout: 8000 });
+        await pagina.waitForTimeout(800);
+        await pagina
+          .getByRole("button", { name: /Confirmar|Restaurar|Sí/i })
+          .last()
+          .click({ timeout: 8000 })
+          .catch(() => null);
+        await pagina.waitForTimeout(3500);
+      };
+      if (vConV && vOriginal && process.argv.includes("api")) {
+        // Diagnóstico: el mismo restaurar por la API, con la respuesta (sin datos de la ficha).
+        const r = await api(`/${coleccion}/versions/${vConV.id}?depth=0`, { method: "POST" });
+        const errores = JSON.stringify(r.cuerpo?.errors ?? r.cuerpo?.message ?? null).slice(0, 600);
+        decir(`   restaurar por la API: HTTP ${r.estado} · ${errores}`);
+      } else if (vConV && vOriginal) {
+        await restaurar(vConV, "con « v»");
+        ok(`restaurar la versión con « v» la pone en la ficha`, (await leer()) === conV);
+        const otra = (await versiones()).find((v) => v.version?.[campo] === original);
+        if (otra) await restaurar(otra, "la de antes");
+      }
+      const final = await leer();
+      ok("al final, la ficha queda como estaba", final === original);
+      if (final !== original) {
+        await poner(original);
+        decir("   devuelta con la API");
+      }
+      hallazgos.push({
+        pantalla: "versiones",
+        ancho: ancho.nombre,
+        coleccion,
+        id,
+        resultado,
+        errores,
+        fallidas,
+      });
+      await contexto.close();
+      continue;
+    }
+
+    /*
+     * Modo `joins` (2026-11-24, para dirección): en la ficha de cada colección
+     * (`… joins <col1,col2,…>`), el primer listado de la pestaña «Contenido» (un campo `join`, con
+     * su asa de arrastre), a la vista y capturado. NO arrastra nada: solo lee.
+     */
+    if (MODO === "joins") {
+      const colecciones = (
+        process.argv[4] ??
+        "marcas-maquinaria,tipos-maquinaria,marcas,tipos-equipo,marcas-lubricante"
+      )
+        .split(",")
+        .filter(Boolean);
+      for (const coleccion of colecciones) {
+        const id = await pagina.evaluate(
+          async (r) => (await (await fetch(r, { credentials: "include" })).json())?.docs?.[0]?.id,
+          `${base}/api/${coleccion}?limit=1&sort=id&depth=0`,
+        );
+        if (!id) {
+          decir(`${coleccion} (${ancho.nombre}): sin fichas`);
+          continue;
+        }
+        await pagina.goto(`${base}/admin/collections/${coleccion}/${id}`, {
+          waitUntil: "networkidle",
+        });
+        await pagina.waitForTimeout(2500);
+        const listado = pagina.locator(".relationship-table, .join-field, [class*='join']").first();
+        const hay = (await listado.count()) > 0;
+        if (hay) {
+          await listado.scrollIntoViewIfNeeded();
+          await pagina.waitForTimeout(800);
+        }
+        await pagina.screenshot({
+          path: path.join(salida, `listado-${coleccion}-${ancho.nombre}.png`),
+          fullPage: false,
+        });
+        const info = await pagina.evaluate(() => {
+          const t = document.querySelector(".relationship-table, .join-field, [class*='join']");
+          return {
+            titulo:
+              t
+                ?.querySelector("h2, h3, h4, label, .relationship-table__header")
+                ?.textContent?.trim()
+                ?.slice(0, 80) ?? null,
+            filas: t ? t.querySelectorAll("tbody tr").length : 0,
+            asas: t
+              ? t.querySelectorAll(
+                  "[class*='drag'], [aria-roledescription='sortable'], [data-dnd-kit]",
+                ).length
+              : 0,
+          };
+        });
+        hallazgos.push({ pantalla: `joins-${coleccion}`, ancho: ancho.nombre, id, hay, ...info });
+        decir(
+          `${coleccion} ${id} (${ancho.nombre}): ${hay ? `listado «${info.titulo ?? "-"}», ${info.filas} filas, ${info.asas} asas` : "SIN listado"}`,
+        );
+      }
+      hallazgos.push({ pantalla: "consola", ancho: ancho.nombre, errores });
+      await contexto.close();
+      continue;
+    }
+
+    /*
+     * Modo `abrir` (2026-11-24, #574): en la lista de cada colección (`… abrir <col1,col2>`), pulsa
+     * en la primera fila la PRIMERA celda (el logo, la foto o el estado) y la del NOMBRE, y anota si
+     * entra en la ficha. Solo lee.
+     */
+    if (MODO === "abrir") {
+      const colecciones = (process.argv[4] ?? "marcas-maquinaria,solicitudes")
+        .split(",")
+        .filter(Boolean);
+      for (const coleccion of colecciones) {
+        const lista = `${base}/admin/collections/${coleccion}?limit=5`;
+        await pagina.goto(lista, { waitUntil: "networkidle" });
+        await pagina.waitForTimeout(1500);
+        await pagina.screenshot({
+          path: path.join(salida, `abrir-${coleccion}-${ancho.nombre}.png`),
+          fullPage: false,
+        });
+        const cabeceras = await pagina
+          .locator("table thead th")
+          .evaluateAll((ths) => ths.map((th) => th.textContent.trim()));
+        const iNombre = cabeceras.findIndex((t) => /^Nombre/.test(t));
+        // La primera columna de datos: la que sigue a la casilla de marcar (si la hay).
+        const iPrimera = cabeceras.findIndex((t) => t !== "");
+        const resultados = [];
+        for (const [que, indice] of [
+          [`primera celda («${cabeceras[iPrimera] || "-"}»)`, iPrimera],
+          ["celda «Nombre»", iNombre],
+        ]) {
+          if (indice < 0) {
+            resultados.push(`${que}: no hay esa columna`);
+            continue;
+          }
+          await pagina.goto(lista, { waitUntil: "networkidle" });
+          await pagina.waitForTimeout(1200);
+          const celda = pagina.locator("table tbody tr").first().locator("td").nth(indice);
+          const enlace = celda.locator("a").first();
+          const objetivo = (await enlace.count()) > 0 ? enlace : celda;
+          await objetivo.click({ timeout: 5000 }).catch(() => null);
+          await pagina.waitForTimeout(2500);
+          const ruta = new URL(pagina.url()).pathname;
+          const entra = new RegExp(`/collections/${coleccion}/\\d+/?$`).test(ruta);
+          resultados.push(`${que}: ${entra ? "ENTRA" : "NO entra"} (${ruta})`);
+        }
+        hallazgos.push({
+          pantalla: `abrir-${coleccion}`,
+          ancho: ancho.nombre,
+          cabeceras,
+          resultados,
+        });
+        decir(`${coleccion} (${ancho.nombre}): ${resultados.join(" · ")}`);
+      }
+      hallazgos.push({ pantalla: "consola", ancho: ancho.nombre, errores });
+      await contexto.close();
+      continue;
+    }
+
+    /*
+     * Modo `csp-subidas` (2026-11-24, para A, tras el #566): los avisos de la CSP HACIENDO cosas en
+     * el panel, a 1440: subir una imagen y un PDF (subida directa al Blob), abrir la vista previa
+     * del documento, escribir en un texto enriquecido y guardar una ficha (y deshacerlo). Imprime
+     * los ids de lo subido: se borra después con la API local (el editor no puede borrar).
+     */
+    if (MODO === "csp-subidas") {
+      if (ancho.movil) {
+        await contexto.close();
+        continue;
+      }
+      const consola = [];
+      pagina.on("console", (m) => {
+        const t = m.text();
+        if (/Content[- ]Security[- ]Policy|Report Only/i.test(t)) consola.push(t.slice(0, 300));
+      });
+      await contexto.addInitScript(() => {
+        window.__violaciones = [];
+        document.addEventListener("securitypolicyviolation", (e) =>
+          window.__violaciones.push(`${e.effectiveDirective} ← ${e.blockedURI}`),
+        );
+      });
+      const limpiar = (v) =>
+        v.replace(/(https?:\/\/[^/\s?]+)([^\s?]*)\?\S*/g, "$1$2").replace(origin, "(mismo origen)");
+      const pasos = [];
+      const anotar = async (paso, extra = "") => {
+        const v = await pagina.evaluate(() => window.__violaciones ?? []).catch(() => []);
+        const unicas = [...new Set(v.map(limpiar))];
+        pasos.push({ paso, violaciones: unicas, extra });
+        decir(
+          `· ${paso}: ${unicas.length ? unicas.join(" | ") : "limpio"}${extra ? ` (${extra})` : ""}`,
+        );
+      };
+      const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "csp-subidas-"));
+      const png = path.join(tmp, "prueba-csp-panel.png");
+      fs.writeFileSync(
+        png,
+        Buffer.from(
+          "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==",
+          "base64",
+        ),
+      );
+      const pdf = path.join(tmp, "prueba-csp-panel.pdf");
+      fs.writeFileSync(
+        pdf,
+        "%PDF-1.4\n1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj\n2 0 obj<</Type/Pages/Kids[3 0 R]/Count 1>>endobj\n3 0 obj<</Type/Page/Parent 2 0 R/MediaBox[0 0 200 200]>>endobj\nxref\n0 4\n0000000000 65535 f \n0000000009 00000 n \n0000000052 00000 n \n0000000101 00000 n \ntrailer<</Size 4/Root 1 0 R>>\nstartxref\n164\n%%EOF\n",
+      );
+      const guardar = async () => {
+        await pagina.getByRole("button", { name: "Guardar" }).first().click();
+        await pagina.waitForTimeout(4000);
+      };
+      const subidos = {};
+      for (const [coleccion, fichero, campo, texto] of [
+        ["media", png, "alt", "Prueba de subida para la CSP del panel"],
+        ["documentos", pdf, "titulo", "Prueba de subida para la CSP del panel"],
+      ]) {
+        await pagina.goto(`${base}/admin/collections/${coleccion}/create`, {
+          waitUntil: "networkidle",
+        });
+        await pagina.waitForTimeout(1500);
+        await pagina.locator('input[type="file"]').first().setInputFiles(fichero);
+        await pagina.waitForTimeout(800);
+        await pagina.locator(`input[name="${campo}"]`).fill(texto);
+        await guardar();
+        await pagina
+          .waitForURL((u) => /\/\d+\/?$/.test(u.pathname), { timeout: 30_000 })
+          .catch(() => null);
+        const id = Number(new URL(pagina.url()).pathname.match(/\/(\d+)\/?$/)?.[1]) || null;
+        subidos[coleccion] = id;
+        await anotar(`subir a ${coleccion}`, id ? `id ${id}` : "NO se guardó");
+      }
+      if (subidos.documentos) {
+        // La vista previa del documento: su miniatura o el enlace al fichero (otra pestaña o un panel).
+        const nueva = contexto.waitForEvent("page", { timeout: 6000 }).catch(() => null);
+        await pagina
+          .locator(".file-details a, .file-details__thumbnail, .thumbnail, .file-meta__url a")
+          .first()
+          .click({ timeout: 5000 })
+          .catch(() => null);
+        const pestana = await nueva;
+        await pagina.waitForTimeout(1500);
+        await anotar(
+          "vista previa del documento",
+          pestana
+            ? `abre otra pestaña en ${new URL(pestana.url()).host === new URL(base).host ? "el mismo origen" : "otro origen (el Blob)"}`
+            : "en el mismo panel",
+        );
+        if (pestana) await pestana.close();
+      }
+      // Escribir en un texto enriquecido y guardar; después, deshacerlo y guardar otra vez.
+      const leerDescripcion = () =>
+        pagina.evaluate(
+          async (r) =>
+            JSON.stringify(
+              (await (await fetch(r, { credentials: "include" })).json())?.descripcion ?? null,
+            ),
+          `${base}/api/equipos-nuevos/1?depth=0`,
+        );
+      const antes = await leerDescripcion();
+      await pagina.goto(`${base}/admin/collections/equipos-nuevos/1`, { waitUntil: "networkidle" });
+      await pagina.waitForTimeout(2000);
+      const editor = pagina.locator('[data-lexical-editor="true"]').first();
+      await editor.click();
+      await pagina.keyboard.press("ControlOrMeta+End");
+      await pagina.keyboard.type(" CSP");
+      await anotar("escribir en el texto enriquecido");
+      await guardar();
+      await anotar("guardar la ficha");
+      await editor.click();
+      await pagina.keyboard.press("ControlOrMeta+End");
+      for (let i = 0; i < 4; i++) await pagina.keyboard.press("Backspace");
+      await guardar();
+      const despues = await leerDescripcion();
+      await anotar(
+        "deshacer y guardar",
+        despues === antes ? "la descripción queda como estaba" : "¡la descripción NO quedó igual!",
+      );
+      hallazgos.push({
+        pantalla: "csp-subidas",
+        ancho: ancho.nombre,
+        pasos,
+        subidos,
+        consola,
+        // Solo si no quedó igual: para devolverla con la API local.
+        ...(despues === antes ? {} : { descripcionAntes: antes }),
+      });
+      decir(`subidos (para borrar): ${JSON.stringify(subidos)}`);
+      fs.rmSync(tmp, { recursive: true, force: true });
+      await contexto.close();
+      continue;
+    }
+
+    /*
+     * Modo `csp` (2026-11-23, para A): los avisos de la Content-Security-Policy (en modo
+     * report-only) en el panel con sesión: inicio, lista de usadas, una usada y una nueva. Junta los
+     * eventos `securitypolicyviolation` de la página y los mensajes de consola que nombran la CSP.
+     * Solo lee.
+     */
+    if (MODO === "csp") {
+      const consola = [];
+      pagina.on("console", (m) => {
+        const t = m.text();
+        if (/Content[- ]Security[- ]Policy|Report Only/i.test(t)) consola.push(t.slice(0, 400));
+      });
+      await contexto.addInitScript(() => {
+        window.__violaciones = [];
+        document.addEventListener("securitypolicyviolation", (e) =>
+          window.__violaciones.push({
+            directiva: e.effectiveDirective,
+            bloqueado: e.blockedURI,
+            fuente: e.sourceFile ? `${e.sourceFile}:${e.lineNumber}` : "",
+            disposicion: e.disposition,
+            muestra: (e.sample ?? "").slice(0, 80),
+          }),
+        );
+      });
+      const idDe = async (coleccion) =>
+        pagina.evaluate(
+          async (r) => (await (await fetch(r, { credentials: "include" })).json())?.docs?.[0]?.id,
+          `${base}/api/${coleccion}?limit=1&sort=id&depth=0`,
+        );
+      const usada = await idDe("equipos-usados");
+      const nueva = await idDe("equipos-nuevos");
+      const RUTAS = [
+        ["inicio", "/admin"],
+        ["lista-usadas", "/admin/collections/equipos-usados"],
+        ["ficha-usada", `/admin/collections/equipos-usados/${usada}`],
+        ["ficha-nueva", `/admin/collections/equipos-nuevos/${nueva}`],
+      ];
+      for (const [nombre, ruta] of RUTAS) {
+        const antes = consola.length;
+        await pagina.goto(`${base}${ruta}`, { waitUntil: "networkidle" });
+        await pagina.waitForTimeout(2500);
+        const violaciones = await pagina.evaluate(() => window.__violaciones ?? []);
+        const unicas = [...new Map(violaciones.map((v) => [JSON.stringify(v), v])).values()];
+        // Sin la query: solo origen y ruta de lo bloqueado.
+        const limpias = unicas.map((v) => ({
+          ...v,
+          bloqueado: /^https?:/.test(v.bloqueado)
+            ? (() => {
+                const u = new URL(v.bloqueado);
+                return `${u.origin === origin ? "(mismo origen)" : u.origin}${u.pathname}`;
+              })()
+            : v.bloqueado,
+          fuente: v.fuente.replace(origin, ""),
+        }));
+        hallazgos.push({
+          pantalla: `csp-${nombre}`,
+          ancho: ancho.nombre,
+          violaciones: limpias,
+          consola: consola.slice(antes),
+        });
+        decir(
+          `· ${nombre} (${ancho.nombre}): ${limpias.length} violaciones${limpias.length ? `: ${limpias.map((v) => `${v.directiva} ← ${v.bloqueado}`).join(" | ")}` : ""} · ${consola.length - antes} mensajes de consola`,
+        );
+      }
+      hallazgos.push({ pantalla: "consola", ancho: ancho.nombre, errores });
+      await contexto.close();
+      continue;
+    }
+
+    /*
      * Modo `borrador` (`… borrador <id de la página>`, PR 8b): con la sesión abierta, el botón del
      * panel (`/api/borrador/?pagina=<id>`) lleva a la página con su ÚLTIMO BORRADOR y el aviso de
      * vista previa; «Salir de la vista previa» vuelve a lo publicado. El borrador de prueba lo
      * pone y lo quita `scripts/paginas/prueba-borrador.ts` (marca «PRUEBA BORRADOR 8B»).
      */
+    /*
+     * Modo `vivo` (`… vivo <id de una unidad usada>`, punto 5): la VISTA PREVIA EN VIVO por efecto.
+     * Sin sesión la ruta da 404; con sesión pinta la ficha con `noindex`. A 1440, en el formulario
+     * de la unidad se abre «Vista previa en vivo», se escribe una marca en el nombre SIN GUARDAR y
+     * el título del iframe la muestra. En móvil, la ruta misma. Nada se guarda: el contexto se cierra.
+     */
+    if (MODO === "vivo") {
+      const id = process.argv[4];
+      if (!/^\d+$/.test(id ?? "")) fallar("Uso: … vivo <id de una unidad usada>");
+      const ruta = `${base}/vista-previa/equipos-usados/${id}/`;
+      const resultado = [];
+      const ok = (texto, bien) => {
+        resultado.push(`${bien ? "✓" : "✗"} ${texto}`);
+        decir(`${bien ? "✓" : "✗"} ${texto} (${ancho.nombre})`);
+      };
+      const anonimo = await pagina.evaluate(
+        async (r) => (await fetch(r, { credentials: "omit" })).status,
+        ruta,
+      );
+      ok(`sin sesión, la ruta da 404 (HTTP ${anonimo})`, anonimo === 404);
+      await pagina.goto(ruta, { waitUntil: "networkidle" });
+      const directa = await pagina.evaluate(() => ({
+        h1: document.querySelector("h1")?.textContent?.trim() ?? "",
+        robots: document.querySelector('meta[name="robots"]')?.getAttribute("content") ?? "",
+      }));
+      ok(`con sesión pinta la ficha («${directa.h1.slice(0, 50)}»)`, directa.h1.length > 0);
+      ok(`noindex (${directa.robots})`, /noindex/.test(directa.robots));
+      await pagina.screenshot({ path: path.join(salida, `vivo-ruta-${ancho.nombre}.png`) });
+      if (!ancho.movil) {
+        const MARCA = " PRUEBA VIVO";
+        await pagina.goto(`${base}/admin/collections/equipos-usados/${id}`, {
+          waitUntil: "networkidle",
+        });
+        const paso = async (nombrePaso, accion) => {
+          try {
+            await accion();
+          } catch (e) {
+            await pagina.screenshot({ path: path.join(salida, `vivo-fallo-${ancho.nombre}.png`) });
+            const estado = await pagina.evaluate(() => {
+              const v = document.querySelector(".live-preview-window");
+              const f = document.querySelector("iframe.live-preview-iframe");
+              const caja = (el) => (el ? JSON.stringify(el.getBoundingClientRect()) : "—");
+              return {
+                ventana: v ? `${v.className} ${caja(v)}` : "no hay",
+                iframe: f ? `${f.getAttribute("src")} ${caja(f)}` : "no hay",
+                boton: document.querySelector(".live-preview-toggler")?.className ?? "no hay",
+                html: v ? v.innerHTML.replace(/<svg[\s\S]*?<\/svg>/g, "").slice(0, 1500) : "",
+              };
+            });
+            decir(`   estado: ${JSON.stringify(estado)}`);
+            fallar(`vivo: falló «${nombrePaso}» (${String(e).split("\n")[0]})`);
+          }
+        };
+        // Payload recuerda por usuario si la dejó abierta: solo se pulsa si está cerrada.
+        await paso("abrir la vista previa en vivo", async () => {
+          const boton = pagina.locator(".live-preview-toggler").first();
+          await boton.waitFor({ timeout: 10000 });
+          const activa = (await boton.getAttribute("class"))?.includes("--active");
+          if (!activa) await boton.click();
+        });
+        const marco = pagina.frameLocator("#live-preview-iframe");
+        await paso("la ficha en el iframe", () =>
+          marco.locator("h1").first().waitFor({ timeout: 20000 }),
+        );
+        const nombre = pagina.locator("#field-nombre");
+        await nombre.click();
+        await nombre.press("End");
+        await nombre.pressSequentially(MARCA, { delay: 30 });
+        let vivo = "";
+        for (let i = 0; i < 20 && !vivo.includes(MARCA.trim()); i++) {
+          await pagina.waitForTimeout(500);
+          vivo = (await marco.locator("h1").first().textContent()) ?? "";
+        }
+        ok(
+          `al escribir sin guardar, el iframe lo muestra («${vivo.trim().slice(-40)}»)`,
+          vivo.includes(MARCA.trim()),
+        );
+        await pagina.screenshot({ path: path.join(salida, `vivo-panel-${ancho.nombre}.png`) });
+      }
+      hallazgos.push({ pantalla: "vivo", ancho: ancho.nombre, id, resultado, errores, fallidas });
+      // Sin guardar: se cierra el contexto y lo escrito se pierde.
+      await contexto.close();
+      continue;
+    }
+
     if (MODO === "borrador") {
       const id = process.argv[4];
       if (!/^\d+$/.test(id ?? "")) fallar("Uso: … borrador <id de la página>");

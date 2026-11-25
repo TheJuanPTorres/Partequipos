@@ -10,7 +10,13 @@ import { slugField } from "../lib/fields/slugField";
 import { mostrarEnWebField } from "../lib/fields/mostrarEnWeb";
 import { marcaDelTipoCoincide } from "./hooks/marcaDelTipo";
 import { revalidarEquipoNuevo, revalidarEquipoNuevoBorrado } from "./hooks/maquinariaHooks";
-import { borradoAdmin, escrituraContenido, lecturaContenido } from "../lib/seguridad/acceso";
+import {
+  borradoAdmin,
+  escrituraContenido,
+  lecturaContenido,
+  soloPersonal,
+} from "../lib/seguridad/acceso";
+import { VERSIONES_SIN_BORRADORES, versionesRecientesPrimero } from "../lib/borradores";
 import { avisoField } from "../lib/fields/avisoField";
 import { ordenListaSinUso } from "../lib/fields/ordenListaSinUso";
 import { conCopia } from "../lib/fields/duplicar";
@@ -68,9 +74,15 @@ export const EquipoNuevo: CollectionConfig = {
     create: escrituraContenido,
     update: escrituraContenido,
     delete: borradoAdmin,
+    // El historial de versiones, solo con sesión del personal (tanda 21, tarea 3, fase 2, punto 4).
+    readVersions: soloPersonal,
   },
+  // Historial sin borradores: cada guardado, una versión que se compara y se restaura.
+  versions: VERSIONES_SIN_BORRADORES,
   hooks: {
     // La marca desnormalizada tiene que ser la del tipo (ver el hook).
+    // La lista de versiones, la más reciente primero.
+    beforeOperation: [versionesRecientesPrimero],
     beforeValidate: [marcaDelTipoCoincide("tipos-maquinaria")],
     afterChange: [revalidarEquipoNuevo],
     afterDelete: [revalidarEquipoNuevoBorrado],

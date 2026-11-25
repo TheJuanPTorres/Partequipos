@@ -2390,6 +2390,19 @@ html[data-theme="dark"] :is(.auth-fields, .where-builder, .group-by-builder, .up
   white-space: nowrap;
 }
 
+/* La miniatura o la insignia de la primera columna, como enlace a la ficha (2026-11-24, urgente). */
+.pq-celda-enlace {
+  display: inline-flex;
+  align-items: center;
+  color: inherit;
+  text-decoration: none;
+
+  &:focus-visible {
+    outline: 2px solid var(--pq-foreground);
+    outline-offset: 2px;
+  }
+}
+
 .pq-celda-nombre {
   display: inline-flex;
   align-items: center;
@@ -2614,4 +2627,17 @@ html[data-theme="dark"] :is(.auth-fields, .where-builder, .group-by-builder, .up
 /* El campo «Modelo» va envuelto (sugerencias debajo): recupera el hueco entre campos. */
 .pq-campo-modelo {
   margin-bottom: var(--spacing-field, 30px);
+}
+
+/* La etiqueta de cada producto de lubricante (fase 2): nombre, «Oculto» y lo que falta. */
+.pq-etiqueta-producto {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+
+  &__falta {
+    color: var(--pq-muted-foreground);
+    font-size: 13px;
+  }
 }

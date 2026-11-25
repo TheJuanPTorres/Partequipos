@@ -306,6 +306,9 @@ export interface User {
 export interface EquiposNuevo {
   id: number;
   '_equipos-nuevos_equipos_order'?: string | null;
+  /**
+   * Como sale en el título de la ficha: tipo, marca y referencia. Ej. «Excavadora Hitachi LANDCROS ZX130-5B» o, en aditamentos, «Martillo para Excavadoras».
+   */
   nombre: string;
   /**
    * Tiene que ser la marca del tipo de equipo de abajo. Si la cambias, vuelve a elegir el tipo.
@@ -384,7 +387,7 @@ export interface EquiposNuevo {
    */
   vista360?: string | null;
   /**
-   * La primera imagen se usa como portada y como imagen social. Tamaño recomendado: 1.600 px de ancho o más; la primera es la de la tarjeta.
+   * Puedes subir varias a la vez. Ordénalas arrastrando: la primera es la portada (y la imagen al compartir en redes). Tamaño recomendado: 1.600 px de ancho o más; la primera es la de la tarjeta.
    */
   imagenes?: (number | Media)[] | null;
   /**
@@ -763,6 +766,9 @@ export interface Documento {
 export interface ModelosRepuesto {
   id: number;
   '_modelos-repuesto_modelos_order'?: string | null;
+  /**
+   * Como sale en la página del modelo. Ej. «Excavadora Caterpillar 320D».
+   */
   nombre: string;
   /**
    * Tiene que ser la marca del tipo de equipo de abajo. Si la cambias, vuelve a elegir el tipo.
@@ -810,7 +816,7 @@ export interface ModelosRepuesto {
    */
   mostrarPiezas?: boolean | null;
   /**
-   * Tamaño recomendado: 1.600 px de ancho o más; la primera es la de la tarjeta.
+   * Puedes subir varias a la vez. Ordénalas arrastrando: la primera es la que sale en la página del modelo y al compartir. Tamaño recomendado: 1.600 px de ancho o más; la primera es la de la tarjeta.
    */
   imagenes?: (number | Media)[] | null;
   /**
@@ -1249,7 +1255,7 @@ export interface CategoriasLubricante {
     [k: string]: unknown;
   } | null;
   /**
-   * En este orden en la página. Nombre y grado tal como los publica el fabricante; no inventes especificaciones.
+   * En este orden en la página (se cambia arrastrando las filas). Nombre y grado tal como los publica el fabricante; no inventes especificaciones. Cada fila dice si el producto está oculto y si le falta la foto o la ficha técnica.
    */
   productos?:
     | {
@@ -1265,6 +1271,9 @@ export interface CategoriasLubricante {
          * Opcional. Los productos seguidos con el mismo grupo salen bajo ese subtítulo (p. ej. «Compresores»).
          */
         grupo?: string | null;
+        /**
+         * La del envase, de frente y con el fondo blanco o transparente: sale en la tarjeta del producto.
+         */
         imagen?: (number | null) | Media;
         /**
          * El PDF del fabricante. Sale como «Ficha técnica».
@@ -1346,7 +1355,7 @@ export interface Video {
 export interface EquiposUsado {
   id: number;
   /**
-   * Ej. «Excavadora Hitachi ZX200-3».
+   * Como sale en el título de la ficha y en la tarjeta: tipo, marca, modelo y año. Ej. «Excavadora Hitachi ZX200-3 2016».
    */
   nombre: string;
   /**
@@ -1357,17 +1366,20 @@ export interface EquiposUsado {
    * Si la marca no está en la lista, créala aquí mismo: tendrá su propia página en el sitio.
    */
   marcaUsada?: (number | null) | MarcasUsada;
+  /**
+   * Como lo escribe el fabricante, con guiones y mayúsculas. Ej. «ZX200-3». Debajo salen los que ya usan otras unidades de esta marca.
+   */
   modelo?: string | null;
   /**
-   * Año del equipo, no de la publicación.
+   * Año de fabricación de la máquina, no de la publicación. Cuatro cifras.
    */
   anio?: number | null;
   /**
-   * Horas de trabajo acumuladas. Es el dato que más comparan los compradores.
+   * Horas de trabajo acumuladas, sin puntos. Es el dato que más comparan los compradores.
    */
   horometro?: number | null;
   /**
-   * Ciudad donde está el equipo; condiciona el costo de traslado.
+   * Ciudad donde está la máquina; condiciona el costo de traslado.
    */
   ubicacion?: string | null;
   pesoOperativo?: number | null;
@@ -1390,7 +1402,7 @@ export interface EquiposUsado {
    */
   fichaTecnicaPdf?: (number | null) | Documento;
   /**
-   * Tamaño recomendado: 1.600 px de ancho o más; la primera es la de la tarjeta.
+   * Puedes elegir o subir varias a la vez. Arrastra para ordenarlas: la PRIMERA es la portada (la de la tarjeta del listado y la de arriba de la ficha). Tamaño recomendado: 1.600 px de ancho o más; la primera es la de la tarjeta.
    */
   imagenes?: (number | Media)[] | null;
   /**
@@ -1440,10 +1452,6 @@ export interface CategoriasUsada {
    */
   enOtros?: boolean | null;
   /**
-   * Solo para las que NO van en «Otros»: el número más bajo sale primero (vacío, al final, por nombre). «Otros» va siempre detrás.
-   */
-  orden?: number | null;
-  /**
    * Opcional. La foto de la tarjeta de esta categoría en la página «Maquinaria pesada usada». Vacía, sale la primera foto de su unidad más reciente. Tamaño recomendado: 1.200 × 900 px.
    */
   imagen?: (number | null) | Media;
@@ -1463,6 +1471,10 @@ export interface CategoriasUsada {
    * Desmarcada, la categoría y sus unidades desaparecen de toda la web (menú, índice, «Otros», pestañas, listados y sitemap) sin borrarse del panel, y su dirección da «página no encontrada». Para llevarla a otra página, crear una redirección en «Redirecciones».
    */
   mostrarEnWeb?: boolean | null;
+  /**
+   * Solo para las que NO van en «Otros»: el número más bajo sale primero (vacío, al final, por nombre). «Otros» va siempre detrás.
+   */
+  orden?: number | null;
   actualizadoPor?: (number | null) | User;
   updatedAt: string;
   createdAt: string;
@@ -3369,7 +3381,6 @@ export interface CategoriasUsadaSelect<T extends boolean = true> {
   nombre?: T;
   descripcion?: T;
   enOtros?: T;
-  orden?: T;
   imagen?: T;
   seo?:
     | T
@@ -3380,6 +3391,7 @@ export interface CategoriasUsadaSelect<T extends boolean = true> {
       };
   slug?: T;
   mostrarEnWeb?: T;
+  orden?: T;
   actualizadoPor?: T;
   updatedAt?: T;
   createdAt?: T;

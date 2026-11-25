@@ -41,14 +41,33 @@ export const VERSIONES_SIN_BORRADORES: NonNullable<CollectionConfig["versions"]>
   maxPerDoc: MAXIMO_VERSIONES_PRODUCTO,
 };
 
+/** ¿La consulta filtra por `parent`? Solo existe en las tablas de versiones (`_<colección>_v`). */
+function filtraPorParent(where: unknown): boolean {
+  if (!where || typeof where !== "object") return false;
+  if (Array.isArray(where)) return where.some(filtraPorParent);
+  return Object.entries(where).some(
+    ([clave, valor]) => clave === "parent" || filtraPorParent(valor),
+  );
+}
+
 /**
  * LA LISTA DE VERSIONES, LA MÁS RECIENTE PRIMERO (2026-11-24, dirección). Payload 3.89 pide las
  * versiones sin orden y el adaptador cae al `defaultSort` de la colección, que no es la fecha: en la
  * lista salían mezcladas. Si nadie pide otro orden (pulsando una columna), se ordena por
  * `-updatedAt`, la fecha que pinta la lista. Lo vigila `versionesProducto.test.ts`.
+ *
+ * OJO, Payload 3.89 NO pasa `findVersions` al gancho: lo traduce a `read`, igual que `find`
+ * (`operationToHookOperation` en `collections/operations/utilities/types.js`; el #578 miraba
+ * «findVersions» y nunca ordenaba). Se reconoce porque la vista del historial filtra por `parent`,
+ * un campo que solo tienen las versiones (ninguna de estas colecciones tiene un campo `parent`).
  */
 export const versionesRecientesPrimero: CollectionBeforeOperationHook = ({ args, operation }) =>
-  operation === "findVersions" && !args.sort ? { ...args, sort: "-updatedAt" } : args;
+  operation === "read" &&
+  "where" in args &&
+  !("sort" in args && args.sort) &&
+  filtraPorParent(args.where)
+    ? { ...args, sort: "-updatedAt" }
+    : args;
 
 /** La condición de lo publicado. */
 export const PUBLICADO = { _status: { equals: "published" } } satisfies Where;

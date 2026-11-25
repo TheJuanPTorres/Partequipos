@@ -61,8 +61,9 @@ const RUTAS = [
   "/maquinaria-pesada/maquinaria-pesada-usada/",
   "/maquinaria-pesada/maquinaria-pesada-usada/excavadoras/",
   "/maquinaria-pesada/maquinaria-pesada-usada/bulldozer/bulldozer-caterpillar-d3c-1996/",
-  "/repuestos-para-maquinaria-pesada/",
-  "/repuestos-para-maquinaria-pesada/marcas/hitachi/",
+  "/repuestos-maquinaria-pesada-colombia/",
+  "/repuestos-maquinaria-pesada-colombia/repuestos-maquinaria-pesada-marcas/repuestos-para-maquinaria-pesada-hitachi-landcros/",
+  "/lubricantes/",
   "/lubricantes/lubricantes-eni/",
   "/servicio-tecnico/",
   "/noticias/",
@@ -107,6 +108,10 @@ function medir(selectorMarcador) {
   };
   const visible = (el) => {
     if (el.closest("[aria-hidden='true'], [inert], .sr-only, dialog:not([open])")) return false;
+    // Dentro de un <details> cerrado (salvo su <summary>) no se pinta, aunque tenga caja: las
+    // opciones de «Ordenar» y los filtros del listado de usados.
+    const cerrado = el.closest("details:not([open])");
+    if (cerrado && !cerrado.querySelector(":scope > summary")?.contains(el)) return false;
     const r = el.getBoundingClientRect();
     // 1 × 1 px o recortado entero: solo para lectores de pantalla (las etiquetas del formulario
     // de Contáctanos, con `clip-path: inset(50%)`).
@@ -294,7 +299,8 @@ function tapados(donde) {
     if (
       flotante.contains(el) ||
       el.contains(flotante) ||
-      el.closest("[aria-hidden='true'], [inert]")
+      el.closest("[aria-hidden='true'], [inert]") ||
+      (el.closest("details:not([open])") && !el.closest("summary"))
     )
       continue;
     // Solo la parte VISIBLE: una miniatura desplazada fuera de su fila no está bajo el botón.

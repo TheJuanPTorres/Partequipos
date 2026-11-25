@@ -8,6 +8,7 @@ import { useDatosContacto } from "@/components/forms/ContextoContacto";
 
 import { ANIMACIONES_VENTANA } from "@/lib/formularios/animacionesVentana";
 import type { ConfigFormulario } from "@/lib/formularios/configFormulario";
+import { ventanaAbierta } from "@/lib/formularios/ventanaAbierta";
 import { activasDe, PARAMETRO_ANIMACIONES } from "@/lib/listado/animaciones";
 
 import piel from "./pielFormulario.module.css";
@@ -86,6 +87,9 @@ export function VentanaFormulario({
     if (abierta && !d.open) d.showModal();
     else if (!abierta && d.open) d.close();
   }, [abierta]);
+
+  // Mientras está abierta, el catálogo de detrás no anima su cambio (`ventanaAbierta.ts`).
+  useEffect(() => (abierta ? ventanaAbierta() : undefined), [abierta]);
 
   const ventana = (
     <dialog

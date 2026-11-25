@@ -20,6 +20,19 @@ export function tituloEligeRepuesto(nombre: string, minusculas: boolean): string
   return n ? `Elige el repuesto de ${n} que necesitas` : "Elige el repuesto que necesitas";
 }
 
+/**
+ * El título de la sección: el que el editor escribió en «Título de la sección de tipos» de la
+ * categoría (tal cual, con los espacios de sobra fuera) o, vacío, el automático.
+ */
+export function tituloDeGrupos(
+  propio: string | null | undefined,
+  nombre: string,
+  minusculas: boolean,
+): string {
+  const escrito = (propio ?? "").trim().replace(/\s+/g, " ");
+  return escrito || tituloEligeRepuesto(nombre, minusculas);
+}
+
 /** «(GETS)» → «(GETS)»; «Corte» → «corte»; «Y» → «y» (una letra no es sigla). */
 function enMinusculasSalvoSigla(palabra: string): string {
   const letras = palabra.replace(/[^\p{L}]/gu, "");

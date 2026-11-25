@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
-import { tituloEligeRepuesto } from "./tituloGrupos";
+import { tituloDeGrupos, tituloEligeRepuesto } from "./tituloGrupos";
 
 test("categoría técnica: el nombre en minúsculas, como en «Qué incluye»", () => {
   assert.equal(
@@ -64,5 +64,22 @@ test("«repuestos» en medio del nombre, o una palabra que solo empieza igual, n
   assert.equal(
     tituloEligeRepuesto("Repuestosa Diesel", true),
     "Elige el repuesto de repuestosa diesel que necesitas",
+  );
+});
+
+test("título propio de la categoría: tal cual; vacío, el automático", () => {
+  assert.equal(
+    tituloDeGrupos("  Todo para el  Motor Diesel ", "Repuestos Motor Diesel", true),
+    "Todo para el Motor Diesel",
+  );
+  for (const vacio of [undefined, null, "", "   "]) {
+    assert.equal(
+      tituloDeGrupos(vacio, "Repuestos Motor Diesel", true),
+      "Elige el repuesto de motor diesel que necesitas",
+    );
+  }
+  assert.equal(
+    tituloDeGrupos(null, "Filtros Donaldson", false),
+    "Elige el repuesto de Filtros Donaldson que necesitas",
   );
 });

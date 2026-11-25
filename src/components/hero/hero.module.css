@@ -245,7 +245,8 @@
   animation: kenBurns calc(var(--hero-pase) + var(--hero-fundido)) linear forwards;
 }
 
-.hero[data-pausado] .fondo {
+.hero[data-pausado] .fondo,
+.hero[data-oculta] .fondo {
   animation-play-state: paused;
 }
 
@@ -532,7 +533,18 @@
   text-transform: none;
 }
 
-.hero[data-pausado] .circular svg {
+/* Una capa por texto, en el mismo círculo que gira: solo se ve la de la diapositiva activa. */
+.circular text {
+  opacity: 0;
+  transition: opacity var(--hero-fundido) var(--hero-curva);
+}
+
+.circular text[data-activo] {
+  opacity: 1;
+}
+
+.hero[data-pausado] .circular svg,
+.hero[data-oculta] .circular svg {
   animation-play-state: paused;
 }
 
@@ -647,6 +659,20 @@
   list-style: none;
 }
 
+/*
+ * LOS CONTROLES NO SE METEN BAJO EL VIDRIO (2026-11-25, regla de Juan Pablo: nada tapado). Desde
+ * 768 px el vidrio va abajo a la derecha, a la altura de los controles: con 7 diapositivas, a
+ * 768 y 820 tapaba los puntos 4 a 7 y no se podían pulsar. La fila de controles se queda en lo
+ * que hay a la izquierda del vidrio y, si los puntos no caben, bajan a una segunda línea.
+ */
+@media (min-width: 768px) {
+  .flechas {
+    max-width: calc(100% - var(--hero-flechas-izquierda) - var(--hero-vidrio-ancho) - 16px);
+    flex-wrap: wrap;
+    row-gap: 6px;
+  }
+}
+
 .punto {
   position: relative;
   display: grid;
@@ -694,7 +720,8 @@
   animation: progreso var(--hero-pase) linear forwards;
 }
 
-.hero[data-pausado] .punto::after {
+.hero[data-pausado] .punto::after,
+.hero[data-oculta] .punto::after {
   animation-play-state: paused;
 }
 
@@ -840,7 +867,8 @@
     animation: none;
   }
 
-  .capaFondo {
+  .capaFondo,
+  .circular text {
     transition: none;
   }
 }

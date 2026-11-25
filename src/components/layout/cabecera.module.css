@@ -606,6 +606,44 @@
 }
 
 /*
+ * ABRIR Y CERRAR EL MENÚ DEL MÓVIL, EN ESPEJO (tanda 24, Juan Pablo): como el megamenú, el panel
+ * se despliega desde la barra (recorte con `clip-path`: no mueve nada, CLS 0) mientras su contenido
+ * aparece, y al cerrar se recoge y se funde a la vez. Sigue montado hasta que acaba de cerrarse
+ * (`Cabecera` le quita `hidden` después). `@starting-style` da el punto de partida al salir de
+ * `display: none`; un navegador que no lo conozca abre sin animación. A mitad, la transición
+ * sigue desde donde estaba.
+ */
+.panel {
+  clip-path: inset(0 0 100% 0);
+  opacity: 0;
+  transition:
+    clip-path 0.22s cubic-bezier(0.4, 0, 1, 1),
+    opacity 0.2s cubic-bezier(0.4, 0, 1, 1);
+}
+
+.panel[data-abierto="si"] {
+  clip-path: inset(0 0 0 0);
+  opacity: 1;
+  transition:
+    clip-path 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.24s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@starting-style {
+  .panel[data-abierto="si"] {
+    clip-path: inset(0 0 100% 0);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .panel,
+  .panel[data-abierto="si"] {
+    transition: none;
+  }
+}
+
+/*
  * Barra de desplazamiento MINIMALISTA (dirección, 2026-10-17): fina, redondeada y
  * discreta; se intensifica al pasar el ratón. La rueda, el táctil y el teclado no
  * cambian: solo se pinta la barra. `scrollbar-*` es el estándar (Firefox y Chrome

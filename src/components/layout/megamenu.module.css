@@ -68,18 +68,16 @@
   top: calc(var(--mega-arriba) - 1px);
   left: 50%;
   visibility: hidden;
-  transform: translate(-50%, -12px);
+  transform: translate(-50%, 0);
+  /* Cerrado deja de verse cuando ACABA de recogerse (220 ms): sigue montado hasta entonces. */
   transition:
-    transform 0.55s ease,
-    visibility 0s linear 0.55s,
+    visibility 0s linear 0.22s,
     top 0.4s ease-in-out;
 }
 
 .marco[data-abierto="si"] {
   visibility: visible;
-  transform: translate(-50%, 0);
   transition:
-    transform 0.55s ease,
     visibility 0s linear 0s,
     top 0.4s ease-in-out;
 }
@@ -93,6 +91,23 @@
   position: relative;
   width: min(820px, 100vw - 2 * var(--mega-curva) - 20px);
   pointer-events: none;
+  /*
+   * ABRIR Y CERRAR, EN ESPEJO (tanda 24, Juan Pablo): el panel se DESPLIEGA desde la barra hacia
+   * abajo (un recorte que se abre: `clip-path`, sin tocar la maqueta, CLS 0) y al cerrar se
+   * RECOGE hacia la barra, mientras su contenido se funde (`.caja`). Antes el contenido se fundía
+   * y el fondo blanco se quedaba entero hasta desaparecer de golpe. Son transiciones CSS de un
+   * valor a otro: si el ratón vuelve a mitad del cierre (o se va a mitad de la apertura), siguen
+   * desde donde estaban, sin salto. Al abrir, salida suave; al cerrar, entrada suave. Los lados del recorte
+   * van holgados: las curvas de arriba salen 20 px por cada lado. Abajo, en %: así el valor a mitad
+   * de la transición es un porcentaje y se puede medir (`qa:menu-animacion`).
+   */
+  clip-path: inset(0 -40px 100% -40px);
+  transition: clip-path 0.22s cubic-bezier(0.4, 0, 1, 1);
+}
+
+.marco[data-abierto="si"] .lienzo {
+  clip-path: inset(0 -40px 0% -40px);
+  transition: clip-path 0.28s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .contorno {
@@ -213,17 +228,19 @@
 }
 
 /*
- * EL FUNDIDO al abrir va SOLO en el contenido. El fondo y el filete no se funden:
- * el panel es blanco SÓLIDO desde el primer fotograma (dirección, 2026-10-17).
- * Cerrado, lo oculta `visibility` del marco.
+ * EL FUNDIDO va SOLO en el contenido. El fondo y el filete no se funden: el panel es blanco
+ * SÓLIDO (dirección, 2026-10-17) y se despliega o se recoge con el recorte de `.lienzo`. Al
+ * abrir, el contenido aparece un instante después de que empiece a bajar el panel; al cerrar,
+ * se funde a la vez que el panel sube (el orden inverso), y acaba con él.
  */
 .caja {
   opacity: 0;
-  transition: opacity 0.55s ease;
+  transition: opacity 0.2s cubic-bezier(0.4, 0, 1, 1);
 }
 
 .marco[data-abierto="si"] .caja {
   opacity: 1;
+  transition: opacity 0.24s cubic-bezier(0.22, 1, 0.36, 1) 0.06s;
 }
 
 @media (max-width: 1024px) {
@@ -235,12 +252,14 @@
 @media (prefers-reduced-motion: reduce) {
   .marco,
   .marco[data-abierto="si"] {
-    transform: translate(-50%, 0);
     transition: none;
   }
 
-  /* El contenido no se desplaza ni se funde: solo aparece. */
-  .caja {
+  /* El panel no se despliega y el contenido no se funde: aparecen y desaparecen. */
+  .lienzo,
+  .marco[data-abierto="si"] .lienzo,
+  .caja,
+  .marco[data-abierto="si"] .caja {
     transition: none;
   }
 

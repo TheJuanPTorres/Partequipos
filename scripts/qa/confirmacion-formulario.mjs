@@ -103,7 +103,7 @@ try {
       JSON.stringify(m),
     );
     comprobar(`${ancho}: la página no desborda en horizontal`, !m.desborda);
-    comprobar(`${ancho}: dice «Solicitud enviada»`, /Solicitud enviada/.test(m.texto), m.texto);
+    comprobar(`${ancho}: dice «¡Recibimos tu solicitud!»`, /Recibimos tu solicitud/.test(m.texto), m.texto);
     if (salida) await pagina.screenshot({ path: path.join(salida, `confirmacion-${ancho}.png`) });
     await pagina.close();
   }

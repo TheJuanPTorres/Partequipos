@@ -1,7 +1,7 @@
 "use client";
 
 import { IconBrandWhatsapp } from "@tabler/icons-react";
-import { useActionState, useEffect, useId, useRef } from "react";
+import { useActionState, useEffect, useId, useRef, useState, type FormEvent } from "react";
 
 import { Campo, claseControl } from "@/components/forms/Campo";
 import { Turnstile } from "@/components/forms/Turnstile";
@@ -9,6 +9,7 @@ import { enviarEvento } from "@/lib/analitica/navegador";
 import { ESTADO_INICIAL } from "@/lib/actions/estadoFormulario";
 import { enviarSolicitud } from "@/lib/actions/solicitudes";
 import { CAMPO_TIEMPO, CAMPO_TRAMPA } from "@/lib/formularios/camposAntiSpam";
+import { CAMPOS_EN_VIVO, errorEnVivo } from "@/lib/formularios/validacionVivo";
 import { INTERESES, PERFILES, type TipoSolicitud } from "@/lib/validation/opcionesSolicitud";
 import { conMensaje, mensajeWhatsApp } from "@/lib/whatsapp";
 import wa from "@/components/whatsapp/botonWhatsapp.module.css";
@@ -142,6 +143,28 @@ export function FormularioSolicitud({
     if (campoInicio.current) campoInicio.current.value = String(Date.now());
   }, []);
 
+  /*
+   * VALIDACIÓN EN VIVO (t8): al salir de un campo se avisa de lo evidente, con los textos del
+   * servidor. Vale solo para la respuesta actual: con una nueva, manda el servidor. `null` = el
+   * campo ya está bien (tapa el error que el servidor puso antes en ese campo).
+   */
+  const [vivosDe, setVivosDe] = useState<{
+    de: typeof estado;
+    v: Record<string, string | null>;
+  }>({ de: estado, v: {} });
+  const vivos = vivosDe.de === estado ? vivosDe.v : {};
+  function revisar(e: FormEvent<HTMLFormElement>, soloSiYaMarcado: boolean) {
+    const el = e.target as HTMLInputElement | HTMLTextAreaElement;
+    const nombre = el.name;
+    if (!(CAMPOS_EN_VIVO as readonly string[]).includes(nombre)) return;
+    const revisado = errorEnVivo(nombre, el.value);
+    const marcado = (vivos[nombre] ?? (estado.errores ?? {})[nombre]) != null;
+    // Al escribir solo se retira el aviso cuando ya está bien; el aviso nuevo llega al salir.
+    if (soloSiYaMarcado && (!marcado || revisado !== null)) return;
+    if (!soloSiYaMarcado && revisado === null && !marcado) return;
+    setVivosDe({ de: estado, v: { ...vivos, [nombre]: revisado } });
+  }
+
   const idBase = useId();
   const campo = (n: string) => `${idBase}-${n}`;
 
@@ -175,7 +198,11 @@ export function FormularioSolicitud({
 
   useEffect(() => {
     if (estado.estado === "ok") confirmacionRef.current?.focus();
-    else if (estado.estado === "error") resumenRef.current?.focus();
+    else if (estado.estado === "error") {
+      // Foco al PRIMER campo con error (t8); si el fallo no es de un campo (reto, servidor), al resumen.
+      const primero = formulario.current?.querySelector<HTMLElement>('[aria-invalid="true"]');
+      (primero ?? resumenRef.current)?.focus();
+    }
   }, [estado]);
 
   if (estado.estado === "ok") {
@@ -214,7 +241,7 @@ export function FormularioSolicitud({
               strokeLinejoin="round"
             />
           </svg>
-          <p className="text-lg font-medium">Solicitud enviada</p>
+          <p className="text-lg font-medium">¡Recibimos tu solicitud!</p>
           <p className="mt-1 text-sm">{estado.mensaje}</p>
           {whatsapp ? (
             <p className="mt-3 text-sm">
@@ -229,7 +256,7 @@ export function FormularioSolicitud({
               </a>
             </p>
           ) : null}
-          {f3 && alCerrar ? (
+          {emergente && alCerrar ? (
             <button type="button" onClick={alCerrar} data-cerrar="">
               Cerrar
             </button>
@@ -239,7 +266,8 @@ export function FormularioSolicitud({
     );
   }
 
-  const err = estado.errores ?? {};
+  const err: Record<string, string | undefined> = { ...(estado.errores ?? {}) };
+  for (const [k, v] of Object.entries(vivos)) err[k] = v ?? undefined;
   // Tras un error, lo que escribió el usuario vuelve como valor por defecto:
   // React restablece el formulario al terminar la acción y, sin esto, lo vaciaría.
   const previo = estado.estado === "error" ? (estado.valores ?? {}) : {};
@@ -363,7 +391,14 @@ export function FormularioSolicitud({
         </div>
       ) : null}
 
-      <form ref={formulario} action={accion} className="mt-6 space-y-4" noValidate>
+      <form
+        ref={formulario}
+        action={accion}
+        className="mt-6 space-y-4"
+        noValidate
+        onBlur={(e) => revisar(e, false)}
+        onInput={(e) => revisar(e, true)}
+      >
         {/* Campos que no toca el usuario. El servidor los valida igual. */}
         <input type="hidden" name="tipo" value={tipo} />
         <input type="hidden" name="origen" value={origen} />
@@ -396,73 +431,79 @@ export function FormularioSolicitud({
           </>
         ) : null}
 
-        {clasificacion
-          ? (["interes", "perfil"] as const).map((nombre) => (
-              <fieldset key={nombre}>
-                <legend className="block text-sm font-medium text-gray-900">
-                  {OPCIONES[nombre].pregunta}
-                  <span className="ml-1 font-normal text-gray-500">(opcional)</span>
-                </legend>
-                <div className="mt-2 flex flex-wrap gap-x-5 gap-y-2">
-                  {OPCIONES[nombre].opciones.map((o) => (
-                    <label key={o.valor} className="flex items-center gap-2 text-sm text-gray-800">
-                      <input
-                        type="radio"
-                        name={nombre}
-                        value={o.valor}
-                        defaultChecked={previo[nombre] === o.valor}
-                      />
-                      {o.etiqueta}
-                    </label>
-                  ))}
-                </div>
-              </fieldset>
-            ))
-          : null}
+        {/* Mientras se envía, los campos se bloquean (sin perder lo escrito): `inert`, no `disabled`. */}
+        <div className="space-y-4" inert={enviando} aria-busy={enviando}>
+          {clasificacion
+            ? (["interes", "perfil"] as const).map((nombre) => (
+                <fieldset key={nombre}>
+                  <legend className="block text-sm font-medium text-gray-900">
+                    {OPCIONES[nombre].pregunta}
+                    <span className="ml-1 font-normal text-gray-500">(opcional)</span>
+                  </legend>
+                  <div className="mt-2 flex flex-wrap gap-x-5 gap-y-2">
+                    {OPCIONES[nombre].opciones.map((o) => (
+                      <label
+                        key={o.valor}
+                        className="flex items-center gap-2 text-sm text-gray-800"
+                      >
+                        <input
+                          type="radio"
+                          name={nombre}
+                          value={o.valor}
+                          defaultChecked={previo[nombre] === o.valor}
+                        />
+                        {o.etiqueta}
+                      </label>
+                    ))}
+                  </div>
+                </fieldset>
+              ))
+            : null}
 
-        {conCiudad && !clasificacion ? (
-          <div className="grid gap-4 sm:grid-cols-2">
-            {campoNombre}
-            {campoTelefono}
-            {campoCorreo}
-            {campoCiudad}
-          </div>
-        ) : clasificacion ? (
-          // Orden del diseño de ux-9: nombre y teléfono en una fila, el correo debajo.
-          // Sin «Empresa»: ahí es una opción de «Quién soy».
-          <div className="grid gap-4 sm:grid-cols-2">
-            {campoNombre}
-            {campoTelefono}
-            <div className="sm:col-span-2">{campoCorreo}</div>
-          </div>
-        ) : (
-          <div className="grid gap-4 sm:grid-cols-2">
-            {campoNombre}
-            {campoCorreo}
-            {campoTelefono}
-            {campoEmpresa}
-          </div>
-        )}
-
-        <Campo id={campo("mensaje")} etiqueta={etiquetaMensaje} obligatorio error={err.mensaje}>
-          {(p) => (
-            <textarea
-              {...p}
-              name="mensaje"
-              rows={compacto ? 3 : 5}
-              defaultValue={previo.mensaje ?? mensajeInicial}
-              placeholder={conMarcador ? etiquetaMensaje : undefined}
-              className={claseControl}
-            />
+          {conCiudad && !clasificacion ? (
+            <div className="grid gap-4 sm:grid-cols-2">
+              {campoNombre}
+              {campoTelefono}
+              {campoCorreo}
+              {campoCiudad}
+            </div>
+          ) : clasificacion ? (
+            // Orden del diseño de ux-9: nombre y teléfono en una fila, el correo debajo.
+            // Sin «Empresa»: ahí es una opción de «Quién soy».
+            <div className="grid gap-4 sm:grid-cols-2">
+              {campoNombre}
+              {campoTelefono}
+              <div className="sm:col-span-2">{campoCorreo}</div>
+            </div>
+          ) : (
+            <div className="grid gap-4 sm:grid-cols-2">
+              {campoNombre}
+              {campoCorreo}
+              {campoTelefono}
+              {campoEmpresa}
+            </div>
           )}
-        </Campo>
 
-        {/*
-         * Cada respuesta del servidor reinicia el reto: el token es de un solo
-         * uso. Sin clave (producción sin claves reales) no se pinta: un widget
-         * con la clave de prueba sería una protección falsa (§10.11).
-         */}
-        {siteKey ? <Turnstile siteKey={siteKey} reinicio={estado} /> : null}
+          <Campo id={campo("mensaje")} etiqueta={etiquetaMensaje} obligatorio error={err.mensaje}>
+            {(p) => (
+              <textarea
+                {...p}
+                name="mensaje"
+                rows={compacto ? 3 : 5}
+                defaultValue={previo.mensaje ?? mensajeInicial}
+                placeholder={conMarcador ? etiquetaMensaje : undefined}
+                className={claseControl}
+              />
+            )}
+          </Campo>
+
+          {/*
+           * Cada respuesta del servidor reinicia el reto: el token es de un solo
+           * uso. Sin clave (producción sin claves reales) no se pinta: un widget
+           * con la clave de prueba sería una protección falsa (§10.11).
+           */}
+          {siteKey ? <Turnstile siteKey={siteKey} reinicio={estado} /> : null}
+        </div>
 
         <div
           className={

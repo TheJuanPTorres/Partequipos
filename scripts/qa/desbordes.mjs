@@ -110,8 +110,14 @@ function medir(selectorMarcador) {
     if (el.closest("[aria-hidden='true'], [inert], .sr-only, dialog:not([open])")) return false;
     // Dentro de un <details> cerrado (salvo su <summary>) no se pinta, aunque tenga caja: las
     // opciones de «Ordenar» y los filtros del listado de usados.
-    const cerrado = el.closest("details:not([open])");
-    if (cerrado && !cerrado.querySelector(":scope > summary")?.contains(el)) return false;
+    // TODOS los <details> cerrados de alrededor: el <summary> de uno cerrado dentro de otro
+    // cerrado tampoco se pinta («Año» dentro de «Filtrar», en el listado de usados en tablet).
+    for (
+      let d = el.closest("details:not([open])");
+      d;
+      d = d.parentElement?.closest("details:not([open])") ?? null
+    )
+      if (!d.querySelector(":scope > summary")?.contains(el)) return false;
     const r = el.getBoundingClientRect();
     // 1 × 1 px o recortado entero: solo para lectores de pantalla (las etiquetas del formulario
     // de Contáctanos, con `clip-path: inset(50%)`).
@@ -300,7 +306,9 @@ function tapados(donde) {
       flotante.contains(el) ||
       el.contains(flotante) ||
       el.closest("[aria-hidden='true'], [inert]") ||
-      (el.closest("details:not([open])") && !el.closest("summary"))
+      [...document.querySelectorAll("details:not([open])")].some(
+        (d) => d.contains(el) && !d.querySelector(":scope > summary")?.contains(el),
+      )
     )
       continue;
     // Solo la parte VISIBLE: una miniatura desplazada fuera de su fila no está bajo el botón.

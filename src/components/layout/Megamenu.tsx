@@ -421,30 +421,48 @@ function AcordeonDesplegable({
  */
 export function ContenidoMenu({ panel, alElegir }: { panel: PanelMenu; alElegir: () => void }) {
   return (
-    <>
-      <Link href={panel.verTodo.href} className={estilos.verTodo} onClick={alElegir}>
-        {panel.verTodo.etiqueta}
-        <IconChevronRight aria-hidden="true" focusable="false" stroke={2} />
-      </Link>
-      <GrupoHermanos>
-        {panel.grupos.map((g) => (
-          <Acordeon key={g.titulo} grupo={g} nivel={1} alElegir={alElegir} />
-        ))}
-      </GrupoHermanos>
-      {(panel.finales ?? []).map((e) => (
-        // Un enlace suelto con el recuadro de los acordeones de nivel 1.
-        <div key={e.href} className={estilos.acordeon} data-nivel={1}>
-          <Link
-            href={e.href}
-            className={`${estilos.titulo} ${estilos.tituloEnlace}`}
-            onClick={alElegir}
-          >
-            <IconChevronRight aria-hidden="true" focusable="false" stroke={2.5} />
-            {e.etiqueta}
-          </Link>
-        </div>
-      ))}
-    </>
+    // Las piezas, en el orden del panel de administración (tanda 24): los acordeones comparten
+    // hermanos estén donde estén, así abrir uno cierra el otro (M4).
+    <GrupoHermanos>
+      {panel.elementos.map((el, i) => {
+        if (el.tipo === "verTodo") {
+          return (
+            <Link
+              key={`ver-${i}`}
+              href={el.enlace.href}
+              className={estilos.verTodo}
+              onClick={alElegir}
+            >
+              {el.enlace.etiqueta}
+              <IconChevronRight aria-hidden="true" focusable="false" stroke={2} />
+            </Link>
+          );
+        }
+        if (el.tipo === "grupo") {
+          return (
+            <Acordeon
+              key={`grupo-${el.grupo.titulo}`}
+              grupo={el.grupo}
+              nivel={1}
+              alElegir={alElegir}
+            />
+          );
+        }
+        return (
+          // Un enlace suelto con el recuadro de los acordeones de nivel 1.
+          <div key={`enlace-${i}`} className={estilos.acordeon} data-nivel={1}>
+            <Link
+              href={el.enlace.href}
+              className={`${estilos.titulo} ${estilos.tituloEnlace}`}
+              onClick={alElegir}
+            >
+              <IconChevronRight aria-hidden="true" focusable="false" stroke={2.5} />
+              {el.enlace.etiqueta}
+            </Link>
+          </div>
+        );
+      })}
+    </GrupoHermanos>
   );
 }
 

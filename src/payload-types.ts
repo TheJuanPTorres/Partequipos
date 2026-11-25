@@ -4222,7 +4222,7 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   createdAt?: T;
 }
 /**
- * Menú y botón de la cabecera de todas las páginas.
+ * Menú y botón de la cabecera de todas las páginas: los enlaces de la barra y los apartados de cada desplegable.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "cabecera".
@@ -4245,6 +4245,51 @@ export interface Cabecera {
     | null;
   botonTexto?: string | null;
   botonEnlace?: string | null;
+  /**
+   * Lo que sale al desplegar «Maquinaria pesada», en escritorio y en el móvil. Arrastra las filas para ordenarlas y desmarca «Mostrar» para quitar una sin borrarla. Una «lista automática» se llena sola con el catálogo, en el orden de su colección; un «enlace fijo» lleva a la dirección que escribas. «Aditamentos» solo sale si existe esa marca de maquinaria nueva. Si borras todas las filas, vuelve el menú de siempre.
+   */
+  menuMaquinaria?:
+    | {
+        mostrar?: boolean | null;
+        nombre: string;
+        tipo: 'ver-todo' | 'nueva' | 'usada' | 'aditamentos' | 'enlace';
+        /**
+         * Una ruta del sitio (/…/) o https://.
+         */
+        enlace?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Lo que sale al desplegar «Repuestos», en escritorio y en el móvil. Arrastra las filas para ordenarlas y desmarca «Mostrar» para quitar una sin borrarla. Una «lista automática» se llena sola con el catálogo, en el orden de su colección; un «enlace fijo» lleva a la dirección que escribas. La política de garantías es un enlace fijo: cambia aquí su texto o su enlace. Si borras todas las filas, vuelve el menú de siempre.
+   */
+  menuRepuestos?:
+    | {
+        mostrar?: boolean | null;
+        nombre: string;
+        tipo: 'ver-todo' | 'marcas' | 'categorias' | 'enlace';
+        /**
+         * Una ruta del sitio (/…/) o https://.
+         */
+        enlace?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Lo que sale al desplegar «Lubricantes», en escritorio y en el móvil. Arrastra las filas para ordenarlas y desmarca «Mostrar» para quitar una sin borrarla. Una «lista automática» se llena sola con el catálogo, en el orden de su colección; un «enlace fijo» lleva a la dirección que escribas. En «marcas de lubricantes» sale un apartado por marca, con el nombre de la marca: el «Nombre visible» de esa fila solo se ve aquí. Si borras todas las filas, vuelve el menú de siempre.
+   */
+  menuLubricantes?:
+    | {
+        mostrar?: boolean | null;
+        nombre: string;
+        tipo: 'ver-todo' | 'marcas' | 'enlace';
+        /**
+         * Una ruta del sitio (/…/) o https://.
+         */
+        enlace?: string | null;
+        id?: string | null;
+      }[]
+    | null;
   /**
    * Última entrada del menú desplegable de Repuestos (escritorio y móvil). Desmarca «Mostrar» para quitarla sin borrarla.
    */
@@ -4810,6 +4855,33 @@ export interface CabeceraSelect<T extends boolean = true> {
       };
   botonTexto?: T;
   botonEnlace?: T;
+  menuMaquinaria?:
+    | T
+    | {
+        mostrar?: T;
+        nombre?: T;
+        tipo?: T;
+        enlace?: T;
+        id?: T;
+      };
+  menuRepuestos?:
+    | T
+    | {
+        mostrar?: T;
+        nombre?: T;
+        tipo?: T;
+        enlace?: T;
+        id?: T;
+      };
+  menuLubricantes?:
+    | T
+    | {
+        mostrar?: T;
+        nombre?: T;
+        tipo?: T;
+        enlace?: T;
+        id?: T;
+      };
   politicaRepuestos?:
     | T
     | {

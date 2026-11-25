@@ -83,3 +83,35 @@ y el desenfoque (el brazo naranja de la foto se ve difuminado a través del pane
 **Destino: `/buscar/?q=…`** (`src/app/(site)/buscar/`), la misma página para la cabecera, el pie y su propio formulario. Busca por nombre —y código, donde lo hay— en equipos nuevos, equipos usados disponibles, modelos de repuesto y artículos del blog (`src/lib/queries/getBusqueda.ts`): una consulta por grupo, 12 resultados como máximo cada una. Mínimo 2 letras, máximo 80; se quitan los caracteres de control y los comodines de `LIKE` (`src/lib/buscador/consulta.ts`, con pruebas). Los usados no tienen página propia: el resultado lleva a su categoría. `noindex, follow`, fuera del sitemap (`RUTAS_FUERA_DEL_SITEMAP`) y con un `<title>` fijo que no refleja lo escrito.
 
 **Regla anterior.** CLAUDE.md §10.33 p.9 dejaba el buscador «fuera de la cola hasta cotización de alcance adicional»: dirección lo ordenó expresamente el 2026-10-14 por petición del cliente.
+
+## 7. Apartados de los desplegables, editables en el panel (2026-11-25, tanda 24 t1, Juan Pablo)
+
+Los apartados de nivel 1 de cada desplegable (Maquinaria pesada, Repuestos y
+Lubricantes) dejan de estar fijos en el código: se ordenan por arrastre, se
+renombran y se muestran u ocultan en el panel, y valen para el megamenú de
+escritorio y para el menú móvil (pintan lo mismo).
+
+- **Dónde:** en el global de la cabecera, que pasa a llamarse «Menú principal
+  (cabecera)», con una lista por desplegable (`menuMaquinaria`,
+  `menuRepuestos`, `menuLubricantes`). No es un global aparte: el orden de los
+  enlaces de la barra ya se editaba ahí («Enlaces del menú»), y así todo el
+  menú está en una sola pantalla.
+- **Cada apartado:** nombre visible, tipo y «Mostrar». El tipo es una lista
+  automática de ese desplegable (su contenido y su orden interno salen del
+  catálogo, como antes) o un enlace fijo con su dirección. Cada lista
+  automática va una sola vez; los enlaces fijos, los que se quieran.
+- **«Más»** no tiene apartados propios: son los enlaces de la barra que no
+  caben, en el orden de «Enlaces del menú».
+- **La política de garantías** es ahora un enlace fijo de la lista de
+  Repuestos. Su grupo antiguo (`politicaRepuestos`) queda oculto y sin uso
+  hasta su borrado con migración.
+- **Migración `20261125_213752_menu_apartados`:** tres tablas y la siembra del
+  menú de siempre con SQL, así lo publicado no cambia. Una prueba compara el
+  SQL con `APARTADOS_POR_DEFECTO`, que es lo que sale si una lista está vacía.
+- **Sin apartados visibles**, el desplegable no abre un panel vacío: su entrada
+  de la barra queda como enlace.
+- **No cambia:** los textos interiores de cada lista («Ver todas las marcas»,
+  «Por marca», «Por tipo de máquina»), que siguen en el código, ni un enlace
+  fijo a otro sitio, que se abre en la misma pestaña (como la política).
+
+Lógica en `src/lib/cabecera/apartados.ts` y `src/lib/megamenu.ts`.

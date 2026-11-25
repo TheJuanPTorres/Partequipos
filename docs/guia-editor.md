@@ -405,10 +405,28 @@ oficial, no lo pongas.
 
 ### 5.9 Menú, pie y datos de la empresa
 
-- **Cabecera:** enlaces del menú y botón. Los desplegables de «Maquinaria
-  Pesada» y «Repuestos» se llenan **solos** con las marcas, los tipos y las
-  categorías del catálogo: al crear una marca o un tipo, sale en el menú sin
-  hacer nada más.
+- **Menú principal (cabecera):** enlaces del menú y botón. Los desplegables de
+  «Maquinaria Pesada», «Repuestos» y «Lubricantes» se llenan **solos** con las
+  marcas, los tipos y las categorías del catálogo: al crear una marca o un
+  tipo, sale en el menú sin hacer nada más.
+  - **Orden de la barra:** arrastra las filas de «Enlaces del menú». Los que
+    no caben en escritorio pasan solos al desplegable «Más», en ese mismo
+    orden.
+  - **Apartados de cada desplegable:** en «Desplegable «Repuestos»:
+    apartados» (y lo mismo en Maquinaria pesada y Lubricantes) hay una fila por
+    apartado: «Ver todos los repuestos», «Repuestos por marca», «Repuestos por
+    categoría técnica» y «Política de garantías y repuestos». **Arrastra** las
+    filas para cambiar el orden, cambia el «Nombre visible» o desmarca
+    «Mostrar» para quitar una sin borrarla. Vale para el menú de escritorio y
+    para el del móvil.
+    - Una **lista automática** se llena sola; su orden interno (las marcas,
+      las categorías) es el de su colección, que se cambia arrastrando en la
+      lista de esa colección. Cada lista automática va una sola vez.
+    - Un **enlace fijo** lleva a la dirección que escribas (una ruta del sitio
+      o https://). Puedes añadir los que quieras con «Añadir Apartado».
+    - Si borras todas las filas de un desplegable, vuelve el menú de siempre.
+      Si las ocultas todas, esa entrada de la barra deja de desplegarse y
+      queda como enlace.
   - **Logos de marca en el menú:** salen con sus colores. Si el logo de una
     marca es blanco o muy claro, marca en esa marca la casilla «Pintar el logo
     en oscuro en el menú»: así se ve sobre el fondo blanco del menú.

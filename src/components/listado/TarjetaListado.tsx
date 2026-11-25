@@ -107,7 +107,9 @@ export function TarjetaListado({
       <div className={estilos.datos}>
         <h3 className={`${estilos.nombre}`}>
           {href ? (
-            <Link href={href}>
+            // El WhatsApp flotante esquiva el título (un enlace pequeño): a 1366 y 1440 con zoom
+            // del 125 %, el de la primera tarjeta quedaba en parte debajo (tanda 24, qa:desbordes).
+            <Link href={href} data-evita-flotante="">
               <TextoTitulo texto={titulo} mayusculas nivel="pequeno" />
             </Link>
           ) : (

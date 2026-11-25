@@ -1115,15 +1115,18 @@ try {
      * pone y lo quita `scripts/paginas/prueba-borrador.ts` (marca «PRUEBA BORRADOR 8B»).
      */
     /*
-     * Modo `vivo` (`… vivo <id de una unidad usada>`, punto 5): la VISTA PREVIA EN VIVO por efecto.
-     * Sin sesión la ruta da 404; con sesión pinta la ficha con `noindex`. A 1440, en el formulario
-     * de la unidad se abre «Vista previa en vivo», se escribe una marca en el nombre SIN GUARDAR y
-     * el título del iframe la muestra. En móvil, la ruta misma. Nada se guarda: el contexto se cierra.
+     * Modo `vivo` (`… vivo <id> [colección] [campo]`, punto 5): la VISTA PREVIA EN VIVO por efecto.
+     * Por defecto, una unidad usada y su nombre. Sin sesión la ruta da 404; con sesión pinta la
+     * ficha con `noindex`. A 1440, en el formulario se abre «Vista previa en vivo», se escribe una
+     * marca en el campo SIN GUARDAR y el iframe la muestra. En móvil, la ruta misma. Nada se
+     * guarda: el contexto se cierra.
      */
     if (MODO === "vivo") {
       const id = process.argv[4];
-      if (!/^\d+$/.test(id ?? "")) fallar("Uso: … vivo <id de una unidad usada>");
-      const ruta = `${base}/vista-previa/equipos-usados/${id}/`;
+      if (!/^\d+$/.test(id ?? "")) fallar("Uso: … vivo <id> [colección] [campo]");
+      const coleccion = process.argv[5] ?? "equipos-usados";
+      const campo = process.argv[6] ?? "nombre";
+      const ruta = `${base}/vista-previa/${coleccion}/${id}/`;
       const resultado = [];
       const ok = (texto, bien) => {
         resultado.push(`${bien ? "✓" : "✗"} ${texto}`);
@@ -1141,10 +1144,32 @@ try {
       }));
       ok(`con sesión pinta la ficha («${directa.h1.slice(0, 50)}»)`, directa.h1.length > 0);
       ok(`noindex (${directa.robots})`, /noindex/.test(directa.robots));
-      await pagina.screenshot({ path: path.join(salida, `vivo-ruta-${ancho.nombre}.png`) });
+      await pagina.screenshot({
+        path: path.join(salida, `vivo-ruta-${coleccion}-${ancho.nombre}.png`),
+      });
       if (!ancho.movil) {
         const MARCA = " PRUEBA VIVO";
-        await pagina.goto(`${base}/admin/collections/equipos-usados/${id}`, {
+        // Lo guardado antes de empezar: al final tiene que seguir igual (la vista previa no guarda).
+        const huella = () =>
+          pagina.evaluate(
+            async ([b, c, i]) => {
+              const doc = await (await fetch(`${b}/api/${c}/${i}?depth=0`)).json();
+              const v = await (
+                await fetch(`${b}/api/${c}/versions?where[parent][equals]=${i}&limit=1`)
+              ).json();
+              return `${doc.updatedAt} · ${v.totalDocs} versiones`;
+            },
+            [base, coleccion, id],
+          );
+        const antes = await huella();
+        // La petición a la función de servidor (las pintadas en el servidor), para repetirla sin sesión.
+        let accion = null;
+        pagina.on("request", (r) => {
+          const h = r.headers();
+          if (!accion && r.method() === "POST" && h["next-action"])
+            accion = { url: r.url(), cuerpo: r.postData() ?? "", cabeceras: h };
+        });
+        await pagina.goto(`${base}/admin/collections/${coleccion}/${id}`, {
           waitUntil: "networkidle",
         });
         const paso = async (nombrePaso, accion) => {
@@ -1178,23 +1203,171 @@ try {
         await paso("la ficha en el iframe", () =>
           marco.locator("h1").first().waitFor({ timeout: 20000 }),
         );
-        const nombre = pagina.locator("#field-nombre");
-        await nombre.click();
-        await nombre.press("End");
-        await nombre.pressSequentially(MARCA, { delay: 30 });
-        let vivo = "";
-        for (let i = 0; i < 20 && !vivo.includes(MARCA.trim()); i++) {
+        const entrada = pagina.locator(`#field-${campo}`);
+        await entrada.click();
+        await entrada.press("End");
+        await entrada.pressSequentially(MARCA, { delay: 30 });
+        // Las pintadas en el servidor tardan más (pausa de 500 ms y la petición): hasta 20 s.
+        let vivo = false;
+        for (let i = 0; i < 40 && !vivo; i++) {
           await pagina.waitForTimeout(500);
-          vivo = (await marco.locator("h1").first().textContent()) ?? "";
+          vivo = ((await marco.locator("body").textContent()) ?? "").includes(MARCA.trim());
         }
-        ok(
-          `al escribir sin guardar, el iframe lo muestra («${vivo.trim().slice(-40)}»)`,
-          vivo.includes(MARCA.trim()),
-        );
-        await pagina.screenshot({ path: path.join(salida, `vivo-panel-${ancho.nombre}.png`) });
+        ok(`al escribir en «${campo}» sin guardar, el iframe lo muestra`, vivo);
+        if (coleccion !== "equipos-usados") {
+          ok("la ficha la pide a la función de servidor", Boolean(accion));
+          if (accion) {
+            // La misma petición, SIN cookies: no puede devolver la ficha ni lo escrito.
+            const cabeceras = { ...accion.cabeceras };
+            delete cabeceras.cookie;
+            const anon = await pagina.evaluate(
+              async ([u, h, c]) => {
+                const r = await fetch(u, {
+                  method: "POST",
+                  headers: h,
+                  body: c,
+                  credentials: "omit",
+                });
+                const t = await r.text();
+                return { estado: r.status, largo: t.length, texto: t.slice(0, 4000) };
+              },
+              [accion.url, cabeceras, accion.cuerpo],
+            );
+            const filtra = anon.texto.includes(MARCA.trim()) || /<h1|"h1"/.test(anon.texto);
+            ok(
+              `sin sesión, la función de servidor no pinta nada (HTTP ${anon.estado}, ${anon.largo} bytes)`,
+              !filtra,
+            );
+            hallazgos.push({
+              pantalla: "vivo-sin-sesion",
+              coleccion,
+              respuesta: anon.texto.slice(0, 500),
+            });
+          }
+        }
+        const despues = await huella();
+        ok(`no se guardó nada (${antes} → ${despues})`, antes === despues);
+        await pagina.screenshot({
+          path: path.join(salida, `vivo-panel-${coleccion}-${ancho.nombre}.png`),
+        });
       }
-      hallazgos.push({ pantalla: "vivo", ancho: ancho.nombre, id, resultado, errores, fallidas });
+      hallazgos.push({
+        pantalla: "vivo",
+        ancho: ancho.nombre,
+        coleccion,
+        id,
+        resultado,
+        errores,
+        fallidas,
+      });
       // Sin guardar: se cierra el contexto y lo escrito se pierde.
+      await contexto.close();
+      continue;
+    }
+
+    /*
+     * Modo `versiones-orden` (`… versiones-orden <colección> <id>`, #578 de B): la lista de
+     * versiones sale por fecha, la más reciente primero, y la hora de la lista, de la comparación y
+     * del aviso de «Restaurar» es la de Colombia (no la UTC). NO restaura: el aviso se cancela.
+     */
+    if (MODO === "versiones-orden") {
+      const coleccion = process.argv[4] ?? "equipos-usados";
+      const id = process.argv[5] ?? "27";
+      const resultado = [];
+      const ok = (texto, bien) => {
+        resultado.push(`${bien ? "✓" : "✗"} ${texto}`);
+        decir(`${bien ? "✓" : "✗"} ${texto} (${ancho.nombre})`);
+      };
+      const hora = (iso, zona) =>
+        new Intl.DateTimeFormat("es-CO", {
+          hour: "2-digit",
+          minute: "2-digit",
+          hourCycle: "h23",
+          timeZone: zona,
+        }).format(new Date(iso));
+      await pagina.goto(`${base}/admin/collections/${coleccion}/${id}/versions`, {
+        waitUntil: "networkidle",
+      });
+      await pagina.waitForTimeout(1500);
+      const api = await pagina.evaluate(
+        async ([b, c, i]) =>
+          (
+            await (
+              await fetch(
+                `${b}/api/${c}/versions?where[parent][equals]=${i}&sort=-updatedAt&limit=10&depth=0`,
+              )
+            ).json()
+          ).docs.map((d) => ({ id: d.id, updatedAt: d.updatedAt })),
+        [base, coleccion, id],
+      );
+      const filas = await pagina
+        .locator("table tbody tr")
+        .evaluateAll((trs) =>
+          trs.map((tr) => [...tr.querySelectorAll("td")].map((td) => td.textContent?.trim() ?? "")),
+        );
+      // La columna del id de versión: la que coincide con los ids de la API.
+      const ids = filas.map((f) => f.find((c) => /^\d+$/.test(c)) ?? "");
+      ok(
+        `la lista va por fecha, la más reciente primero (${ids.join(",")})`,
+        ids.join(",") === api.map((v) => String(v.id)).join(","),
+      );
+      const reciente = api[0];
+      const colombia = hora(reciente.updatedAt, "America/Bogota");
+      const utc = hora(reciente.updatedAt, "UTC");
+      ok(
+        `la primera fila lleva la hora de Colombia (${colombia}; UTC sería ${utc}): «${filas[0]?.[0]}»`,
+        (filas[0] ?? []).join(" ").includes(colombia),
+      );
+      await pagina.screenshot({
+        path: path.join(salida, `versiones-orden-lista-${ancho.nombre}.png`),
+      });
+      await pagina.goto(`${base}/admin/collections/${coleccion}/${id}/versions/${reciente.id}`, {
+        waitUntil: "networkidle",
+      });
+      await pagina.waitForTimeout(1500);
+      const migas =
+        (await pagina.locator(".step-nav, nav[aria-label]").first().textContent()) ?? "";
+      ok(
+        `las migas de la comparación, en hora de Colombia («${migas.trim().slice(-30)}»)`,
+        migas.includes(colombia) && !migas.includes(utc),
+      );
+      await pagina.screenshot({
+        path: path.join(salida, `versiones-orden-comparar-${ancho.nombre}.png`),
+      });
+      const boton = pagina.getByRole("button", { name: /Restaurar/i }).first();
+      if (await boton.count()) {
+        await boton.click();
+        await pagina.waitForTimeout(800);
+        const aviso =
+          (await pagina
+            .locator("dialog, [role=dialog], .modal, .confirmation-modal")
+            .last()
+            .textContent()
+            .catch(() => "")) ?? "";
+        ok(
+          `el aviso de «Restaurar», en hora de Colombia («${aviso.trim().slice(0, 120)}»)`,
+          aviso.includes(colombia) && !aviso.includes(utc),
+        );
+        await pagina.screenshot({
+          path: path.join(salida, `versiones-orden-aviso-${ancho.nombre}.png`),
+        });
+        await pagina
+          .getByRole("button", { name: /Cancelar/i })
+          .last()
+          .click()
+          .catch(() => pagina.keyboard.press("Escape"));
+      } else {
+        ok("hay botón «Restaurar» en la comparación", false);
+      }
+      hallazgos.push({
+        pantalla: "versiones-orden",
+        ancho: ancho.nombre,
+        coleccion,
+        id,
+        resultado,
+        errores,
+        fallidas,
+      });
       await contexto.close();
       continue;
     }

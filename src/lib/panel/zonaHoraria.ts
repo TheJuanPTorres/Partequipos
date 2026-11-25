@@ -33,7 +33,15 @@ export function zonaDelProceso(env: Entorno): string | undefined {
   return env.NEXT_RUNTIME === "nodejs" ? ZONA_PANEL : undefined;
 }
 
-export function fijarZonaDelPanel(env: Entorno = process.env as Entorno): void {
-  const zona = zonaDelProceso(env);
+/**
+ * OJO: `process.env.NEXT_RUNTIME` se lee ESCRITO ASÍ, literal. Next lo sustituye en el build por
+ * «nodejs» (`define-env.js`), pero en la función de Vercel NO existe como variable de entorno: el
+ * #578 lo leía por un alias (`env.NEXT_RUNTIME`) y en producción la zona nunca se fijaba.
+ */
+export function fijarZonaDelPanel(
+  runtime: string | undefined = process.env.NEXT_RUNTIME,
+  env: Entorno = process.env as Entorno,
+): void {
+  const zona = zonaDelProceso({ NEXT_RUNTIME: runtime });
   if (zona && env.TZ !== zona) env.TZ = zona;
 }

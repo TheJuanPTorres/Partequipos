@@ -17,6 +17,7 @@ import {
   soloPersonal,
 } from "../lib/seguridad/acceso";
 import { VERSIONES_SIN_BORRADORES, versionesRecientesPrimero } from "../lib/borradores";
+import { VISTA_PREVIA_NUEVA } from "../lib/vistaPrevia/enVivo";
 import { avisoField } from "../lib/fields/avisoField";
 import { ordenListaSinUso } from "../lib/fields/ordenListaSinUso";
 import { conCopia } from "../lib/fields/duplicar";
@@ -63,6 +64,8 @@ export const EquipoNuevo: CollectionConfig = {
     group: "Maquinaria",
     description:
       "El orden en que salen los equipos en la web se cambia en la ficha de su TIPO («Equipos del tipo»); el de las marcas, en «Marcas de maquinaria nueva».",
+    // Vista previa en vivo (tanda 21, tarea 3, fase 2, punto 5): la ficha se pinta mientras se escribe.
+    livePreview: VISTA_PREVIA_NUEVA,
   },
   /*
    * SIN `orderable` desde el 2026-11-23 (Juan Pablo, tanda 21): el arrastre de esta lista no movía

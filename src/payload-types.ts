@@ -77,6 +77,7 @@ export interface Config {
     'marcas-maquinaria': MarcasMaquinaria;
     'tipos-maquinaria': TiposMaquinaria;
     'categorias-maquinaria': CategoriasMaquinaria;
+    'atributos-ficha': AtributosFicha;
     'categorias-usada': CategoriasUsada;
     'marcas-usada': MarcasUsada;
     'marcas-lubricante': MarcasLubricante;
@@ -128,6 +129,7 @@ export interface Config {
     'marcas-maquinaria': MarcasMaquinariaSelect<false> | MarcasMaquinariaSelect<true>;
     'tipos-maquinaria': TiposMaquinariaSelect<false> | TiposMaquinariaSelect<true>;
     'categorias-maquinaria': CategoriasMaquinariaSelect<false> | CategoriasMaquinariaSelect<true>;
+    'atributos-ficha': AtributosFichaSelect<false> | AtributosFichaSelect<true>;
     'categorias-usada': CategoriasUsadaSelect<false> | CategoriasUsadaSelect<true>;
     'marcas-usada': MarcasUsadaSelect<false> | MarcasUsadaSelect<true>;
     'marcas-lubricante': MarcasLubricanteSelect<false> | MarcasLubricanteSelect<true>;
@@ -339,6 +341,19 @@ export interface EquiposNuevo {
     };
     [k: string]: unknown;
   } | null;
+  /**
+   * Los datos que salen junto al título de la ficha, hasta 5. Elige el atributo (escribe para buscarlo en el catálogo «Atributos de ficha») y escribe solo el valor; arrastra para ordenarlos. Si no pones ninguno, la ficha enseña los de siempre, sacados de la «Ficha técnica».
+   */
+  atributosDestacados?:
+    | {
+        atributo: number | AtributosFicha;
+        /**
+         * Solo el valor: la unidad la pone el catálogo.
+         */
+        valor: string;
+        id?: string | null;
+      }[]
+    | null;
   /**
    * Pares etiqueta/valor tal como los publica el fabricante. No inventar datos: si no hay dato oficial, se deja fuera. En la ficha salen como mucho 5, junto al título: potencia neta, peso operativo, motor, fuerza de tracción máxima y ancho de la zapata (se reconocen por la etiqueta); si falta alguna, se completa con las siguientes filas, en el orden de aquí. «Destacar» elige los datos de la tarjeta del equipo en la página de su marca.
    */
@@ -686,6 +701,33 @@ export interface CategoriasMaquinaria {
    * Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. Después ya no se puede cambiar, porque Google ya conoce esa dirección. Si tiene una errata, pide a un administrador el permiso «Puede cambiar direcciones web ya publicadas»: la dirección antigua seguirá llevando a la nueva.
    */
   slug: string;
+  actualizadoPor?: (number | null) | User;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Los datos que salen junto al título de cada máquina nueva (potencia, peso, motor…). Aquí se define cómo se llama, su icono, su unidad y si es número o texto; en cada máquina, «Atributos destacados» elige hasta 5 y escribe el valor. Arrastra para cambiar el orden en que se ofrecen.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "atributos-ficha".
+ */
+export interface AtributosFicha {
+  id: number;
+  _order?: string | null;
+  titulo?: string | null;
+  /**
+   * Cómo se llama en la ficha: «Potencia neta», «Peso operativo»…
+   */
+  nombre: string;
+  icono: 'peso' | 'potencia' | 'motor' | 'capacidad' | 'alcance' | 'profundidad' | 'velocidad' | 'otro';
+  /**
+   * Se escribe después del valor. Por ejemplo: hp, kW, t, kg, mm, m, cm, L, km/h, rpm. Vacía, sin unidad.
+   */
+  unidad?: string | null;
+  /**
+   * «Número»: en la máquina solo se puede escribir un número.
+   */
+  tipoValor: 'numero' | 'texto';
   actualizadoPor?: (number | null) | User;
   updatedAt: string;
   createdAt: string;
@@ -2794,6 +2836,10 @@ export interface PayloadLockedDocument {
         value: number | CategoriasMaquinaria;
       } | null)
     | ({
+        relationTo: 'atributos-ficha';
+        value: number | AtributosFicha;
+      } | null)
+    | ({
         relationTo: 'categorias-usada';
         value: number | CategoriasUsada;
       } | null)
@@ -3114,6 +3160,13 @@ export interface EquiposNuevosSelect<T extends boolean = true> {
   codigo?: T;
   entradilla?: T;
   descripcion?: T;
+  atributosDestacados?:
+    | T
+    | {
+        atributo?: T;
+        valor?: T;
+        id?: T;
+      };
   fichaTecnica?:
     | T
     | {
@@ -3300,6 +3353,21 @@ export interface CategoriasMaquinariaSelect<T extends boolean = true> {
         ogImage?: T;
       };
   slug?: T;
+  actualizadoPor?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "atributos-ficha_select".
+ */
+export interface AtributosFichaSelect<T extends boolean = true> {
+  _order?: T;
+  titulo?: T;
+  nombre?: T;
+  icono?: T;
+  unidad?: T;
+  tipoValor?: T;
   actualizadoPor?: T;
   updatedAt?: T;
   createdAt?: T;

@@ -8,8 +8,9 @@ const B = "https://partequipos.vercel.app";
 const destino = (ruta: string) => entradaListaOrdenable(new URL(B + ruta))?.toString() ?? null;
 
 describe("las listas ordenables se abren por su arrastre", () => {
-  it("son las 10 ordenables por lista", () => {
+  it("son las 11 ordenables por lista", () => {
     assert.deepEqual([...LISTAS_ORDENABLES].sort(), [
+      "atributos-ficha",
       "categorias-maquinaria",
       "categorias-tecnicas",
       "categorias-usada",

@@ -15,9 +15,15 @@ const cat = (id: number, nombre = `Cat ${id}`) => ({ id, nombre }) as Categorias
 describe("categoriasDelTipo", () => {
   const todas = [cat(1), cat(2), cat(3), cat(4, " ")];
 
-  it("las del tipo, en el orden del tipo (ids o pobladas)", () => {
+  it("las del tipo, en el orden por arrastre de todas (ids o pobladas), no en el del tipo", () => {
     assert.deepEqual(
       categoriasDelTipo({ categoriasModelo: [3, cat(1)] }, todas).map((c) => c.id),
+      [1, 3],
+    );
+    // `todas` llega en el orden del panel: si es otro, manda ese.
+    const arrastradas = [cat(3), cat(2), cat(1)];
+    assert.deepEqual(
+      categoriasDelTipo({ categoriasModelo: [1, 3] }, arrastradas).map((c) => c.id),
       [3, 1],
     );
   });

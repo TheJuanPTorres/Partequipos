@@ -11,7 +11,8 @@
  *   que se puede desplazar (`auto`/`scroll`), ni un recorte a propósito: `text-overflow:
  *   ellipsis`, `line-clamp` o un antepasado con `data-qa-recorte` (la descripción plegada con
  *   «Leer más»).
- * - ✗ **tapado**: un enlace, botón o campo debajo del WhatsApp flotante, arriba del todo y abajo
+ * - ✗ **tapado**: un enlace, botón o campo debajo del WhatsApp flotante (uno GRANDE, como una
+ *   tarjeta entera, solo si le tapa más del 12 % de su área: `tapadoCuenta`), arriba del todo y abajo
  *   del todo de la página (en medio, al desplazar, pasa por debajo y sale); un texto, solo abajo
  *   del todo o en una página que no se desplaza (ahí no hay forma de sacarlo de debajo).
  * - ⚠ **solape**: dos textos que se pisan (más del 30 % del menor). Aviso: hay que mirarlo.
@@ -35,6 +36,7 @@ import { createRequire } from "node:module";
 import path from "node:path";
 
 import { instalarDerivacion, origenDePreview } from "../../src/lib/preview/derivacion.mjs";
+import { SELECTOR_MARCADOR_MAPA, tapadoCuenta } from "../../src/lib/qa/desbordesReglas.mjs";
 
 function cargarPlaywright() {
   const bins = (process.env.PATH || "").split(path.delimiter).filter((p) => /_npx/.test(p));
@@ -89,7 +91,7 @@ const navegador = await pw.chromium.launch({
 const secreto = process.env.VERCEL_AUTOMATION_BYPASS_SECRET ?? "";
 
 /** Se ejecuta en la página: devuelve los fallos, cada uno con un selector para marcarlo. */
-function medir() {
+function medir(selectorMarcador) {
   const fallos = [];
   let n = 0;
   const marcar = (el) => {
@@ -148,6 +150,8 @@ function medir() {
       const e = getComputedStyle(a);
       if (e.textOverflow === "ellipsis" || e.webkitLineClamp !== "none") return true;
       if (a.hasAttribute("data-qa-recorte")) return true;
+      // Un marcador de mapa asoma por el borde del mapa al moverlo: no es un recorte de la página.
+      if (selectorMarcador && a.matches(selectorMarcador)) return true;
     }
     return false;
   };
@@ -320,6 +324,11 @@ function tapados(donde) {
         detalle: `<${el.tagName.toLowerCase()}> «${texto.slice(0, 50)}» bajo el WhatsApp (${donde})`,
         selector: `[data-qa-desborde="${el.dataset.qaDesborde}"]`,
         donde,
+        // Para `tapadoCuenta` (en Node): un control grande pisado en una esquina no cuenta.
+        control: el.matches(INTERACTIVO),
+        area: (r.right - r.left) * (r.bottom - r.top),
+        pisada: w * h,
+        areaFlotante: f.width * f.height,
       });
     }
   }
@@ -327,6 +336,11 @@ function tapados(donde) {
 }
 
 const decir = (t) => process.stdout.write(`${t}\n`);
+/** De lo tapado, lo que cuenta (`tapadoCuenta`); el texto, siempre. Sin las medidas en la salida. */
+const cuentan = (tapados) =>
+  tapados
+    .filter((f) => !f.control || tapadoCuenta(f))
+    .map(({ tipo, detalle, selector, donde }) => ({ tipo, detalle, selector, donde }));
 const resultados = [];
 for (const vista of vistas) {
   const contexto = await navegador.newContext({
@@ -350,8 +364,8 @@ for (const vista of vistas) {
         scrollTo(0, 0);
       });
       await pagina.waitForTimeout(800);
-      fila.fallos.push(...(await pagina.evaluate(medir)));
-      fila.fallos.push(...(await pagina.evaluate(tapados, "arriba")));
+      fila.fallos.push(...(await pagina.evaluate(medir, SELECTOR_MARCADOR_MAPA)));
+      fila.fallos.push(...cuentan(await pagina.evaluate(tapados, "arriba")));
       // Con `DESBORDES_CAPTURAS=1`, además, la vista de arriba de cada página (antes y después).
       // Con un selector (`DESBORDES_CAPTURAS='main section[class*=principal]'`), la captura es de
       // ese elemento (la tarjeta de la ficha, aunque quede más abajo).
@@ -368,7 +382,7 @@ for (const vista of vistas) {
       }
       await pagina.evaluate(() => scrollTo(0, document.documentElement.scrollHeight));
       await pagina.waitForTimeout(600);
-      fila.fallos.push(...(await pagina.evaluate(tapados, "abajo")));
+      fila.fallos.push(...cuentan(await pagina.evaluate(tapados, "abajo")));
       // Una captura por tipo de fallo, con el elemento marcado.
       const porTipo = new Map();
       for (const f of fila.fallos) if (f.selector && !porTipo.has(f.tipo)) porTipo.set(f.tipo, f);

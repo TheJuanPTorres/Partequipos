@@ -106,10 +106,14 @@ function medir() {
   const visible = (el) => {
     if (el.closest("[aria-hidden='true'], [inert], .sr-only, dialog:not([open])")) return false;
     const r = el.getBoundingClientRect();
-    if (r.width < 1 || r.height < 1) return false;
+    // 1 × 1 px o recortado entero: solo para lectores de pantalla (las etiquetas del formulario
+    // de Contáctanos, con `clip-path: inset(50%)`).
+    if (r.width <= 1 || r.height <= 1) return false;
     for (let a = el; a; a = a.parentElement) {
       const e = getComputedStyle(a);
       if (e.visibility === "hidden" || e.opacity === "0" || e.display === "none") return false;
+      if (/inset\(50%/.test(e.clipPath) || /rect\(0(px)?,? 0(px)?,? 0(px)?,? 0(px)?\)/.test(e.clip))
+        return false;
     }
     return true;
   };

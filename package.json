@@ -181,7 +181,8 @@
     "humo": "tsx scripts/qa/humo.ts",
     "lanzamiento:urls": "tsx scripts/lanzamiento/comprobar-urls.ts",
     "qa:vuelo-pie": "npx -y -p puppeteer-core@24.43.1 node scripts/qa/vuelo-pie.mjs",
-    "qa:huecos": "npx -y -p playwright-core@1.63.0 node scripts/qa/huecos-secciones.mjs"
+    "qa:huecos": "npx -y -p playwright-core@1.63.0 node scripts/qa/huecos-secciones.mjs",
+    "qa:desbordes": "npx -y -p playwright-core@1.63.0 node scripts/qa/desbordes.mjs"
   },
   "dependencies": {
     "@payloadcms/db-postgres": "3.89.0",

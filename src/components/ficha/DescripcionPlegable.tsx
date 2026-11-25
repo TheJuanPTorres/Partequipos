@@ -7,9 +7,9 @@ import nueva from "./fichaNueva.module.css";
 /*
  * LA DESCRIPCIÓN Y LOS BOTONES DE LA FICHA NUEVA, con «Leer más» (dirección, 2026-11-12).
  *
- * En escritorio la columna derecha NUNCA es más alta que la foto: esta envoltura no aporta su
- * alto a la fila (`contain: size` en el CSS, con un mínimo para unas líneas y los botones), así
- * que la fila la marca la galería y la descripción se recorta en lo que quede. En tablet y móvil
+ * En escritorio la foto marca el alto MÍNIMO de la fila: esta envoltura solo aporta a la fila su
+ * mínimo (`contain: size` en el CSS: unas líneas, «Leer más» y el alto real de los botones), así
+ * que la descripción se recorta en lo que deje la foto, y si los botones no caben, la tarjeta crece. En tablet y móvil
  * la descripción se recorta a unas líneas. Si el texto no cabe, sale «Leer más», que la despliega
  * entera (y «Leer menos» la vuelve a plegar).
  *
@@ -33,11 +33,31 @@ export function DescripcionPlegable({
   botones: ReactNode;
 }) {
   const id = useId();
+  const envolturaRef = useRef<HTMLDivElement>(null);
   const cajaRef = useRef<HTMLDivElement>(null);
   const cuerpoRef = useRef<HTMLDivElement>(null);
   const abiertoRef = useRef(false);
   const [cortado, setCortado] = useState(false);
   const [abierto, setAbierto] = useState(false);
+
+  /*
+   * EL ALTO REAL DE LOS BOTONES (tanda 24, BUG-005): el mínimo de la envoltura (`contain: size`)
+   * suponía una sola fila de 60 px. Cuando no caben uno al lado del otro (columna estrecha, zoom,
+   * letra grande) bajan a dos filas, y «Habla con un experto» se salía por abajo de la tarjeta, que
+   * lo cortaba. Ahora el mínimo lleva su alto medido (`--alto-botones`); sin JavaScript, la
+   * envoltura no se contiene (`<noscript>`).
+   */
+  useEffect(() => {
+    const envoltura = envolturaRef.current;
+    const botones = envoltura?.lastElementChild;
+    if (!envoltura || !(botones instanceof HTMLElement) || botones === cajaRef.current) return;
+    const medir = () =>
+      envoltura.style.setProperty("--alto-botones", `${Math.ceil(botones.offsetHeight)}px`);
+    medir();
+    const observador = new ResizeObserver(medir);
+    observador.observe(botones);
+    return () => observador.disconnect();
+  }, []);
 
   useEffect(() => {
     const caja = cajaRef.current;
@@ -65,6 +85,7 @@ export function DescripcionPlegable({
 
   return (
     <div
+      ref={envolturaRef}
       className={nueva.envoltura}
       data-con-descripcion={descripcion ? "" : undefined}
       data-cortado={cortado && !abierto ? "" : undefined}
@@ -79,6 +100,8 @@ export function DescripcionPlegable({
           id={id}
           className={`${nueva.descripcion} ${nueva.reserva} ${claseTexto}`}
           data-reserva={reserva}
+          // Plegada a propósito, con «Leer más»: el test de desbordes no la cuenta como cortada.
+          data-qa-recorte=""
         >
           <div ref={cuerpoRef} className={nueva.cuerpoDescripcion}>
             {descripcion}

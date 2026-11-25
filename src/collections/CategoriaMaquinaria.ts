@@ -34,6 +34,8 @@ export const CategoriaMaquinaria: CollectionConfig = {
    * web antigua (migración `…_categorias_nueva_orden`); una categoría nueva va al final.
    */
   orderable: true,
+  // Se abre YA ordenada por el arrastre: así se puede arrastrar sin pulsar antes el icono ⇅.
+  defaultSort: "_order",
   admin: {
     useAsTitle: "nombre",
     group: "Maquinaria",

@@ -69,6 +69,8 @@ export const CategoriaTecnica: CollectionConfig = {
    * «Posición en la portada» (`ordenPortada`) se queda: además decide si sale en la portada.
    */
   orderable: true,
+  // Se abre YA ordenada por el arrastre: así se puede arrastrar sin pulsar antes el icono ⇅.
+  defaultSort: "_order",
   access: {
     read: lecturaContenido,
     create: escrituraContenido,

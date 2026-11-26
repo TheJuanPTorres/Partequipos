@@ -409,24 +409,34 @@ oficial, no lo pongas.
   «Maquinaria Pesada», «Repuestos» y «Lubricantes» se llenan **solos** con las
   marcas, los tipos y las categorías del catálogo: al crear una marca o un
   tipo, sale en el menú sin hacer nada más.
-  - **Orden de la barra:** arrastra las filas de «Enlaces del menú». Los que
-    no caben en escritorio pasan solos al desplegable «Más», en ese mismo
-    orden.
-  - **Apartados de cada desplegable:** en «Desplegable «Repuestos»:
-    apartados» (y lo mismo en Maquinaria pesada y Lubricantes) hay una fila por
-    apartado: «Ver todos los repuestos», «Repuestos por marca», «Repuestos por
-    categoría técnica» y «Política de garantías y repuestos». **Arrastra** las
-    filas para cambiar el orden, cambia el «Nombre visible» o desmarca
-    «Mostrar» para quitar una sin borrarla. Vale para el menú de escritorio y
-    para el del móvil.
-    - Una **lista automática** se llena sola; su orden interno (las marcas,
-      las categorías) es el de su colección, que se cambia arrastrando en la
-      lista de esa colección. Cada lista automática va una sola vez.
-    - Un **enlace fijo** lleva a la dirección que escribas (una ruta del sitio
-      o https://). Puedes añadir los que quieras con «Añadir Apartado».
-    - Si borras todas las filas de un desplegable, vuelve el menú de siempre.
-      Si las ocultas todas, esa entrada de la barra deja de desplegarse y
-      queda como enlace.
+  - **Todo el menú se arma en «Enlaces del menú»**, como un árbol. Cada fila
+    plegada dice qué es («Repuestos · desplegable · 4 apartados») y si está
+    oculta.
+  - **Orden de la barra:** arrastra las filas. Los que no caben en escritorio
+    pasan solos al desplegable «Más», en ese mismo orden.
+  - **Tipo de cada fila:** «Enlace simple» o «Desplegable». Un desplegable
+    lleva en «Enlace» la página de su sección y, debajo, sus **apartados**.
+    Puedes crear desplegables nuevos (por ejemplo, «Servicio técnico» con sus
+    servicios).
+  - **Apartados de un desplegable:** una fila por apartado. **Arrastra** para
+    cambiar el orden, cambia el «Nombre visible» o desmarca «Mostrar» para
+    quitar uno sin borrarlo. Vale para el menú de escritorio y para el del
+    móvil. Hay tres tipos:
+    - **Lista automática:** eliges la «Fuente» (marcas de repuestos,
+      categorías técnicas, maquinaria nueva, categorías de usada, marcas de
+      lubricantes…) y se llena sola. Su orden interno es el de su colección,
+      que se cambia arrastrando en la lista de esa colección. Cada fuente va
+      una sola vez por desplegable. «Ver todos…» y «Aditamentos» también son
+      fuentes: su enlace se calcula solo.
+    - **Enlace fijo:** lleva a la dirección que escribas (una ruta del sitio,
+      o https:// en pestaña nueva).
+    - **Grupo:** un título con varios enlaces fijos dentro («Enlaces del
+      grupo»), que se despliegan al pulsarlo.
+  - **Vista previa:** bajo la lista hay un esquema de cómo queda el menú con
+    lo escrito, también antes de guardar. Lo tachado no sale, y dice por qué.
+  - Si dejas un desplegable de Maquinaria pesada, Repuestos o Lubricantes sin
+    ningún apartado, vuelve el menú de siempre. Si los ocultas todos, esa
+    entrada de la barra deja de desplegarse y queda como enlace.
   - **Logos de marca en el menú:** salen con sus colores. Si el logo de una
     marca es blanco o muy claro, marca en esa marca la casilla «Pintar el logo
     en oscuro en el menú»: así se ve sobre el fondo blanco del menú.

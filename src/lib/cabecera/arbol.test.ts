@@ -93,7 +93,7 @@ describe("árbol del menú principal (tanda 25, tarea 2)", () => {
           assert.equal(a.enlace, de608.enlace);
         } else {
           assert.equal(a.tipo, "lista");
-          assert.equal(a.fuente, FUENTE_DE_TIPO_608[d][de608.tipo]);
+          assert.equal(a.fuente, FUENTE_DE_TIPO_608[d][de608.tipo ?? ""]);
           assert.ok(fuentes.has(a.fuente!), `${d}: ${a.fuente}`);
           // El nombre por defecto de la fuente es el del menú de siempre.
           assert.equal(FUENTES.find((f) => f.value === a.fuente)?.nombre, de608.nombre);

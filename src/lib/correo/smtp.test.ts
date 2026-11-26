@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
-import { destinoAvisos, modoCorreo, opcionesTransporte } from "./smtp";
+import { buzonDePruebas, destinoAvisos, modoCorreo, opcionesTransporte } from "./smtp";
 
 const COMPLETO = {
   SMTP_HOST: "smtp.ejemplo.test",
@@ -76,5 +76,33 @@ describe("destino de los avisos: el preview nunca escribe al cliente (§10.21)",
     assert.equal(destinoAvisos("cliente@x.co", { VERCEL_ENV: "preview" }, "panel@x.co"), null);
     const env = { VERCEL_ENV: "preview", SOLICITUDES_EMAIL_TO: "p@x.co" };
     assert.equal(destinoAvisos("cliente@x.co", env, "panel@x.co"), "p@x.co");
+  });
+});
+
+describe("buzón de pruebas del panel (2026-11-26)", () => {
+  it("fuera de producción gana a la variable", () => {
+    const env = { VERCEL_ENV: "preview", SOLICITUDES_EMAIL_TO: "env@x.co" };
+    assert.equal(destinoAvisos("cliente@x.co", env, null, "sistemas6@x.co"), "sistemas6@x.co");
+    assert.equal(buzonDePruebas(env, " sistemas6@x.co "), "sistemas6@x.co");
+  });
+  it("fuera de producción, vacío en el panel: la variable; sin ninguna, nada", () => {
+    const env = { VERCEL_ENV: "preview", SOLICITUDES_EMAIL_TO: "env@x.co" };
+    assert.equal(destinoAvisos("cliente@x.co", env, null, "  "), "env@x.co");
+    assert.equal(destinoAvisos("cliente@x.co", { VERCEL_ENV: "preview" }, null, ""), null);
+    assert.equal(destinoAvisos("cliente@x.co", {}, null, undefined), null);
+  });
+  it("el buzón no se mezcla con el correo para solicitudes del panel", () => {
+    assert.equal(
+      destinoAvisos("cliente@x.co", { VERCEL_ENV: "preview" }, "real@x.co", "sistemas6@x.co"),
+      "sistemas6@x.co",
+    );
+  });
+  it("EN PRODUCCIÓN el buzón de pruebas no se usa jamás: todo igual que antes", () => {
+    const env = { VERCEL_ENV: "production" };
+    assert.equal(destinoAvisos("cliente@x.co", env, null, "sistemas6@x.co"), "cliente@x.co");
+    assert.equal(destinoAvisos("cliente@x.co", env, "panel@x.co", "sistemas6@x.co"), "panel@x.co");
+    const conVariable = { VERCEL_ENV: "production", SOLICITUDES_EMAIL_TO: "env@x.co" };
+    assert.equal(destinoAvisos("cliente@x.co", conVariable, null, "sistemas6@x.co"), "env@x.co");
+    assert.equal(buzonDePruebas(env, "sistemas6@x.co"), "");
   });
 });

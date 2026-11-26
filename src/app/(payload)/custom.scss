@@ -2641,3 +2641,77 @@ html[data-theme="dark"] :is(.auth-fields, .where-builder, .group-by-builder, .up
     font-size: 13px;
   }
 }
+
+/* El árbol del menú (tanda 25): la etiqueta de cada fila plegada y el esquema de vista previa. */
+.pq-etiqueta-menu {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+
+  &__detalle {
+    color: var(--pq-muted-foreground);
+    font-size: 13px;
+    font-weight: 400;
+  }
+}
+
+.pq-esquema-menu {
+  margin-bottom: var(--spacing-field, 30px);
+  padding: 16px 20px;
+  border: 1px solid var(--theme-elevation-150);
+  border-radius: var(--style-radius-m, 8px);
+
+  h3 {
+    margin: 0 0 4px;
+    font-size: 16px;
+  }
+
+  &__nota {
+    margin: 0 0 12px;
+    color: var(--pq-muted-foreground);
+    font-size: 13px;
+  }
+
+  ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  li {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 4px 10px;
+    padding: 4px 0;
+  }
+
+  li[data-nivel="1"] {
+    margin-top: 6px;
+    font-weight: 600;
+  }
+
+  li[data-nivel="2"] {
+    padding-left: 24px;
+  }
+
+  li[data-nivel="3"] {
+    padding-left: 48px;
+  }
+
+  &__detalle,
+  &__motivo {
+    color: var(--pq-muted-foreground);
+    font-size: 13px;
+    font-weight: 400;
+  }
+
+  li[data-sale="no"] &__texto {
+    text-decoration: line-through;
+  }
+
+  &__motivo {
+    font-style: italic;
+  }
+}

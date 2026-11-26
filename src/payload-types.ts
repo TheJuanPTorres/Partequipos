@@ -779,7 +779,7 @@ export interface ModelosRepuesto {
    */
   tipo: number | TiposEquipo;
   /**
-   * Opcional. La dirección (https://…) de la página de este modelo en la tienda, por ejemplo https://… página de este producto en la tienda. Si lo dejas vacío, lleva a la tienda general (la del botón «Tienda» de la cabecera).
+   * Opcional. La dirección (https://…) de la página de este modelo en la tienda. Si lo dejas vacío, lleva a la tienda general (la del botón «Tienda» de la cabecera).
    */
   enlaceTienda?: string | null;
   /**
@@ -1003,7 +1003,7 @@ export interface CategoriasTecnica {
   colorMarca?: string | null;
   descripcion?: string | null;
   /**
-   * Opcional. La dirección (https://…) de la página de esta categoría en la tienda, por ejemplo https://… página de este producto en la tienda. Si lo dejas vacío, lleva a la tienda general (la del botón «Tienda» de la cabecera).
+   * Opcional. La dirección (https://…) de la página de esta categoría en la tienda. Si lo dejas vacío, lleva a la tienda general (la del botón «Tienda» de la cabecera).
    */
   enlaceTienda?: string | null;
   /**
@@ -1034,14 +1034,14 @@ export interface CategoriasTecnica {
          */
         descripcion?: string | null;
         /**
-         * Opcional. La dirección (https://…) de la página de este tipo de repuesto en la tienda, por ejemplo https://… página de este producto en la tienda. Si lo dejas vacío, lleva a la tienda general (la del botón «Tienda» de la cabecera).
+         * Opcional. La dirección (https://…) de la página de este tipo de repuesto en la tienda. Si lo dejas vacío, lleva a la tienda general (la del botón «Tienda» de la cabecera).
          */
         enlaceTienda?: string | null;
         productos?:
           | {
               texto: string;
               /**
-               * Opcional. La dirección (https://…) de la página de este producto en la tienda, por ejemplo https://… página de este producto en la tienda. Si lo dejas vacío, lleva a la tienda general (la del botón «Tienda» de la cabecera).
+               * Opcional. La dirección (https://…) de la página de este producto en la tienda. Si lo dejas vacío, lleva a la tienda general (la del botón «Tienda» de la cabecera).
                */
               enlaceTienda?: string | null;
               id?: string | null;
@@ -4242,7 +4242,7 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   createdAt?: T;
 }
 /**
- * Menú y botón de la cabecera de todas las páginas: los enlaces de la barra y los apartados de cada desplegable.
+ * Todo el menú de la cabecera, en un solo sitio: los enlaces de la barra y, dentro de cada desplegable, sus apartados.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "cabecera".
@@ -4250,16 +4250,67 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
 export interface Cabecera {
   id: number;
   /**
-   * Hasta 8, en el orden de la barra (escritorio y móvil). Si en escritorio no caben todos, los últimos pasan a un desplegable «Más» al final de la barra; en el móvil salen todos en lista. Un enlace a otro sitio (https://), como la tienda, sale como botón oscuro en su sitio de la barra y se abre en una pestaña nueva. Desmarca «Mostrar» para quitarlo sin borrarlo, o para crearlo antes de tener su enlace: oculto, no ocupa sitio.
+   * Hasta 8, en el orden de la barra (escritorio y móvil); arrastra para ordenar. Cada fila es un «Enlace simple» o un «Desplegable» con sus apartados dentro. Si en escritorio no caben todos, los últimos pasan solos a «Más» al final de la barra; en el móvil salen todos en lista. Un enlace a otro sitio (https://), como la tienda, sale como botón oscuro y se abre en una pestaña nueva. Desmarca «Mostrar» para quitar una fila sin borrarla.
    */
   enlaces?:
     | {
         mostrar?: boolean | null;
         etiqueta: string;
         /**
-         * Una ruta del sitio (/…/) o https:// (otro sitio: pestaña nueva). Puede quedar vacío si la fila está oculta.
+         * Una ruta del sitio (/…/) o https:// (otro sitio: pestaña nueva). Puede quedar vacío si la fila está oculta. En un desplegable, la página de su sección.
          */
         enlace?: string | null;
+        /**
+         * «Desplegable»: al pulsarlo se abre con los apartados de abajo; el enlace de la fila es la página de su sección.
+         */
+        tipo: 'enlace' | 'desplegable';
+        /**
+         * Lo que sale al desplegar, en escritorio y en el móvil. Arrastra para ordenar; desmarca «Mostrar» para quitar un apartado sin borrarlo. Sin ningún apartado que salga, la fila queda como enlace simple (en Maquinaria pesada, Repuestos y Lubricantes, sin ninguna fila vuelve el menú de siempre).
+         */
+        apartados?:
+          | {
+              mostrar?: boolean | null;
+              nombre: string;
+              tipo: 'lista' | 'enlace' | 'grupo';
+              /**
+               * Se llena sola con el catálogo, en el orden por arrastre de su colección. Cada fuente, una vez por desplegable. En «Marcas de lubricantes» sale un apartado por marca, con el nombre de la marca.
+               */
+              fuente?:
+                | (
+                    | 'pagina-maquinaria'
+                    | 'nueva'
+                    | 'nueva-marcas'
+                    | 'nueva-tipos'
+                    | 'usada'
+                    | 'aditamentos'
+                    | 'pagina-repuestos'
+                    | 'repuestos-marcas'
+                    | 'categorias-tecnicas'
+                    | 'pagina-lubricantes'
+                    | 'lubricantes-marcas'
+                  )
+                | null;
+              /**
+               * Una ruta del sitio (/…/) o https:// (otro sitio: pestaña nueva).
+               */
+              enlace?: string | null;
+              /**
+               * Los enlaces que salen al desplegar el grupo, en este orden. Un grupo sin ningún enlace que se muestre no sale.
+               */
+              enlaces?:
+                | {
+                    mostrar?: boolean | null;
+                    etiqueta: string;
+                    /**
+                     * Una ruta del sitio (/…/) o https:// (pestaña nueva).
+                     */
+                    enlace?: string | null;
+                    id?: string | null;
+                  }[]
+                | null;
+              id?: string | null;
+            }[]
+          | null;
         id?: string | null;
       }[]
     | null;
@@ -4875,6 +4926,25 @@ export interface CabeceraSelect<T extends boolean = true> {
         mostrar?: T;
         etiqueta?: T;
         enlace?: T;
+        tipo?: T;
+        apartados?:
+          | T
+          | {
+              mostrar?: T;
+              nombre?: T;
+              tipo?: T;
+              fuente?: T;
+              enlace?: T;
+              enlaces?:
+                | T
+                | {
+                    mostrar?: T;
+                    etiqueta?: T;
+                    enlace?: T;
+                    id?: T;
+                  };
+              id?: T;
+            };
         id?: T;
       };
   botonTexto?: T;

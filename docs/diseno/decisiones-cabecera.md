@@ -117,3 +117,40 @@ escritorio y para el menú móvil (pintan lo mismo).
   llamarse igual (el panel lo rechaza).
 
 Lógica en `src/lib/cabecera/apartados.ts` y `src/lib/megamenu.ts`.
+
+## 8. El menú como árbol en «Enlaces del menú» (2026-11-26, tanda 25 t2, Juan Pablo)
+
+Sustituye a las tres listas del §7: todo el menú (barra, desplegables y sus
+apartados) se arma en un solo sitio.
+
+- **Árbol de tres niveles:** fila de la barra («Enlace simple» o
+  «Desplegable») → apartados del desplegable → enlaces de un grupo. No hay un
+  cuarto nivel; las listas automáticas conservan su propia profundidad (marca →
+  tipos), que sale del catálogo.
+- **Apartado:** lista automática con su **fuente**, enlace fijo o grupo de
+  enlaces fijos. Cualquier fuente cabe en cualquier desplegable, una vez.
+- **«Ver todos…» y «Aditamentos» son fuentes**, no enlaces fijos: su destino
+  se calcula (el de lubricantes depende de la categoría con selector;
+  Aditamentos solo sale si existe la marca) y se pintan distinto del enlace con
+  recuadro. Así el HTML no cambia.
+- **El panel es de su fila:** antes se asignaba por la dirección del enlace
+  (maquinaria, repuestos, lubricantes). Ahora cualquier fila «Desplegable» con
+  una ruta del sitio abre sus apartados. Un desplegable no comparte dirección
+  con otra fila visible (el panel lo rechaza).
+- **Respaldo:** un desplegable de las tres direcciones de siempre sin ningún
+  apartado pinta el menú de siempre (`APARTADOS_POR_DEFECTO`). Sin nada que
+  salga, la fila queda como enlace.
+- **Migración `20261126_154909_menu_arbol`:** columna `tipo` y dos tablas
+  anidadas. La siembra, con SQL: la fila que lleva a cada una de las tres
+  direcciones pasa a desplegable y recibe, en su orden, las filas de su lista
+  del §7 (o el menú de siempre si está vacía). Una prueba compara el SQL con el
+  menú de siempre.
+- **Lo antiguo se queda oculto:** `menuMaquinaria`, `menuRepuestos`,
+  `menuLubricantes` y `politicaRepuestos`, hasta su borrado con migración.
+- **Panel:** etiqueta de cada fila legible plegada y vista previa en esquema,
+  en vivo (campo `ui`, no guarda nada). No es un render del megamenú: las
+  listas automáticas solo nombran su fuente.
+- **No cambia:** el componente del megamenú, la animación, `CAMPOS_MENU`, los
+  ganchos, la caché `datos:marco` ni «Más».
+
+Lógica en `src/lib/cabecera/arbol.ts` y `src/lib/megamenu.ts`.

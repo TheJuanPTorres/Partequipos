@@ -1,12 +1,16 @@
 import type { CategoriasTecnica } from "@/payload-types";
 
+import { type ApartadoMenu, type Desplegable } from "./cabecera/apartados";
 import {
-  apartadosVisibles,
-  TIPO_ENLACE,
-  type ApartadoMenu,
-  type ApartadoVisible,
-  type Desplegable,
-} from "./cabecera/apartados";
+  APARTADO_ENLACE,
+  APARTADO_GRUPO,
+  apartadosQueSalen,
+  arbolDe608,
+  esDesplegable,
+  type ApartadoArbol,
+  type FilaBarra,
+  type Fuente,
+} from "./cabecera/arbol";
 import { claveDeMarca, logoPropio } from "./marca/logoMarca";
 import {
   enlaceExternoLubricante,
@@ -165,36 +169,6 @@ export function panelConTarjetas(panel: PanelMenu): boolean {
   return panel.elementos.some((e) => e.tipo === "grupo" && tiene(e.grupo));
 }
 
-/**
- * El panel de un desplegable: cada apartado visible del panel de administración
- * (`apartadosVisibles`), en su orden, convertido en sus piezas. Un apartado automático sin
- * contenido (sin categorías, sin la marca de aditamentos…) no deja nada.
- */
-function panelDe(
-  filas: ReadonlyArray<ApartadoMenu> | null | undefined,
-  desplegable: Desplegable,
-  piezas: (apartado: ApartadoVisible) => ElementoMenu[],
-): PanelMenu {
-  return {
-    elementos: apartadosVisibles(filas, desplegable).flatMap((a) =>
-      // Un enlace fijo, igual en los tres desplegables: tal cual se escribió en el panel. A otro
-      // sitio (https://), en pestaña nueva y con su aviso, como los enlaces de la barra.
-      a.tipo === TIPO_ENLACE
-        ? [
-            {
-              tipo: "enlace" as const,
-              enlace: {
-                etiqueta: a.nombre,
-                href: a.enlace,
-                ...(/^https?:\/\//i.test(a.enlace) ? { externo: true as const } : {}),
-              },
-            },
-          ]
-        : piezas(a),
-    ),
-  };
-}
-
 /** Lo que el menú necesita de una categoría técnica (la foto, `depth: 1`: url y medidas). */
 export type CategoriaTecnicaMenu = Pick<
   CategoriasTecnica,
@@ -291,6 +265,12 @@ export type DatosMegamenu = {
    * dato o con la lista vacía, el menú de siempre (`APARTADOS_POR_DEFECTO`).
    */
   apartados?: Partial<Record<Desplegable, ReadonlyArray<ApartadoMenu> | null>> | null;
+  /**
+   * EL ÁRBOL (tanda 25, tarea 2): las filas de «Enlaces del menú» del global `cabecera`, cada
+   * desplegable con sus apartados (`src/lib/cabecera/arbol.ts`). Con el dato, manda el árbol y
+   * `apartados` no se mira; sin él, los tres desplegables de siempre.
+   */
+  barra?: ReadonlyArray<FilaBarra> | null;
   /** Las marcas de lubricante y sus categorías (desplegable «Lubricantes», 2026-10-20). */
   marcasLubricante?: ReadonlyArray<ItemCatalogo>;
   categoriasLubricante?: ReadonlyArray<CategoriaLubricanteMenu>;
@@ -353,7 +333,8 @@ function grupoDeMarca(
   };
 }
 
-export function panelMaquinaria(d: DatosMegamenu): PanelMenu {
+/** Las piezas de maquinaria que una fuente puede pedir (nueva, usada y aditamentos). */
+function partesMaquinaria(d: DatosMegamenu) {
   // Un tipo de maquinaria nueva SIN equipos no se enlaza (dirección, 2026-10-18; la misma regla
   // que las páginas de marca, #232): vuelve solo con el primer equipo (`tiposConEquipos`).
   const conEquipos = tiposConEquipos(d.equiposNuevos, d.tiposMaquinaria);
@@ -482,31 +463,7 @@ export function panelMaquinaria(d: DatosMegamenu): PanelMenu {
     grupos: [],
   };
 
-  return panelDe(d.apartados?.maquinaria, "maquinaria", (a): ElementoMenu[] => {
-    const etiqueta = a.nombre;
-    switch (a.tipo) {
-      case "ver-todo":
-        return [{ tipo: "verTodo", enlace: { etiqueta, href: conBarra(rutas.maquinaria()) } }];
-      case "nueva":
-        return [{ tipo: "grupo", grupo: { ...nueva, titulo: etiqueta } }];
-      case "usada":
-        return [{ tipo: "grupo", grupo: { ...usada, titulo: etiqueta } }];
-      case "aditamentos":
-        // «Aditamentos» es un ENLACE directo a su página, sin submenú (dirección, 2026-10-20):
-        // la fila de nivel 1 con el recuadro de los acordeones, como la política de Repuestos.
-        // Sin la marca de aditamentos, no sale.
-        return aditamentos
-          ? [
-              {
-                tipo: "enlace",
-                enlace: { etiqueta, href: conBarra(rutas.marcaMaquinaria(aditamentos.slug)) },
-              },
-            ]
-          : [];
-      default:
-        return [];
-    }
-  });
+  return { nueva, porMarca, porTipo, usada, aditamentos };
 }
 
 /** La foto de una tarjeta del menú: sin url o sin medidas, ninguna (la tarjeta va sin foto). */
@@ -562,36 +519,6 @@ export function grupoCategoriasTecnicas(
   };
 }
 
-export function panelRepuestos(d: DatosMegamenu): PanelMenu {
-  // En el orden del panel (arrastrando, 2026-11-19): la consulta ya las trae así.
-  const marcas = [...d.marcasRepuestos];
-  const categorias = grupoCategoriasTecnicas(d.categoriasTecnicas ?? []);
-  // La política de garantías es, desde la tanda 24, un enlace fijo más de la lista del panel.
-  return panelDe(d.apartados?.repuestos, "repuestos", (a): ElementoMenu[] => {
-    const etiqueta = a.nombre;
-    switch (a.tipo) {
-      case "ver-todo":
-        return [{ tipo: "verTodo", enlace: { etiqueta, href: conBarra(rutas.repuestos()) } }];
-      case "marcas":
-        return [
-          {
-            tipo: "grupo",
-            grupo: {
-              titulo: etiqueta,
-              enlaces: [{ etiqueta: "Ver todas las marcas", href: conBarra(rutas.marcas()) }],
-              grupos: marcas.map((m) => grupoDeMarca(m, d.tiposRepuestos, rutas.marca, rutas.tipo)),
-            },
-          },
-        ];
-      case "categorias":
-        // Sin ninguna categoría con página, el apartado no sale.
-        return categorias ? [{ tipo: "grupo", grupo: { ...categorias, titulo: etiqueta } }] : [];
-      default:
-        return [];
-    }
-  });
-}
-
 /**
  * «LUBRICANTES» (2026-10-20, dirección): «Ver todos los lubricantes» a la página
  * general y, por marca, un acordeón «Lubricantes <marca>» con «Ver todo» a su
@@ -600,7 +527,7 @@ export function panelRepuestos(d: DatosMegamenu): PanelMenu {
  * de la marca (sus páginas propias llegarán con la plantilla de Andrés). Sin
  * ninguna marca, no hay panel: «Lubricantes» sigue siendo un enlace.
  */
-export function panelLubricantes(d: DatosMegamenu): PanelMenu | null {
+function gruposLubricantes(d: DatosMegamenu): GrupoMenu[] {
   // Una marca de «Otra web» va a su web; sin enlace válido, a la página del selector de marcas
   // que la muestra (Dispel, 2026-11-05). Sin ninguna de las dos, no sale: sin
   // enlaces rotos.
@@ -613,11 +540,10 @@ export function panelLubricantes(d: DatosMegamenu): PanelMenu | null {
     .sort(
       (a, b) => Number(tienePaginaPropiaLubricante(b)) - Number(tienePaginaPropiaLubricante(a)),
     );
-  if (marcas.length === 0) return null;
   // Las líneas de cada marca, en el orden del panel (arrastrando en la ficha de la marca), que ya
   // trae la consulta: el mismo de la página de la marca (2026-11-19, dirección).
   const categorias = d.categoriasLubricante ?? [];
-  const grupos = marcas.map((m): GrupoMenu => {
+  return marcas.map((m): GrupoMenu => {
     const titulo = `Lubricantes ${m.nombre}`;
     const pais = paisDe(m.paisOrigen);
     const conPais = pais ? { pais } : {};
@@ -650,27 +576,6 @@ export function panelLubricantes(d: DatosMegamenu): PanelMenu | null {
       ],
       grupos: [],
     };
-  });
-  return panelDe(d.apartados?.lubricantes, "lubricantes", (a): ElementoMenu[] => {
-    switch (a.tipo) {
-      case "ver-todo":
-        return [
-          {
-            tipo: "verTodo",
-            enlace: {
-              etiqueta: a.nombre,
-              href:
-                paginaDeLubricantes(d.categoriasTecnicas ?? []) ?? conBarra(rutas.lubricantes()),
-            },
-          },
-        ];
-      case "marcas":
-        // Un acordeón por marca, cada uno con su nombre («Lubricantes Eni»): el nombre del
-        // apartado solo se ve en el panel.
-        return grupos.map((grupo) => ({ tipo: "grupo" as const, grupo }));
-      default:
-        return [];
-    }
   });
 }
 
@@ -710,16 +615,200 @@ function paginaDelSelector(
 const idDeMarcaLubricante = (c: CategoriaLubricanteMenu) =>
   typeof c.marca === "object" ? c.marca?.id : c.marca;
 
+/** Un enlace escrito en el panel: a otro sitio (https://), en pestaña nueva y con su aviso. */
+function enlaceFijo(etiqueta: string, href: string): EnlaceMenu {
+  return { etiqueta, href, ...(/^https?:\/\//i.test(href) ? { externo: true as const } : {}) };
+}
+
 /**
- * Paneles por clave de enlace de la cabecera: el enlace del global `cabecera`
- * que apunte a la portada de maquinaria o de repuestos abre su panel. Los
- * demás («Lubricantes», «Servicio Técnico») siguen siendo enlaces.
+ * EL CONSTRUCTOR DE PANELES (tanda 25, tarea 2): convierte los apartados de un desplegable del
+ * árbol (`src/lib/cabecera/arbol.ts`) en las piezas del panel, en su orden. Cada FUENTE de una
+ * lista automática da sus piezas con el nombre del apartado; sin contenido (sin categorías, sin
+ * la marca de aditamentos…), no deja nada. Lo de cada sección se calcula una vez, y solo si
+ * alguna fuente lo pide.
+ */
+function constructorDePaneles(d: DatosMegamenu) {
+  const unaVez = <T>(calcular: () => T) => {
+    let hecho: { valor: T } | undefined;
+    return () => (hecho ??= { valor: calcular() }).valor;
+  };
+  const maquinaria = unaVez(() => partesMaquinaria(d));
+  const categorias = unaVez(() => grupoCategoriasTecnicas(d.categoriasTecnicas ?? []));
+  const lubricantes = unaVez(() => gruposLubricantes(d));
+  const grupo = (g: GrupoMenu, titulo: string): ElementoMenu => ({
+    tipo: "grupo",
+    grupo: { ...g, titulo },
+  });
+  const verTodo = (etiqueta: string, href: string): ElementoMenu => ({
+    tipo: "verTodo",
+    enlace: { etiqueta, href },
+  });
+
+  const deFuente = (fuente: Fuente, etiqueta: string): ElementoMenu[] => {
+    switch (fuente) {
+      case "pagina-maquinaria":
+        return [verTodo(etiqueta, conBarra(rutas.maquinaria()))];
+      case "nueva":
+        return [grupo(maquinaria().nueva, etiqueta)];
+      case "nueva-marcas": {
+        // Sin marcas, no sale (como dentro de «Maquinaria pesada nueva»).
+        const { porMarca } = maquinaria();
+        return porMarca.grupos.length > 0 ? [grupo(porMarca, etiqueta)] : [];
+      }
+      case "nueva-tipos": {
+        const { porTipo } = maquinaria();
+        return porTipo.enlaces.length > 0 ? [grupo(porTipo, etiqueta)] : [];
+      }
+      case "usada":
+        return [grupo(maquinaria().usada, etiqueta)];
+      case "aditamentos": {
+        // «Aditamentos» es un ENLACE directo a su página, sin submenú (dirección, 2026-10-20):
+        // la fila de nivel 1 con el recuadro de los acordeones, como la política de Repuestos.
+        // Sin la marca de aditamentos, no sale.
+        const { aditamentos } = maquinaria();
+        return aditamentos
+          ? [
+              {
+                tipo: "enlace",
+                enlace: { etiqueta, href: conBarra(rutas.marcaMaquinaria(aditamentos.slug)) },
+              },
+            ]
+          : [];
+      }
+      case "pagina-repuestos":
+        return [verTodo(etiqueta, conBarra(rutas.repuestos()))];
+      case "repuestos-marcas":
+        return [
+          {
+            tipo: "grupo",
+            grupo: {
+              titulo: etiqueta,
+              enlaces: [{ etiqueta: "Ver todas las marcas", href: conBarra(rutas.marcas()) }],
+              // En el orden del panel (arrastrando, 2026-11-19): la consulta ya las trae así.
+              grupos: d.marcasRepuestos.map((m) =>
+                grupoDeMarca(m, d.tiposRepuestos, rutas.marca, rutas.tipo),
+              ),
+            },
+          },
+        ];
+      case "categorias-tecnicas": {
+        // Sin ninguna categoría con página, el apartado no sale.
+        const g = categorias();
+        return g ? [grupo(g, etiqueta)] : [];
+      }
+      case "pagina-lubricantes":
+        // Sin ninguna marca de lubricantes que salga, tampoco su «Ver todos…»: «Lubricantes»
+        // sigue siendo un enlace (2026-10-20).
+        return lubricantes().length > 0
+          ? [
+              verTodo(
+                etiqueta,
+                paginaDeLubricantes(d.categoriasTecnicas ?? []) ?? conBarra(rutas.lubricantes()),
+              ),
+            ]
+          : [];
+      case "lubricantes-marcas":
+        // Un acordeón por marca, cada uno con su nombre («Lubricantes Eni»): el nombre del
+        // apartado solo se ve en el panel.
+        return lubricantes().map((g) => ({ tipo: "grupo" as const, grupo: g }));
+    }
+  };
+
+  return (apartados: ReadonlyArray<ApartadoArbol> | null | undefined): PanelMenu => ({
+    elementos: apartadosQueSalen(apartados).flatMap((a): ElementoMenu[] => {
+      // Un enlace fijo: tal cual se escribió en el panel, con el recuadro de los acordeones.
+      if (a.tipo === APARTADO_ENLACE) {
+        return [{ tipo: "enlace", enlace: enlaceFijo(a.nombre, a.enlace) }];
+      }
+      // Un grupo: un acordeón con su título y sus enlaces fijos.
+      if (a.tipo === APARTADO_GRUPO) {
+        return [
+          {
+            tipo: "grupo",
+            grupo: {
+              titulo: a.nombre,
+              enlaces: a.enlaces.map((e) => enlaceFijo(e.etiqueta, e.enlace)),
+              grupos: [],
+            },
+          },
+        ];
+      }
+      return deFuente(a.fuente, a.nombre);
+    }),
+  });
+}
+
+/** El desplegable «Maquinaria pesada» de siempre, con las filas de la tanda 24 (`apartados`). */
+export function panelMaquinaria(d: DatosMegamenu): PanelMenu {
+  return constructorDePaneles(d)(arbolDe608(d.apartados?.maquinaria, "maquinaria"));
+}
+
+/** El desplegable «Repuestos» de siempre (la política de garantías es un enlace fijo más). */
+export function panelRepuestos(d: DatosMegamenu): PanelMenu {
+  return constructorDePaneles(d)(arbolDe608(d.apartados?.repuestos, "repuestos"));
+}
+
+/** El desplegable «Lubricantes» de siempre. Sin ninguna marca que salga, no hay panel. */
+export function panelLubricantes(d: DatosMegamenu): PanelMenu | null {
+  if (gruposLubricantes(d).length === 0) return null;
+  return constructorDePaneles(d)(arbolDe608(d.apartados?.lubricantes, "lubricantes"));
+}
+
+/** Las direcciones que abren el desplegable de Lubricantes: la general y la de cada marca con página. */
+function direccionesDeLubricantes(d: DatosMegamenu): string[] {
+  return [
+    rutas.lubricantes(),
+    ...(d.marcasLubricante ?? [])
+      .filter(tienePaginaPropiaLubricante)
+      .map((m) => rutas.marcaLubricante(m.slug)),
+  ].map(claveDeEnlace);
+}
+
+/**
+ * El desplegable de siempre que corresponde a una dirección (la portada de maquinaria, la de
+ * repuestos, o la de lubricantes o de una de sus marcas), o `null`.
+ */
+export function desplegableDeDireccion(clave: string, d: DatosMegamenu): Desplegable | null {
+  if (clave === claveDeEnlace(rutas.maquinaria())) return "maquinaria";
+  if (clave === claveDeEnlace(rutas.repuestos())) return "repuestos";
+  return direccionesDeLubricantes(d).includes(clave) ? "lubricantes" : null;
+}
+
+/**
+ * Paneles por clave de enlace de la cabecera (`claveDeEnlace` del destino de la fila).
+ *
+ * CON EL ÁRBOL (`d.barra`): cada fila «Desplegable» que se muestra abre el panel de SUS apartados,
+ * lleve adonde lleve. Si no tiene ningún apartado y su dirección es una de las tres de siempre,
+ * vuelve el menú de siempre (`APARTADOS_POR_DEFECTO`). Sin nada que salga, no hay panel: la fila
+ * queda como enlace.
+ *
+ * SIN EL ÁRBOL (una base sin el dato): los tres desplegables de siempre, por su dirección.
  */
 export function construirMegamenu(d: DatosMegamenu): Record<string, PanelMenu> {
-  // Un desplegable con todos sus apartados ocultos no abre un panel vacío: su entrada de la
-  // cabecera se queda como enlace.
   const paneles: Record<string, PanelMenu> = {};
   const conContenido = (p: PanelMenu | null): p is PanelMenu => !!p && p.elementos.length > 0;
+
+  if (d.barra) {
+    const construir = constructorDePaneles(d);
+    for (const fila of d.barra) {
+      if (!esDesplegable(fila)) continue;
+      const clave = claveDeEnlace(fila.enlace ?? "");
+      if (paneles[clave]) continue;
+      const deSiempre = desplegableDeDireccion(clave, d);
+      const apartados =
+        (fila.apartados?.length ?? 0) > 0
+          ? fila.apartados
+          : deSiempre
+            ? arbolDe608(null, deSiempre)
+            : [];
+      const panel = construir(apartados);
+      if (conContenido(panel)) paneles[clave] = panel;
+    }
+    return paneles;
+  }
+
+  // Un desplegable con todos sus apartados ocultos no abre un panel vacío: su entrada de la
+  // cabecera se queda como enlace.
   const maquinaria = panelMaquinaria(d);
   if (conContenido(maquinaria)) paneles[claveDeEnlace(rutas.maquinaria())] = maquinaria;
   const repuestos = panelRepuestos(d);
@@ -728,14 +817,7 @@ export function construirMegamenu(d: DatosMegamenu): Record<string, PanelMenu> {
   // (desde el 2026-10-20 la cabecera enlaza a la general).
   const lubricantes = panelLubricantes(d);
   if (conContenido(lubricantes)) {
-    for (const href of [
-      rutas.lubricantes(),
-      ...(d.marcasLubricante ?? [])
-        .filter(tienePaginaPropiaLubricante)
-        .map((m) => rutas.marcaLubricante(m.slug)),
-    ]) {
-      paneles[claveDeEnlace(href)] = lubricantes;
-    }
+    for (const clave of direccionesDeLubricantes(d)) paneles[clave] = lubricantes;
   }
   return paneles;
 }

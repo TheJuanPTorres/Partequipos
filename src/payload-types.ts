@@ -779,7 +779,7 @@ export interface ModelosRepuesto {
    */
   tipo: number | TiposEquipo;
   /**
-   * Opcional. La dirección (https://…) de la página de este modelo en la tienda, por ejemplo https://… página de este producto en la tienda. Si lo dejas vacío, lleva a la tienda general (la del botón «Tienda» de la cabecera).
+   * Opcional. La dirección (https://…) de la página de este modelo en la tienda. Si lo dejas vacío, lleva a la tienda general (la del botón «Tienda» de la cabecera).
    */
   enlaceTienda?: string | null;
   /**
@@ -1003,7 +1003,7 @@ export interface CategoriasTecnica {
   colorMarca?: string | null;
   descripcion?: string | null;
   /**
-   * Opcional. La dirección (https://…) de la página de esta categoría en la tienda, por ejemplo https://… página de este producto en la tienda. Si lo dejas vacío, lleva a la tienda general (la del botón «Tienda» de la cabecera).
+   * Opcional. La dirección (https://…) de la página de esta categoría en la tienda. Si lo dejas vacío, lleva a la tienda general (la del botón «Tienda» de la cabecera).
    */
   enlaceTienda?: string | null;
   /**
@@ -1034,14 +1034,14 @@ export interface CategoriasTecnica {
          */
         descripcion?: string | null;
         /**
-         * Opcional. La dirección (https://…) de la página de este tipo de repuesto en la tienda, por ejemplo https://… página de este producto en la tienda. Si lo dejas vacío, lleva a la tienda general (la del botón «Tienda» de la cabecera).
+         * Opcional. La dirección (https://…) de la página de este tipo de repuesto en la tienda. Si lo dejas vacío, lleva a la tienda general (la del botón «Tienda» de la cabecera).
          */
         enlaceTienda?: string | null;
         productos?:
           | {
               texto: string;
               /**
-               * Opcional. La dirección (https://…) de la página de este producto en la tienda, por ejemplo https://… página de este producto en la tienda. Si lo dejas vacío, lleva a la tienda general (la del botón «Tienda» de la cabecera).
+               * Opcional. La dirección (https://…) de la página de este producto en la tienda. Si lo dejas vacío, lleva a la tienda general (la del botón «Tienda» de la cabecera).
                */
               enlaceTienda?: string | null;
               id?: string | null;

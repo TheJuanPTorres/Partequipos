@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import { describe, it } from "node:test";
 
 import { APARTADOS_POR_DEFECTO, type Desplegable } from "./apartados";
@@ -267,5 +268,63 @@ describe("árbol del menú principal (tanda 25, tarea 2)", () => {
       "1+ Blog",
     ]);
     assert.deepEqual(esquemaDelMenu(null), []);
+  });
+  it("LA MIGRACIÓN COPIA EL MENÚ DE HOY: mismas fuentes que la tanda 24 y, sin filas, el de siempre", () => {
+    // La migración no puede importar nada de `src/` (CLAUDE.md §3.5): se compara su SQL.
+    const sql = readFileSync("src/migrations/20261126_154909_menu_arbol.ts", "utf8");
+    // 1. Cada tipo automático de la tanda 24 pasa a su fuente (los `CASE … WHEN … THEN …`).
+    const casos = [
+      ...sql.matchAll(/\(CASE a\."tipo"::text ((?:WHEN '[a-z-]+' THEN '[a-z-]+' ?)+)END\)/g),
+    ];
+    assert.equal(casos.length, DESPLEGABLES.length);
+    DESPLEGABLES.forEach((d, i) => {
+      const pares = Object.fromEntries(
+        [...casos[i]![1]!.matchAll(/WHEN '([a-z-]+)' THEN '([a-z-]+)'/g)].map((m) => [m[1], m[2]]),
+      );
+      assert.deepEqual(pares, FUENTE_DE_TIPO_608[d], d);
+    });
+    // 2. Con la lista de la tanda 24 vacía, siembra el menú de siempre (los `VALUES`), que es
+    //    lo que pinta el código sin apartados (`arbolDe608(null, …)`).
+    const filas = [
+      ...sql.matchAll(
+        /\((\d), '([^']+)', '(lista|enlace)', (?:'([a-z-]+)'|NULL), (?:'([^']+)'|NULL)\)/g,
+      ),
+    ].map((m) => ({ orden: Number(m[1]), nombre: m[2], tipo: m[3], fuente: m[4], enlace: m[5] }));
+    const grupos: (typeof filas)[] = [];
+    for (const f of filas) {
+      if (f.orden === 1) grupos.push([]);
+      grupos.at(-1)!.push(f);
+    }
+    assert.equal(grupos.length, DESPLEGABLES.length);
+    DESPLEGABLES.forEach((d, i) => {
+      assert.deepEqual(
+        grupos[i]!.map(({ orden, ...resto }) => {
+          void orden;
+          return resto;
+        }),
+        arbolDe608(null, d).map((a) => ({
+          nombre: a.nombre,
+          tipo: a.tipo,
+          fuente: a.fuente ?? undefined,
+          enlace: a.enlace ?? undefined,
+        })),
+        d,
+      );
+      assert.deepEqual(
+        grupos[i]!.map((f) => f.orden),
+        grupos[i]!.map((_, n) => n + 1),
+      );
+    });
+    // 3. Las tres direcciones de siempre, y la siembra solo si la lista de la tanda 24 está vacía.
+    for (const direccion of [
+      "'/maquinaria-pesada/'",
+      "'/repuestos-maquinaria-pesada-colombia/'",
+      "'/lubricantes/'",
+    ]) {
+      assert.ok(sql.includes(`= ${direccion}`), direccion);
+    }
+    assert.equal(sql.match(/AND NOT EXISTS \(SELECT 1 FROM "cabecera_menu_/g)?.length, 3);
+    // No borra nada de la tanda 24.
+    assert.ok(!/DROP TABLE "cabecera_menu_|DROP COLUMN "politica_/.test(sql));
   });
 });

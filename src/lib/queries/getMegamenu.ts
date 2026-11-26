@@ -17,7 +17,7 @@ import { ordenDe } from "@/lib/ordenArrastre";
 
 /**
  * Datos del megamenú (`src/lib/megamenu.ts`): doce consultas LIGERAS (con las
- * categorías técnicas, los apartados de cada desplegable del global `cabecera` y las
+ * categorías técnicas, el árbol del menú del global `cabecera` y las
  * marcas y categorías de lubricante) —solo
  * nombre, slug y marca, `depth: 0`— porque la cabecera va en todas las
  * páginas y esto se ejecuta en cada una al construir el sitio (CLAUDE.md
@@ -132,12 +132,8 @@ const megamenuEnCache = unstable_cache(
         sort: ordenDe("categorias-tecnicas"),
         select: selectDelMenu("categorias-tecnicas"),
       }),
-      // Los apartados de cada desplegable (orden, nombre y «Mostrar»), del global de la cabecera.
-      payload.findGlobal({
-        slug: "cabecera",
-        depth: 0,
-        select: { menuMaquinaria: true, menuRepuestos: true, menuLubricantes: true },
-      }),
+      // EL ÁRBOL del menú (tanda 25): las filas de la barra, cada desplegable con sus apartados.
+      payload.findGlobal({ slug: "cabecera", depth: 0, select: { enlaces: true } }),
       // «Lubricantes» (2026-10-20): las marcas y sus categorías con su enlace del menú.
       payload.find({
         collection: "marcas-lubricante",
@@ -164,11 +160,7 @@ const megamenuEnCache = unstable_cache(
       equiposNuevos: equiposNuevos.docs,
       equiposUsados: equiposUsados.docs,
       categoriasTecnicas: categoriasTecnicas.docs,
-      apartados: {
-        maquinaria: cabecera.menuMaquinaria,
-        repuestos: cabecera.menuRepuestos,
-        lubricantes: cabecera.menuLubricantes,
-      },
+      barra: cabecera.enlaces ?? [],
       marcasLubricante: marcasLubricante.docs,
       categoriasLubricante: categoriasLubricante.docs,
     });

@@ -273,3 +273,197 @@ export function validarBarra(filas: unknown): true | string {
 /** La etiqueta de la fuente de una lista, para el panel. */
 export const etiquetaDeFuente = (fuente: string | null | undefined): string =>
   FUENTE_POR_VALOR.get(fuente ?? "")?.label ?? "sin fuente";
+
+/*
+ * EL PANEL: la etiqueta de cada fila (se lee aunque esté plegada) y el esquema del menú.
+ */
+
+const TIPO_DE_APARTADO: Record<string, string> = {
+  [APARTADO_LISTA]: "lista automática",
+  [APARTADO_ENLACE]: "enlace fijo",
+  [APARTADO_GRUPO]: "grupo",
+};
+
+const cuantos = (n: number, uno: string, varios: string) => `${n} ${n === 1 ? uno : varios}`;
+
+/** La etiqueta de una fila de la barra: su texto, qué es y si está oculta. */
+export function etiquetaDeFilaBarra(
+  fila: FilaBarra | undefined,
+  numero: number,
+): { titulo: string; detalle: string; oculto: boolean } {
+  const titulo = fila?.etiqueta?.trim() || `Enlace ${String(numero).padStart(2, "0")} (sin texto)`;
+  const detalle =
+    fila?.tipo === FILA_DESPLEGABLE
+      ? `desplegable · ${cuantos(fila.apartados?.length ?? 0, "apartado", "apartados")}`
+      : `enlace · ${fila?.enlace?.trim() || "sin destino"}`;
+  return { titulo, detalle, oculto: fila?.mostrar === false };
+}
+
+/** La etiqueta de un apartado: su nombre, su tipo (con la fuente o el destino) y si está oculto. */
+export function etiquetaDeApartado(
+  fila: ApartadoArbol | undefined,
+  numero: number,
+): { titulo: string; detalle: string; oculto: boolean } {
+  const titulo = fila?.nombre?.trim() || `Apartado ${String(numero).padStart(2, "0")} (sin nombre)`;
+  const tipo = TIPO_DE_APARTADO[fila?.tipo ?? ""] ?? "sin tipo";
+  const detalle =
+    fila?.tipo === APARTADO_LISTA
+      ? `${tipo} · ${etiquetaDeFuente(fila.fuente)}`
+      : fila?.tipo === APARTADO_GRUPO
+        ? `${tipo} · ${cuantos(fila.enlaces?.length ?? 0, "enlace", "enlaces")}`
+        : `${tipo} · ${fila?.enlace?.trim() || "sin destino"}`;
+  return { titulo, detalle, oculto: fila?.mostrar === false };
+}
+
+/** La etiqueta de un enlace de un grupo. */
+export function etiquetaDeEnlaceDeGrupo(
+  fila: EnlaceDeGrupo | undefined,
+  numero: number,
+): { titulo: string; detalle: string; oculto: boolean } {
+  return {
+    titulo: fila?.etiqueta?.trim() || `Enlace ${String(numero).padStart(2, "0")} (sin texto)`,
+    detalle: fila?.enlace?.trim() || "sin destino",
+    oculto: fila?.mostrar === false,
+  };
+}
+
+/** Una línea del esquema del menú: su nivel, lo que dice y si sale en el sitio. */
+export type LineaEsquema = {
+  nivel: 1 | 2 | 3;
+  texto: string;
+  detalle: string;
+  sale: boolean;
+  /** Por qué no sale, si no sale y no es evidente. */
+  motivo?: string;
+};
+
+/**
+ * EL ESQUEMA DEL MENÚ, para la vista previa del panel: una línea por fila de la barra, por
+ * apartado y por enlace de grupo, con lo que saldrá y lo que no (y por qué). Usa las mismas
+ * reglas que el sitio (`apartadosQueSalen`, `esDesplegable`).
+ */
+export function esquemaDelMenu(filas: ReadonlyArray<FilaBarra> | null | undefined): LineaEsquema[] {
+  const lineas: LineaEsquema[] = [];
+  for (const fila of filas ?? []) {
+    const texto = fila?.etiqueta?.trim() ?? "";
+    const destino = fila?.enlace?.trim() ?? "";
+    const oculta = fila?.mostrar === false;
+    const sale = !oculta && !!texto && !!destino;
+    const desplegable = fila?.tipo === FILA_DESPLEGABLE;
+    const salen = desplegable ? apartadosQueSalen(fila.apartados) : [];
+    lineas.push({
+      nivel: 1,
+      texto: texto || "(sin texto)",
+      detalle: desplegable
+        ? salen.length > 0 || (fila.apartados?.length ?? 0) === 0
+          ? `desplegable → ${destino || "sin destino"}`
+          : `desplegable sin apartados que salgan: queda como enlace → ${destino || "sin destino"}`
+        : destino || "sin destino",
+      sale,
+      ...(sale ? {} : { motivo: oculta ? "oculto" : !texto ? "sin texto" : "sin destino" }),
+    });
+    if (!desplegable) continue;
+    if ((fila.apartados?.length ?? 0) === 0) {
+      lineas.push({
+        nivel: 2,
+        texto: "(sin apartados)",
+        detalle:
+          "en Maquinaria pesada, Repuestos y Lubricantes sale el menú de siempre; en otro, queda como enlace",
+        sale,
+      });
+      continue;
+    }
+    const fuentes = new Set<string>();
+    for (const a of fila.apartados ?? []) {
+      const nombre = a?.nombre?.trim() ?? "";
+      const uno = apartadosQueSalen([a]);
+      const repetida =
+        a?.tipo === APARTADO_LISTA && !!a.fuente && a.mostrar !== false && fuentes.has(a.fuente);
+      if (a?.tipo === APARTADO_LISTA && a.fuente && a.mostrar !== false) fuentes.add(a.fuente);
+      const saleA = sale && uno.length > 0 && !repetida;
+      const motivo =
+        a?.mostrar === false
+          ? "oculto"
+          : repetida
+            ? "fuente repetida"
+            : uno.length === 0
+              ? a?.tipo === APARTADO_LISTA
+                ? "sin fuente"
+                : a?.tipo === APARTADO_GRUPO
+                  ? "sin enlaces que salgan"
+                  : "sin nombre o sin destino"
+              : !sale
+                ? "su fila no sale"
+                : undefined;
+      lineas.push({
+        nivel: 2,
+        texto: nombre || "(sin nombre)",
+        detalle: etiquetaDeApartado(a, 0).detalle,
+        sale: saleA,
+        ...(saleA || !motivo ? {} : { motivo }),
+      });
+      if (a?.tipo !== APARTADO_GRUPO) continue;
+      for (const e of a.enlaces ?? []) {
+        const etiqueta = e?.etiqueta?.trim() ?? "";
+        const enlace = e?.enlace?.trim() ?? "";
+        const saleE = saleA && e?.mostrar !== false && !!etiqueta && !!enlace;
+        lineas.push({
+          nivel: 3,
+          texto: etiqueta || "(sin texto)",
+          detalle: enlace || "sin destino",
+          sale: saleE,
+          ...(saleE
+            ? {}
+            : {
+                motivo: e?.mostrar === false ? "oculto" : !etiqueta || !enlace ? "incompleto" : "",
+              }),
+        });
+      }
+    }
+  }
+  return lineas;
+}
+
+/**
+ * Las filas de «Enlaces del menú» a partir del estado del formulario del panel, que llega PLANO
+ * (`enlaces.0.etiqueta`, `enlaces.0.apartados.1.fuente`, `enlaces.0.apartados.1.enlaces.0.enlace`…).
+ */
+export function filasDesdeCampos(valores: Readonly<Record<string, unknown>>): FilaBarra[] {
+  const filas: FilaBarra[] = [];
+  const sitio = <T>(lista: T[], i: number, vacio: () => T): T => (lista[i] ??= vacio());
+  for (const [ruta, valor] of Object.entries(valores)) {
+    const p = ruta.split(".");
+    if (p[0] !== "enlaces" || p.length < 3) continue;
+    const fila = sitio(filas, Number(p[1]), () => ({}) as FilaBarra) as Record<string, unknown>;
+    if (p.length === 3) {
+      if (p[2] !== "apartados") fila[p[2] as string] = valor;
+      continue;
+    }
+    if (p[2] !== "apartados" || p.length < 5) continue;
+    const apartados = (fila.apartados ??= []) as ApartadoArbol[];
+    const apartado = sitio(apartados, Number(p[3]), () => ({}) as ApartadoArbol) as Record<
+      string,
+      unknown
+    >;
+    if (p.length === 5) {
+      if (p[4] !== "enlaces") apartado[p[4] as string] = valor;
+      continue;
+    }
+    if (p[4] !== "enlaces" || p.length !== 7) continue;
+    const enlaces = (apartado.enlaces ??= []) as EnlaceDeGrupo[];
+    const enlace = sitio(enlaces, Number(p[5]), () => ({}) as EnlaceDeGrupo) as Record<
+      string,
+      unknown
+    >;
+    enlace[p[6] as string] = valor;
+  }
+  // Sin huecos (una fila borrada a medias) y cada lista en su orden.
+  const limpio = <T>(lista: T[] | undefined | null): T[] => (lista ?? []).filter(Boolean);
+  return limpio(filas).map((f) => ({
+    ...f,
+    apartados: limpio(f.apartados as ApartadoArbol[] | undefined).map((a) => ({
+      ...a,
+      enlaces: limpio(a.enlaces as EnlaceDeGrupo[] | undefined),
+    })),
+  }));
+}

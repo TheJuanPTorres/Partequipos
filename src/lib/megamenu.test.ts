@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
+import { arbolDe608, type FilaBarra } from "./cabecera/arbol";
 import {
   SLUG_ADITAMENTOS,
   claveDeEnlace,
@@ -824,5 +825,182 @@ describe("megamenú: apartados del panel (tanda 24, tarea 1)", () => {
     assert.equal(m["/repuestos-maquinaria-pesada-colombia/"], undefined);
     assert.equal(m["/lubricantes/"], undefined);
     assert.ok(m["/maquinaria-pesada/"]);
+  });
+});
+
+describe("megamenú: el árbol de «Enlaces del menú» (tanda 25, tarea 2)", () => {
+  const completo: DatosMegamenu = {
+    ...DATOS,
+    categoriasTecnicas: [{ id: 1, nombre: "Tren de rodaje", slug: "tren-de-rodaje" }],
+    marcasLubricante: [
+      { id: 1, nombre: "Eni", slug: "lubricantes-eni" },
+      { id: 2, nombre: "Otra", slug: "lubricantes-otra" },
+    ],
+  };
+  const nivel1 = (p: PanelMenu | undefined) =>
+    (p?.elementos ?? []).map(
+      (e) => `${e.tipo}:${e.tipo === "grupo" ? e.grupo.titulo : e.enlace.etiqueta}`,
+    );
+  const MAQUINARIA = "/maquinaria-pesada/";
+  const REPUESTOS = "/repuestos-maquinaria-pesada-colombia/";
+  const LUBRICANTES = "/lubricantes/";
+  /** La barra tal como la deja la migración `…_menu_arbol`: los tres desplegables de siempre. */
+  const barraSembrada: FilaBarra[] = [
+    {
+      etiqueta: "Maquinaria Pesada",
+      enlace: MAQUINARIA,
+      tipo: "desplegable",
+      apartados: arbolDe608(null, "maquinaria"),
+    },
+    {
+      etiqueta: "Repuestos",
+      enlace: REPUESTOS,
+      tipo: "desplegable",
+      apartados: arbolDe608(null, "repuestos"),
+    },
+    {
+      etiqueta: "Lubricantes",
+      enlace: LUBRICANTES,
+      tipo: "desplegable",
+      apartados: arbolDe608(null, "lubricantes"),
+    },
+    { etiqueta: "Servicio Técnico", enlace: "/servicio-tecnico/", tipo: "enlace" },
+    { etiqueta: "Blog", enlace: "/noticias/", tipo: "enlace" },
+  ];
+
+  it("LO SEMBRADO PINTA LO MISMO QUE ANTES del árbol, panel a panel y pieza a pieza", () => {
+    const antes = construirMegamenu(completo);
+    const ahora = construirMegamenu({ ...completo, barra: barraSembrada });
+    assert.deepEqual(Object.keys(ahora).sort(), [LUBRICANTES, MAQUINARIA, REPUESTOS].sort());
+    for (const clave of Object.keys(ahora)) assert.deepEqual(ahora[clave], antes[clave], clave);
+  });
+
+  it("un desplegable de siempre sin ningún apartado vuelve al menú de siempre", () => {
+    const vacia = barraSembrada.map((f) => ({ ...f, apartados: [] }));
+    assert.deepEqual(
+      construirMegamenu({ ...completo, barra: vacia }),
+      construirMegamenu({ ...completo, barra: barraSembrada }),
+    );
+    // «Lubricantes» también cuando su fila lleva a la página de una marca con página propia.
+    const aMarca = construirMegamenu({
+      ...completo,
+      barra: [
+        { etiqueta: "Lubricantes", enlace: "/lubricantes/lubricantes-eni/", tipo: "desplegable" },
+      ],
+    });
+    assert.deepEqual(nivel1(aMarca["/lubricantes/lubricantes-eni/"]), [
+      "verTodo:Ver todos los lubricantes",
+      "grupo:Lubricantes Eni",
+      "grupo:Lubricantes Otra",
+    ]);
+  });
+
+  it("el panel es de SU fila: un enlace simple a Maquinaria no abre panel; un desplegable nuevo, sí", () => {
+    const m = construirMegamenu({
+      ...completo,
+      barra: [
+        { etiqueta: "Maquinaria Pesada", enlace: MAQUINARIA, tipo: "enlace" },
+        {
+          etiqueta: "Servicio técnico",
+          enlace: "/servicio-tecnico/",
+          tipo: "desplegable",
+          apartados: [
+            { tipo: "enlace", nombre: "Ver el servicio técnico", enlace: "/servicio-tecnico/" },
+            {
+              tipo: "grupo",
+              nombre: "Servicios",
+              enlaces: [
+                { etiqueta: "Taller", enlace: "/servicio-tecnico/#taller" },
+                { etiqueta: "Portal", enlace: "https://portal.example.com/" },
+                { etiqueta: "Oculto", enlace: "/x/", mostrar: false },
+              ],
+            },
+            // Una fuente de otra sección cabe en cualquier desplegable.
+            { tipo: "lista", fuente: "repuestos-marcas", nombre: "Repuestos por marca" },
+          ],
+        },
+      ],
+    });
+    assert.deepEqual(Object.keys(m), ["/servicio-tecnico/"]);
+    const panel = m["/servicio-tecnico/"]!;
+    assert.deepEqual(nivel1(panel), [
+      "enlace:Ver el servicio técnico",
+      "grupo:Servicios",
+      "grupo:Repuestos por marca",
+    ]);
+    const grupo = panel.elementos[1];
+    assert.ok(grupo?.tipo === "grupo");
+    assert.deepEqual(grupo.grupo.enlaces, [
+      { etiqueta: "Taller", href: "/servicio-tecnico/#taller" },
+      { etiqueta: "Portal", href: "https://portal.example.com/", externo: true },
+    ]);
+    assert.deepEqual(grupo.grupo.grupos, []);
+  });
+
+  it("orden, nombres y ocultos del árbol; las fuentes separadas de maquinaria nueva", () => {
+    const m = construirMegamenu({
+      ...completo,
+      barra: [
+        {
+          etiqueta: "Maquinaria",
+          enlace: MAQUINARIA,
+          tipo: "desplegable",
+          apartados: [
+            { tipo: "lista", fuente: "usada", nombre: "Usada primero" },
+            { tipo: "lista", fuente: "nueva-marcas", nombre: "Nueva, por marca" },
+            { tipo: "lista", fuente: "nueva-tipos", nombre: "Nueva, por tipo" },
+            { tipo: "lista", fuente: "nueva", nombre: "Oculta", mostrar: false },
+            { tipo: "lista", fuente: "pagina-maquinaria", nombre: "Todo, al final" },
+          ],
+        },
+      ],
+    });
+    const panel = m[MAQUINARIA]!;
+    assert.deepEqual(nivel1(panel).slice(0, 2), ["grupo:Usada primero", "grupo:Nueva, por marca"]);
+    assert.equal(nivel1(panel).at(-1), "verTodo:Todo, al final");
+    assert.ok(!nivel1(panel).includes("grupo:Oculta"));
+    // «Por marca» suelta lleva lo mismo que dentro de «Maquinaria pesada nueva».
+    const nueva = partesDe(panelMaquinariaReal(completo)).grupos[0]!;
+    const porMarca = panel.elementos[1];
+    assert.ok(porMarca?.tipo === "grupo");
+    assert.deepEqual(porMarca.grupo.grupos, nueva.grupos[0]!.grupos);
+  });
+
+  it("sin nada que salga no hay panel; una fila oculta o a otro sitio tampoco lo abre", () => {
+    const m = construirMegamenu({
+      ...completo,
+      barra: [
+        {
+          etiqueta: "Repuestos",
+          enlace: REPUESTOS,
+          tipo: "desplegable",
+          apartados: [
+            { tipo: "lista", fuente: "repuestos-marcas", nombre: "Marcas", mostrar: false },
+          ],
+        },
+        {
+          etiqueta: "Nuevo",
+          enlace: "/nuevo/",
+          tipo: "desplegable",
+          apartados: [],
+        },
+        {
+          etiqueta: "Maquinaria",
+          enlace: MAQUINARIA,
+          tipo: "desplegable",
+          mostrar: false,
+          apartados: arbolDe608(null, "maquinaria"),
+        },
+        // Sin marcas de lubricantes que salgan, ni siquiera su «Ver todos…».
+        {
+          etiqueta: "Lubricantes",
+          enlace: LUBRICANTES,
+          tipo: "desplegable",
+          apartados: arbolDe608(null, "lubricantes"),
+        },
+      ],
+      marcasLubricante: [],
+    });
+    assert.deepEqual(m, {});
   });
 });

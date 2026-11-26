@@ -14,8 +14,9 @@ export function destinoHojasDeVida(
   correoEmpresa: string,
   env: Entorno = process.env,
   correoSolicitudes?: string | null,
+  buzonPruebasDelPanel?: string | null,
 ): string | null {
   const propio = correoDelPanel?.trim() ?? "";
   if (env.VERCEL_ENV === "production" && propio) return propio;
-  return destinoAvisos(correoEmpresa, env, correoSolicitudes);
+  return destinoAvisos(correoEmpresa, env, correoSolicitudes, buzonPruebasDelPanel);
 }

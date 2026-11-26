@@ -174,3 +174,30 @@ describe("asuntoHv", () => {
     assert.equal(asuntoHv("A\r\nBcc: x", "Pepe"), "Hoja de vida: A Bcc: x — Pepe");
   });
 });
+
+describe("destinoHojasDeVida con el buzón de pruebas del panel", () => {
+  it("fuera de producción va al buzón del panel, nunca al correo real", () => {
+    assert.equal(
+      destinoHojasDeVida(
+        "rrhh@ejemplo.test",
+        "info@ejemplo.test",
+        { VERCEL_ENV: "preview" },
+        "ventas@ejemplo.test",
+        "sistemas6@ejemplo.test",
+      ),
+      "sistemas6@ejemplo.test",
+    );
+  });
+  it("en producción el buzón de pruebas no cuenta", () => {
+    assert.equal(
+      destinoHojasDeVida(
+        "rrhh@ejemplo.test",
+        "info@ejemplo.test",
+        { VERCEL_ENV: "production" },
+        null,
+        "sistemas6@ejemplo.test",
+      ),
+      "rrhh@ejemplo.test",
+    );
+  });
+});

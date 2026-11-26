@@ -31,7 +31,7 @@ export default async function EstadoSmtp({ payload }: { payload: Payload }) {
       de volver a desplegar.
       {publicado
         ? ""
-        : " Fuera del sitio publicado, los avisos van solo al buzón de pruebas (SOLICITUDES_EMAIL_TO), no a los destinatarios de abajo."}
+        : " Fuera del sitio publicado, los avisos van solo al buzón de pruebas (el campo «Buzón de pruebas» de abajo o, vacío, la variable SOLICITUDES_EMAIL_TO), no a los destinatarios de abajo."}
     </p>
   );
   const aviso = e.aviso ? (

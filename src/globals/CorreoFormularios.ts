@@ -19,7 +19,8 @@ import { esAdministrador, soloAdmin, soloPersonal } from "../lib/seguridad/acces
  *
  * Privado: lo lee el personal del panel y lo cambia un administrador (decide adónde van los
  * leads). Los destinatarios solo cuentan en el sitio publicado: un preview avisa siempre al buzón
- * de pruebas (`SOLICITUDES_EMAIL_TO`), porque su base es un clon de la de producción.
+ * de pruebas (el campo `buzonPruebas`, 2026-11-26, solo administradores, o, vacío, la variable
+ * `SOLICITUDES_EMAIL_TO`), porque su base es un clon de la de producción.
  *
  * EL SMTP DESDE EL PANEL (2026-10-27, Juan Pablo: que la cliente ponga sus datos sin pasárselos a
  * nadie). Grupo `smtpPanel`, SOLO para administradores (los editores ni lo ven). Si está completo,
@@ -137,6 +138,17 @@ export const CorreoFormularios: GlobalConfig = {
             placeholder: "seleccion@…",
             description:
               "A este correo llegan las hojas de vida de «Trabaja con nosotros» («Enviar HV»), con el PDF adjunto (no se guarda en el sitio). Vacío, el correo para solicitudes. Solo cuenta en el sitio publicado.",
+          },
+        },
+        {
+          name: "buzonPruebas",
+          type: "email",
+          label: "Buzón de pruebas",
+          access: { read: soloAdministradores, update: soloAdministradores },
+          admin: {
+            placeholder: "pruebas@…",
+            description:
+              "Solo para administradores. A este correo llegan los avisos y la respuesta automática de los formularios en los PREVIEWS (nunca en el sitio publicado, donde este campo no se usa): la base de un preview es una copia con correos reales, así que allí no se escribe a nadie más. Vacío, se usa la variable SOLICITUDES_EMAIL_TO de Vercel; sin ninguna, no se envía nada.",
           },
         },
       ],

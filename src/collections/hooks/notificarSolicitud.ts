@@ -44,6 +44,7 @@ export const notificarSolicitud: CollectionAfterChangeHook = async ({
     datosEmpresa(seo.empresa).correo,
     process.env,
     correoFormularios.correoSolicitudes,
+    correoFormularios.buzonPruebas,
   );
 
   /*
@@ -66,7 +67,7 @@ export const notificarSolicitud: CollectionAfterChangeHook = async ({
   if (!destino) {
     req.payload.logger.warn(
       { solicitud: doc.id },
-      "Solicitud guardada SIN aviso al equipo: falta SOLICITUDES_EMAIL_TO (fuera de producción no se avisa al cliente). El lead está en /admin.",
+      "Solicitud guardada SIN aviso al equipo: falta el «Buzón de pruebas» (o SOLICITUDES_EMAIL_TO): fuera de producción no se avisa al cliente. El lead está en /admin.",
     );
   } else {
     try {
@@ -89,7 +90,9 @@ export const notificarSolicitud: CollectionAfterChangeHook = async ({
   // 2. Respuesta automática al visitante (editable; apagable). Un fallo aquí tampoco cuesta el lead.
   try {
     const respuesta = respuestaAlVisitante(doc, correoFormularios);
-    const salida = respuesta && destinoRespuesta(doc.correo, respuesta.subject);
+    const salida =
+      respuesta &&
+      destinoRespuesta(doc.correo, respuesta.subject, process.env, correoFormularios.buzonPruebas);
     if (respuesta && salida) {
       const enviado = (await req.payload.sendEmail({
         to: salida.to,

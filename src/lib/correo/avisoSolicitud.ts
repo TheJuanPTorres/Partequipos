@@ -10,6 +10,8 @@
  * y la respuesta nunca lleva su mensaje de vuelta.
  */
 
+import { buzonDePruebas } from "./smtp";
+
 export const RESPUESTA_POR_DEFECTO = {
   asunto: "Hemos recibido tu mensaje",
   texto: [
@@ -108,12 +110,13 @@ export function destinoRespuesta(
   correoVisitante: string,
   asunto: string,
   env: Entorno = process.env,
+  buzonPruebasDelPanel?: string | null,
 ): { to: string; subject: string } | null {
   if (env.VERCEL_ENV === "production") {
     const to = correoVisitante.trim();
     return to ? { to, subject: asunto } : null;
   }
-  const prueba = env.SOLICITUDES_EMAIL_TO?.trim();
+  const prueba = buzonDePruebas(env, buzonPruebasDelPanel);
   return prueba
     ? {
         to: prueba,

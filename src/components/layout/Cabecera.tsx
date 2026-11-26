@@ -41,6 +41,7 @@ import {
 import { inicioDelPanel, modoCabecera } from "@/lib/cabecera/modo";
 import { activasDe, PARAMETRO_ANIMACIONES } from "@/lib/listado/animaciones";
 import { claveDeFila, etiquetaOtraPestana } from "@/lib/cabecera/enlaces";
+import { esSeccionActual } from "@/lib/cabecera/seccionActual";
 import { claveDeEnlace, type PanelMenu } from "@/lib/megamenu";
 import type { ImagenLogo } from "@/lib/seo/logo";
 
@@ -718,9 +719,9 @@ export function Cabecera({
   // Los externos (la tienda) son botones en su sitio de la fila; sin megamenú.
   const internos = enlaces.filter((e) => !e.externo);
 
-  // La portada («/») solo es la actual en la portada: toda ruta empieza por «/».
-  const actual = (href: string) =>
-    ruta === href || (href !== "/" && ruta.startsWith(href)) ? "page" : undefined;
+  // La sección actual, con la ruta y el enlace normalizados: al regenerarse la página,
+  // `usePathname()` llega sin la barra final (`lib/cabecera/seccionActual.ts`).
+  const actual = (href: string) => (esSeccionActual(ruta, href) ? "page" : undefined);
 
   // Móvil: las entradas con panel despliegan su contenido (el mismo del megamenú, 2026-10-20).
   const listaEnlaces = (
@@ -944,7 +945,6 @@ export function Cabecera({
         ref={cabecera}
         className={estilos.cabecera}
         data-portada={esPortada ? "si" : "no"}
-        data-diag-ruta={ruta}
         data-modo={modoCabecera({
           esPortada,
           arriba,

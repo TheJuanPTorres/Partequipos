@@ -60,6 +60,9 @@ export const CURVA_MENU = "cubic-bezier(0.33, 0, 0.2, 1)";
  */
 export const DURACION_CIERRE_MENU_MS = 220;
 
+/** Lo que dura la apertura del panel del megamenú (el contorno se despliega con su alto real). */
+export const DURACION_ABRIR_MENU_MS = 280;
+
 export type Punto = { x: number; y: number };
 export type Caja = { left: number; top: number; right: number; bottom: number };
 

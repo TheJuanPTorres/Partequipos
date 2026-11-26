@@ -141,6 +141,10 @@ async function cambioEntreApartados(pagina, raiz, donde) {
       { raiz, indice },
     );
 
+  // Las pulsaciones de esta medida son de script (para muestrear desde el mismo instante): el
+  // navegador no las cuenta como entrada del usuario y sumaria como CLS lo que un acordeon
+  // empuja al abrirse. El CLS de la pagina se deja como estaba al acabar.
+  const clsAntes = await pagina.evaluate(() => window.__cls);
   const abrir = await medir(0);
   if (!abrir) return fallos; // menos de dos apartados que desplieguen: nada que cambiar
   await pagina.waitForTimeout(200);
@@ -184,6 +188,9 @@ async function cambioEntreApartados(pagina, raiz, donde) {
       );
     }
   }
+  await pagina.evaluate((v) => {
+    window.__cls = v;
+  }, clsAntes);
   return fallos;
 }
 

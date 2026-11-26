@@ -85,3 +85,27 @@ describe("unaLinea", () => {
     assert.equal(unaLinea("x".repeat(500), 10).length, 10);
   });
 });
+
+describe("destinoRespuesta con el buzón de pruebas del panel", () => {
+  it("fuera del sitio publicado, la respuesta automática va al buzón del panel", () => {
+    const d = destinoRespuesta(
+      "ana@ejemplo.test",
+      "Asunto",
+      { VERCEL_ENV: "preview", SOLICITUDES_EMAIL_TO: "env@ejemplo.test" },
+      "sistemas6@ejemplo.test",
+    );
+    assert.equal(d?.to, "sistemas6@ejemplo.test");
+    assert.match(d?.subject ?? "", /^\[PRUEBA: respuesta automática a ana@ejemplo.test\]/);
+  });
+  it("sin buzón en el panel, la variable; sin ninguno, a nadie", () => {
+    const env = { VERCEL_ENV: "preview", SOLICITUDES_EMAIL_TO: "env@ejemplo.test" };
+    assert.equal(destinoRespuesta("ana@ejemplo.test", "A", env, " ")?.to, "env@ejemplo.test");
+    assert.equal(destinoRespuesta("ana@ejemplo.test", "A", { VERCEL_ENV: "preview" }, null), null);
+  });
+  it("en el sitio publicado sigue yendo al visitante, con buzón o sin él", () => {
+    assert.deepEqual(
+      destinoRespuesta("ana@ejemplo.test", "A", { VERCEL_ENV: "production" }, "sistemas6@x.test"),
+      { to: "ana@ejemplo.test", subject: "A" },
+    );
+  });
+});

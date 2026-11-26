@@ -51,6 +51,7 @@ export async function POST(peticion: Request) {
         datosEmpresa(seo.empresa).correo,
         process.env,
         correo.correoSolicitudes,
+        correo.buzonPruebas,
       );
     },
     enviarCorreo: async (correo) => {

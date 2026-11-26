@@ -129,6 +129,7 @@ import * as migration_20261125_043955_atributos_ficha from './20261125_043955_at
 import * as migration_20261125_153231_categoria_titulo_grupos from './20261125_153231_categoria_titulo_grupos';
 import * as migration_20261125_191535_categorias_en_portada from './20261125_191535_categorias_en_portada';
 import * as migration_20261125_213752_menu_apartados from './20261125_213752_menu_apartados';
+import * as migration_20261126_142737_buzon_pruebas from './20261126_142737_buzon_pruebas';
 
 export const migrations = [
   {
@@ -784,6 +785,11 @@ export const migrations = [
   {
     up: migration_20261125_213752_menu_apartados.up,
     down: migration_20261125_213752_menu_apartados.down,
-    name: '20261125_213752_menu_apartados'
+    name: '20261125_213752_menu_apartados',
+  },
+  {
+    up: migration_20261126_142737_buzon_pruebas.up,
+    down: migration_20261126_142737_buzon_pruebas.down,
+    name: '20261126_142737_buzon_pruebas'
   },
 ];

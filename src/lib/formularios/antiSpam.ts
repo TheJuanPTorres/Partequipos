@@ -69,6 +69,8 @@ export function crearLimitePorIp(
     permitir(ip, ahora = Date.now()) {
       // Sin IP (no debería pasar tras el proxy) no se puede limitar: se deja pasar.
       if (!ip) return true;
+      // Límite desactivado (solo fuera de producción, `maxEnviosDelEntorno`): no se cuenta nada.
+      if (!Number.isFinite(max)) return true;
       const clave = huella(ip);
       const vigentes = (envios.get(clave) ?? []).filter((t) => ahora - t < ventanaMs);
       if (vigentes.length >= max) {
@@ -94,5 +96,24 @@ export function crearLimitePorIp(
   };
 }
 
+/**
+ * LÍMITE AJUSTABLE SOLO PARA PRUEBAS DE CARGA (2026-11-26, el cliente): en un preview o en local,
+ * `ANTISPAM_MAX_ENVIOS` sube el tope por IP (un número entero ≥ 1) o lo desactiva (`0` u `off`).
+ * EN PRODUCCIÓN NUNCA SE LEE: manda siempre `MAX_ENVIOS`, aunque la variable esté puesta. Producción
+ * es `VERCEL_ENV=production`, o un servidor de producción fuera de Vercel (`NODE_ENV=production`
+ * sin `VERCEL_ENV`): ante la duda, se trata como producción. Una variable mal escrita se ignora.
+ */
+export const VARIABLE_MAX_ENVIOS = "ANTISPAM_MAX_ENVIOS";
+
+export function maxEnviosDelEntorno(env: Record<string, string | undefined> = process.env): number {
+  const enProduccion =
+    env.VERCEL_ENV === "production" || (!env.VERCEL_ENV && env.NODE_ENV === "production");
+  if (enProduccion) return MAX_ENVIOS;
+  const crudo = env[VARIABLE_MAX_ENVIOS]?.trim().toLowerCase();
+  if (!crudo) return MAX_ENVIOS;
+  if (crudo === "0" || crudo === "off") return Number.POSITIVE_INFINITY;
+  return /^[1-9]\d{0,8}$/.test(crudo) ? Number(crudo) : MAX_ENVIOS;
+}
+
 /** El límite de esta instancia, compartido por todos los envíos que atienda. */
-export const limiteDeEnvios = crearLimitePorIp();
+export const limiteDeEnvios = crearLimitePorIp(maxEnviosDelEntorno());

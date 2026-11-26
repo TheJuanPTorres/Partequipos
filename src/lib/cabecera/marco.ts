@@ -73,25 +73,32 @@ export function interpolarCaja(desde: CajaMarco, hacia: CajaMarco, t: number): C
 }
 
 /**
- * La curva de M3, `cubic-bezier(0.33, 0, 0.2, 1)` (la del fundido de los
- * paneles), para `t` de 0 a 1.
+ * Una curva `cubic-bezier(x1, y1, x2, y2)` como función de `t` (0–1): las mismas del CSS, para
+ * lo que el marco interpola fotograma a fotograma.
  */
-export function suavizadoMarco(t: number): number {
-  const x1 = 0.33;
-  const x2 = 0.2;
-  const y1 = 0;
-  const y2 = 1;
-  if (t <= 0) return 0;
-  if (t >= 1) return 1;
+export function curvaBezier(x1: number, y1: number, x2: number, y2: number): (t: number) => number {
   const bx = (s: number) => 3 * x1 * s * (1 - s) ** 2 + 3 * x2 * s ** 2 * (1 - s) + s ** 3;
   const by = (s: number) => 3 * y1 * s * (1 - s) ** 2 + 3 * y2 * s ** 2 * (1 - s) + s ** 3;
-  // Bisección: x(s) es monótona en [0, 1].
-  let a = 0;
-  let b = 1;
-  for (let i = 0; i < 30; i++) {
-    const s = (a + b) / 2;
-    if (bx(s) < t) a = s;
-    else b = s;
-  }
-  return by((a + b) / 2);
+  return (t) => {
+    if (t <= 0) return 0;
+    if (t >= 1) return 1;
+    // Bisección: x(s) es monótona en [0, 1].
+    let a = 0;
+    let b = 1;
+    for (let i = 0; i < 30; i++) {
+      const s = (a + b) / 2;
+      if (bx(s) < t) a = s;
+      else b = s;
+    }
+    return by((a + b) / 2);
+  };
 }
+
+/** La curva de M3, `cubic-bezier(0.33, 0, 0.2, 1)` (la del fundido de los paneles). */
+export const suavizadoMarco = curvaBezier(0.33, 0, 0.2, 1);
+
+/** Abrir el panel: salida suave (la del fundido del contenido al abrir, en el CSS). */
+export const curvaAbrirMarco = curvaBezier(0.22, 1, 0.36, 1);
+
+/** Cerrar el panel: entrada suave (el espejo). */
+export const curvaCerrarMarco = curvaBezier(0.4, 0, 1, 1);

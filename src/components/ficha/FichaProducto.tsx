@@ -154,7 +154,7 @@ export function FichaProducto({
       >
         {fotos.length > 0 ? (
           <div className={estilos.columnaGaleria}>
-            <GaleriaFicha fotos={fotos} nombre={nombre} altoMovil={400} />
+            <GaleriaFicha fotos={fotos} nombre={nombre} />
           </div>
         ) : null}
 

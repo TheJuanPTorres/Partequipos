@@ -293,7 +293,9 @@ async function escritorio(navegador, reducido) {
     if (e && !e.abierto) break;
     await pagina.waitForTimeout(15);
   }
-  await pagina.waitForTimeout(70);
+  // El panel solo deja volver mientras dura el cierre (220 ms): la espera es corta para que la
+  // vuelta caiga dentro también en una máquina cargada (con 70 ms fallaba de vez en cuando).
+  await pagina.waitForTimeout(35);
   const antesDeVolver = await leerMarco(pagina);
   await pagina.mouse.move(caja.x, caja.y, { steps: 3 });
   await pagina.waitForTimeout(40);

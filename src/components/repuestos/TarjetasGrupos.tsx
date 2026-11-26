@@ -2,9 +2,11 @@ import { IconMessageCircle } from "@tabler/icons-react";
 import Image from "next/image";
 
 import { BotonFormulario } from "@/components/forms/BotonFormulario";
+import { BotonTienda } from "@/components/tienda/BotonTienda";
 import { VerTodosEquipos } from "@/components/nueva/VerTodosEquipos";
 import type { ConfigFormulario } from "@/lib/formularios/configFormulario";
 import { mensajeCotizar, type GrupoVista } from "@/lib/repuestos/grupos";
+import { destinoTienda } from "@/lib/tienda/enlaceTienda";
 
 import estilos from "./marca.module.css";
 import { RecuadrosConScroll } from "./RecuadrosConScroll";
@@ -24,6 +26,10 @@ import { RecuadrosConScroll } from "./RecuadrosConScroll";
  *   HTML de la página para Google; solo se ve sin JavaScript (`productosSinJs`), y el botón lleva a
  *   ella.
  *
+ * «VER EN LA TIENDA» (2026-11-26): a la derecha de «Ver productos», un botón cuadrado de solo
+ * icono con el «Enlace en la tienda» del grupo o, vacío, la tienda general; y en el panel de
+ * productos, un botón de tienda a la derecha de cada producto (el suyo o el del grupo o el general).
+ *
  * Misma rejilla y colocación que las tarjetas de la marca (`rejillaTarjetas`, regla #281).
  *
  * La foto, SIEMPRE ENTERA (dirección, 2026-10-26): son fotos de producto (motores, cilindros,
@@ -37,6 +43,7 @@ export function TarjetasGrupos({
   grupos,
   formulario,
   anclaContacto,
+  tiendaGeneral = null,
 }: {
   id: string;
   titulo: string;
@@ -46,6 +53,8 @@ export function TarjetasGrupos({
   /** El formulario de contacto de la página; cada tarjeta le añade su mensaje. */
   formulario: ConfigFormulario;
   anclaContacto: string;
+  /** El enlace de la tienda general (el botón «Tienda» de la cabecera), si el panel lo tiene. */
+  tiendaGeneral?: string | null;
 }) {
   if (grupos.length === 0) return null;
   const idTitulo = `${id}-titulo`;
@@ -62,6 +71,8 @@ export function TarjetasGrupos({
         {grupos.map((g) => {
           const idT = `${id}-${g.id}`;
           const idLista = `${idT}-productos`;
+          // El del grupo o, vacío, el general; cada producto puede tener el suyo.
+          const tiendaGrupo = destinoTienda(g.enlaceTienda, tiendaGeneral);
           return (
             <li key={g.id} className={estilos.tarjeta}>
               {g.imagen ? (
@@ -106,13 +117,21 @@ export function TarjetasGrupos({
                       titulo={g.nombre}
                       href={`#${idLista}`}
                       total={g.productos.length}
-                      equipos={g.productos.map((p, i) => ({ id: i, nombre: p, href: null }))}
+                      equipos={g.productos.map((p, i) => ({
+                        id: i,
+                        nombre: p,
+                        href: null,
+                        tienda: destinoTienda(g.enlacesProductos[i], tiendaGrupo),
+                      }))}
                       buscador
                       cotizar={{ formulario, categoria }}
                       className={`${estilos.botonTarjeta} ${estilos.botonSecundario}`}
                       etiqueta="Ver productos"
                       describedBy={idT}
                     />
+                  ) : null}
+                  {tiendaGrupo ? (
+                    <BotonTienda href={tiendaGrupo} origen="tipo-repuesto" nombre={g.nombre} />
                   ) : null}
                 </div>
                 {/*

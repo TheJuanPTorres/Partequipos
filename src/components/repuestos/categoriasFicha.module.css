@@ -28,6 +28,7 @@
 }
 
 .caja {
+  position: relative;
   display: flex;
   min-width: 0;
 }
@@ -112,7 +113,7 @@
 
 .ver {
   display: flex;
-  min-height: 40px;
+  min-height: 44px;
   align-items: center;
   justify-content: center;
   gap: 8px;
@@ -127,6 +128,48 @@
   transition:
     background-color 0.3s,
     color 0.3s;
+}
+
+/*
+ * «Ver en la tienda» (2026-11-26): el botón de solo icono va sobre el pie de la tarjeta, a la
+ * derecha de «Ver productos», que cede su sitio (44 px + 8 px de hueco). En la tarjeta estrecha el
+ * texto baja a dos líneas y sin flecha, en vez de cortarse.
+ */
+.tienda {
+  position: absolute;
+  right: 14px;
+  bottom: 14px;
+}
+
+.conTienda .ver {
+  margin-right: 52px;
+  padding: 0 10px;
+  font-size: 13.5px;
+  line-height: 1.15;
+  text-align: center;
+  white-space: normal;
+}
+
+.conTienda .flecha {
+  display: none;
+}
+
+@media (min-width: 640px) {
+  .tienda {
+    right: 20px;
+    bottom: 20px;
+  }
+}
+
+@media (min-width: 1280px) {
+  .conTienda .ver {
+    font-size: 14.4px;
+    white-space: nowrap;
+  }
+
+  .conTienda .flecha {
+    display: block;
+  }
 }
 
 .tarjeta:hover .ver {

@@ -216,7 +216,7 @@ export function FichaNueva({
    * antes de llegar Inter y el título saltaba 18 px a 390 (CLS 0,059).
    */
   const migasFicha = (clase: string) => (
-    <nav aria-label="Ruta de navegación" className={`${clase} ${nueva.migasReserva}`}>
+    <nav aria-label="Ruta de navegación" className={`${clase} ${estilos.migasReserva}`}>
       <ol>
         {migas.map((m, i) =>
           i === migas.length - 1 ? (
@@ -231,7 +231,7 @@ export function FichaNueva({
           ),
         )}
       </ol>
-      <ol aria-hidden="true" className={nueva.copiaMigas}>
+      <ol aria-hidden="true" className={estilos.copiaMigas}>
         {migas.map((m, i) => (
           <li key={m.path}>
             {i === migas.length - 1 ? sinCortarCodigos(m.nombre, nueva.sinCorte) : m.nombre}

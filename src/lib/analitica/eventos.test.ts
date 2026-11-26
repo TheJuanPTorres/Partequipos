@@ -134,3 +134,22 @@ describe("paginaDeOrigen", () => {
     assert.equal(paginaDeOrigen(""), "/");
   });
 });
+
+describe("clic_tienda", () => {
+  const base = { href: "https://tienda.ejemplo.test/", texto: "", ventana: "", abreVentana: false };
+  it("el botón «Ver en la tienda» da su evento con el elemento de origen", () => {
+    assert.deepEqual(
+      clasificarClic({ ...base, texto: "Ver Cadena en la tienda", marca: "tienda:producto" }),
+      { nombre: "clic_tienda", parametros: { elemento: "producto" } },
+    );
+    assert.deepEqual(clasificarClic({ ...base, marca: "tienda:tipo-repuesto" }), {
+      nombre: "clic_tienda",
+      parametros: { elemento: "tipo-repuesto" },
+    });
+  });
+  it("sin la marca, o con una malformada, no es ese evento", () => {
+    assert.equal(clasificarClic({ ...base, marca: null }), null);
+    assert.equal(clasificarClic({ ...base, marca: "tienda:" }), null);
+    assert.equal(clasificarClic({ ...base, marca: "tienda:A B" }), null);
+  });
+});

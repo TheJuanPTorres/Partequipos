@@ -431,6 +431,26 @@ a.item[data-actual]:hover {
   overflow-wrap: anywhere;
 }
 
+/*
+ * La fila de un producto con «Ver en la tienda» (2026-11-26): el nombre (que abre la cotización) y,
+ * a su derecha y aparte, el botón de la tienda de 44 px. El hueco entre los dos no se pulsa.
+ */
+.filaProducto {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.filaProducto > .fila {
+  min-width: 0;
+  flex: 1;
+  width: auto;
+}
+
+.tienda {
+  margin-right: 4px;
+}
+
 /* El icono de cotizar, que aparece al pasar el ratón o enfocar (sin mover el texto). */
 .flecha {
   display: inline-flex;

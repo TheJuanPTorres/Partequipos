@@ -31,13 +31,17 @@ import { Bandera } from "@/components/marca/Bandera";
 import { LogoMarca } from "@/components/marca/LogoMarca";
 import {
   CURVA_MENU,
+  DURACION_ABRIR_MENU_MS,
   DURACION_ACORDEON_MS,
+  DURACION_CIERRE_MENU_MS,
   DURACION_MARCO_MS,
   type MejoraMegamenu,
 } from "@/lib/cabecera/fluidez";
 import {
   cajaMarco,
   type CajaMarco,
+  curvaAbrirMarco,
+  curvaCerrarMarco,
   interpolarCaja,
   recorteMarco,
   suavizadoMarco,
@@ -100,10 +104,16 @@ function useAbierto(clave: string): [boolean, () => void] {
 
 /**
  * M4. Una región que se pliega: con la mejora, la altura pasa de 0 a la del
- * contenido (y al revés) en `DURACION_ACORDEON_MS`; cerrada, `hidden` como
- * siempre (fuera del orden del tabulador y de los lectores). Si se invierte a
- * medias, sigue desde la altura en la que estaba: sin saltos. Sin la mejora o con
- * «reducir movimiento», cambia al instante.
+ * contenido (y al revés) en `DURACION_ACORDEON_MS`, y su contenido se funde a la vez;
+ * cerrada, `hidden` como siempre (fuera del orden del tabulador y de los lectores).
+ * Si se invierte a medias, sigue desde la altura y la opacidad que tenía: sin saltos.
+ * Sin la mejora o con «reducir movimiento», cambia al instante.
+ *
+ * COORDINADOS (tanda 25, tarea 4): al abrir un hermano, el que se cierra y el que se abre
+ * arrancan en el mismo fotograma, con la misma duración y la misma curva, así el alto del
+ * panel pasa del de antes al nuevo de una vez. El que se cierra SE QUEDA en 0 al acabar
+ * (`fill: forwards`) hasta que React lo oculta: antes, al terminar su animación recuperaba
+ * su alto entero durante un fotograma y el panel daba un salto («reaparece todo abierto»).
  */
 function usePlegable(ref: RefObject<HTMLDivElement | null>, abierto: boolean) {
   const animar = useContext(MejorasMenu).has("M4");
@@ -116,32 +126,53 @@ function usePlegable(ref: RefObject<HTMLDivElement | null>, abierto: boolean) {
   }
   const previo = useRef(abierto);
   const animacion = useRef<Animation | null>(null);
+  /** El cierre ya acabado, que sigue sujetando el alto en 0 hasta que la región queda oculta. */
+  const cerrada = useRef<Animation | null>(null);
 
   useLayoutEffect(() => {
     const el = ref.current;
     const eraAbierto = previo.current;
     previo.current = abierto;
     if (!el || eraAbierto === abierto) return;
-    // A medias de otra animación, se sigue desde la altura que tenía en pantalla.
-    const amedias = animacion.current !== null;
+    // A medias de otra animación, se sigue desde la altura y la opacidad que tenía en pantalla.
+    const amedias = animacion.current !== null || cerrada.current !== null;
     const desde = el.getBoundingClientRect().height;
+    const opacidad = amedias ? Number(getComputedStyle(el).opacity) : abierto ? 0 : 1;
     animacion.current?.cancel();
+    cerrada.current?.cancel();
     animacion.current = null;
+    cerrada.current = null;
     if (!animar || reducirMovimiento() || typeof el.animate !== "function") return;
     const hasta = abierto ? el.scrollHeight : 0;
     const a = el.animate(
       [
-        { height: `${abierto && !amedias ? 0 : desde}px`, overflow: "hidden" },
-        { height: `${hasta}px`, overflow: "hidden" },
+        { height: `${abierto && !amedias ? 0 : desde}px`, opacity: opacidad, overflow: "hidden" },
+        { height: `${hasta}px`, opacity: abierto ? 1 : 0, overflow: "hidden" },
       ],
-      { duration: DURACION_ACORDEON_MS, easing: CURVA_MENU },
+      {
+        duration: DURACION_ACORDEON_MS,
+        easing: CURVA_MENU,
+        // Cerrada, se queda en 0 hasta que deja de pintarse; abierta, vuelve a su alto natural.
+        fill: abierto ? "none" : "forwards",
+      },
     );
     animacion.current = a;
     a.onfinish = () => {
+      if (animacion.current !== a) return;
       animacion.current = null;
-      if (!abierto) setCerrando(false);
+      if (!abierto) {
+        cerrada.current = a;
+        setCerrando(false);
+      }
     };
   }, [ref, abierto, animar]);
+
+  // Ya oculta (`hidden`): se suelta el cierre que sujetaba el alto.
+  useLayoutEffect(() => {
+    if (cerrando || abierto) return;
+    cerrada.current?.cancel();
+    cerrada.current = null;
+  }, [cerrando, abierto]);
 
   return { oculto: !abierto && !cerrando, inerte: !abierto };
 }
@@ -575,6 +606,12 @@ export type EstadoPanel = "activo" | "saliendo" | "oculto";
  * medida nueva); el saliente se funde mientras entra el nuevo. Nada cambia de
  * sitio en la maqueta: CLS 0. Sin M3, el cambio vuelve a hacer la entrada de
  * siempre (bajada y fundido). Con «reducir movimiento», al instante.
+ *
+ * ABRIR Y CERRAR (tanda 25, tarea 4): el contorno se despliega y se recoge cambiando su ALTO
+ * REAL, de 0 al del panel y al revés, con el mismo motor: el filete y las esquinas redondeadas de
+ * abajo son los nativos de `.forma` durante todo el trayecto (antes, un recorte recto de
+ * `.lienzo` las cortaba al cerrar). El contenido se recorta con la misma caja, redondeada. Si se
+ * invierte a medias, sigue desde el alto que tenía.
  */
 export function MarcoMegamenu({
   activo,
@@ -604,7 +641,12 @@ export function MarcoMegamenu({
     hacia: CajaMarco;
     inicio: number;
     fotograma: number;
+    duracion: number;
+    curva: (t: number) => number;
+    /** Recogiéndose: el destino es alto 0 y no lo cambia una medida nueva del panel. */
+    cierre: boolean;
   } | null>(null);
+  const estaAbierto = useRef(abierto);
   const [saliente, setSaliente] = useState<string | null>(null);
 
   /** Pone la caja en el contorno y en el recorte del contenido: valores fijos, sin transiciones. */
@@ -620,7 +662,11 @@ export function MarcoMegamenu({
       f.style.width = `${caja.ancho}px`;
       f.style.setProperty("--mega-ancho", `${caja.ancho}px`);
     }
-    if (f.style.height !== `${caja.alto}px`) f.style.height = `${caja.alto}px`;
+    if (f.style.height !== `${caja.alto}px`) {
+      f.style.height = `${caja.alto}px`;
+      // Las curvas de arriba no asoman por debajo de un contorno más bajo que ellas.
+      f.style.setProperty("--mega-alto", `${caja.alto}px`);
+    }
     f.dataset.medida = "si";
     const recorte = recorteMarco(caja, l.clientWidth, c.offsetHeight, radioDe(m));
     if (c.style.clipPath !== recorte) c.style.clipPath = recorte;
@@ -641,6 +687,8 @@ export function MarcoMegamenu({
 
   /** Pinta el contorno sobre el panel que se ve; durante un cambio, solo le da el destino nuevo. */
   const pintar = useCallback(() => {
+    // Cerrado (o recogiéndose), el contorno no sigue al panel: está en 0 o va hacia 0.
+    if (!estaAbierto.current || cambio.current?.cierre) return;
     const caja = medir();
     if (!caja) return;
     if (cambio.current) cambio.current.hacia = caja;
@@ -652,23 +700,45 @@ export function MarcoMegamenu({
     cambio.current = null;
   }, []);
 
+  /** De la caja `desde` a `hacia`, un fotograma tras otro, con su duración y su curva. */
+  const animarCaja = useCallback(
+    (
+      desde: CajaMarco,
+      hacia: CajaMarco,
+      duracion: number,
+      curva: (t: number) => number,
+      cierre = false,
+    ) => {
+      pararCambio();
+      const paso = (ahora: number) => {
+        const actual = cambio.current;
+        if (!actual) return;
+        const t = Math.min(1, (ahora - actual.inicio) / actual.duracion);
+        aplicar(interpolarCaja(actual.desde, actual.hacia, actual.curva(t)));
+        if (t < 1) actual.fotograma = window.requestAnimationFrame(paso);
+        else cambio.current = null;
+      };
+      cambio.current = {
+        desde,
+        hacia,
+        inicio: performance.now(),
+        fotograma: 0,
+        duracion,
+        curva,
+        cierre,
+      };
+      aplicar(desde);
+      cambio.current.fotograma = window.requestAnimationFrame(paso);
+    },
+    [aplicar, pararCambio],
+  );
+
   /** M3: del tamaño que se ve al del panel nuevo, un fotograma tras otro. */
   const empezarCambio = useCallback(() => {
     const hacia = medir();
     if (!hacia) return;
-    const desde = pintada.current ?? hacia;
-    pararCambio();
-    const paso = (ahora: number) => {
-      const actual = cambio.current;
-      if (!actual) return;
-      const t = Math.min(1, (ahora - actual.inicio) / DURACION_MARCO_MS);
-      aplicar(interpolarCaja(actual.desde, actual.hacia, suavizadoMarco(t)));
-      if (t < 1) actual.fotograma = window.requestAnimationFrame(paso);
-      else cambio.current = null;
-    };
-    cambio.current = { desde, hacia, inicio: performance.now(), fotograma: 0 };
-    cambio.current.fotograma = window.requestAnimationFrame(paso);
-  }, [aplicar, medir, pararCambio]);
+    animarCaja(pintada.current ?? hacia, hacia, DURACION_MARCO_MS, suavizadoMarco);
+  }, [animarCaja, medir]);
 
   // Cualquier cambio de tamaño (un acordeón, una foto que llega, otro ancho de ventana): se repinta.
   useEffect(() => {
@@ -693,9 +763,40 @@ export function MarcoMegamenu({
   useLayoutEffect(() => {
     const antes = previo.current;
     previo.current = { activo, abierto };
+    estaAbierto.current = abierto;
     const m = marco.current;
     const c = contenido.current;
     if (!m || !c) return;
+    if (abierto !== antes.abierto) {
+      // ABRIR o CERRAR: el contorno cambia de alto de verdad, de 0 al del panel o al revés.
+      window.clearTimeout(finCambio.current);
+      c.style.minHeight = "";
+      // A medias de recogerse (o de desplegarse), sigue desde el alto que se ve.
+      const amedias = cambio.current !== null && pintada.current !== null;
+      const visto = amedias ? pintada.current : null;
+      pararCambio();
+      if (abierto) {
+        const hacia = medir();
+        if (!hacia) return;
+        if (reducirMovimiento()) aplicar(hacia);
+        else {
+          animarCaja(
+            visto ?? { ...hacia, alto: 0 },
+            hacia,
+            DURACION_ABRIR_MENU_MS,
+            curvaAbrirMarco,
+          );
+        }
+      } else {
+        const desde = pintada.current;
+        if (!desde) return;
+        const cerrada = { ...desde, alto: 0 };
+        if (reducirMovimiento()) aplicar(cerrada);
+        else animarCaja(desde, cerrada, DURACION_CIERRE_MENU_MS, curvaCerrarMarco, true);
+      }
+      return;
+    }
+    if (!abierto) return;
     const otroPanel = abierto && antes.abierto && antes.activo !== null && antes.activo !== activo;
     const animar = otroPanel && !reducirMovimiento();
     if (animar && mejoras.has("M3")) {
@@ -726,7 +827,7 @@ export function MarcoMegamenu({
       });
       c.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 550, easing: "ease" });
     }
-  }, [activo, abierto, mejoras, empezarCambio, pararCambio, pintar]);
+  }, [activo, abierto, mejoras, animarCaja, aplicar, empezarCambio, medir, pararCambio, pintar]);
 
   // El saliente se funde durante el cambio de tamaño y después desaparece.
   useEffect(() => {

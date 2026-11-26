@@ -130,6 +130,7 @@ import * as migration_20261125_153231_categoria_titulo_grupos from './20261125_1
 import * as migration_20261125_191535_categorias_en_portada from './20261125_191535_categorias_en_portada';
 import * as migration_20261125_213752_menu_apartados from './20261125_213752_menu_apartados';
 import * as migration_20261126_142737_buzon_pruebas from './20261126_142737_buzon_pruebas';
+import * as migration_20261126_145016_enlace_tienda from './20261126_145016_enlace_tienda';
 
 export const migrations = [
   {
@@ -790,6 +791,11 @@ export const migrations = [
   {
     up: migration_20261126_142737_buzon_pruebas.up,
     down: migration_20261126_142737_buzon_pruebas.down,
-    name: '20261126_142737_buzon_pruebas'
+    name: '20261126_142737_buzon_pruebas',
+  },
+  {
+    up: migration_20261126_145016_enlace_tienda.up,
+    down: migration_20261126_145016_enlace_tienda.down,
+    name: '20261126_145016_enlace_tienda'
   },
 ];

@@ -8,6 +8,7 @@ import { activasDe } from "../listado/animaciones";
 
 import {
   dentroDelPasillo,
+  DURACION_ABRIR_MENU_MS,
   DURACION_CIERRE_MENU_MS,
   FLUIDEZ_MEGAMENU,
   RETRASO_ABRIR_MS,
@@ -69,10 +70,11 @@ describe("apertura y cierre del panel", () => {
   it("el megamenú se recoge en lo que dura el cierre y deja de verse justo entonces", () => {
     const mega = css("megamenu.module.css");
     assert.ok(mega.includes(`visibility 0s linear ${cierre}`), "el marco no espera al cierre");
-    assert.ok(
-      mega.includes(`transition: clip-path ${cierre} `),
-      "el panel no se recoge en ese tiempo",
-    );
+    // El contorno se recoge con su alto real, interpolado por el marco (tanda 25, tarea 4): ya
+    // no hay recorte recto en el lienzo, que cortaba las esquinas de abajo.
+    const lienzo = mega.slice(mega.indexOf(".lienzo {"), mega.indexOf(".contorno {"));
+    assert.ok(!/clip-path\s*:/.test(lienzo.replace(/\/\*[\s\S]*?\*\//g, "")), "recorte recto");
+    assert.ok(DURACION_ABRIR_MENU_MS > DURACION_CIERRE_MENU_MS);
   });
 
   it("el menú del móvil se recoge en lo que dura el cierre", () => {

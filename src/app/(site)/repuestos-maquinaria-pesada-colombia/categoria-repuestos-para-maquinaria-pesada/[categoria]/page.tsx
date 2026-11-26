@@ -28,7 +28,9 @@ import { getRepuestosMarca } from "@/lib/queries/getRepuestosMarca";
 import { getSedesDePortada } from "@/lib/queries/getSedes";
 import { getEmpresa } from "@/lib/queries/getSeo";
 import { fondoDeRespaldo, vistaEncabezadoCategoria } from "@/lib/repuestos/categoria";
+import { getCabecera } from "@/lib/queries/getCabecera";
 import { gruposDeCategoria } from "@/lib/repuestos/grupos";
+import { enlaceTiendaGeneral } from "@/lib/tienda/enlaceTienda";
 import { accesosDe, esCategoriaPrincipal } from "@/lib/repuestos/subcategorias";
 import { vistaPorQue } from "@/lib/repuestos/plantillaTipo";
 import { rutas } from "@/lib/routes";
@@ -86,7 +88,7 @@ export default async function CategoriaRepuestosPage({ params }: { params: Promi
   const categoria = await getCategoriaRepuestosPorSlug(slug);
   if (!categoria) notFound();
 
-  const [global, marcas, testimonios, empresa, sedes, todas, selector, baldosas] =
+  const [global, marcas, testimonios, empresa, sedes, todas, selector, baldosas, cabecera] =
     await Promise.all([
       getRepuestosMarca(),
       getMarcas(),
@@ -99,6 +101,7 @@ export default async function CategoriaRepuestosPage({ params }: { params: Promi
         ? getMarcasLubricanteSelector().then((m) => vistaSelector(categoria, m))
         : Promise.resolve(null),
       getBaldosasMarca(),
+      getCabecera(),
     ]);
   // Las páginas que cuelgan de esta categoría (Filtros Donaldson en Filtración, 2026-10-26),
   // con el banner de marca del #385: su color y, a la derecha, su «Fondo del encabezado» o, sin
@@ -182,6 +185,7 @@ export default async function CategoriaRepuestosPage({ params }: { params: Promi
             titulo={tituloDeGrupos(categoria.tituloGrupos, nombre, true)}
             categoria={nombre}
             grupos={gruposDeCategoria(categoria)}
+            tiendaGeneral={enlaceTiendaGeneral(cabecera.enlaces)}
             formulario={formulario}
             anclaContacto={ANCLA_CONTACTO}
           />

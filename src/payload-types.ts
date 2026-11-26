@@ -779,6 +779,10 @@ export interface ModelosRepuesto {
    */
   tipo: number | TiposEquipo;
   /**
+   * Opcional. La dirección (https://…) de la página de este modelo en la tienda, por ejemplo https://… página de este producto en la tienda. Si lo dejas vacío, lleva a la tienda general (la del botón «Tienda» de la cabecera).
+   */
+  enlaceTienda?: string | null;
+  /**
    * Código del modelo, ej. 320D.
    */
   codigo?: string | null;
@@ -999,6 +1003,10 @@ export interface CategoriasTecnica {
   colorMarca?: string | null;
   descripcion?: string | null;
   /**
+   * Opcional. La dirección (https://…) de la página de esta categoría en la tienda, por ejemplo https://… página de este producto en la tienda. Si lo dejas vacío, lleva a la tienda general (la del botón «Tienda» de la cabecera).
+   */
+  enlaceTienda?: string | null;
+  /**
    * Opcional. Vacío: la tarjeta de la portada usa el nombre de la categoría.
    */
   tituloPortada?: string | null;
@@ -1025,9 +1033,17 @@ export interface CategoriasTecnica {
          * Opcional. Una o dos frases bajo el nombre, en su tarjeta (p. ej. para qué sirve ese tipo de filtro). Un grupo con descripción sale aunque no tenga productos.
          */
         descripcion?: string | null;
+        /**
+         * Opcional. La dirección (https://…) de la página de este tipo de repuesto en la tienda, por ejemplo https://… página de este producto en la tienda. Si lo dejas vacío, lleva a la tienda general (la del botón «Tienda» de la cabecera).
+         */
+        enlaceTienda?: string | null;
         productos?:
           | {
               texto: string;
+              /**
+               * Opcional. La dirección (https://…) de la página de este producto en la tienda, por ejemplo https://… página de este producto en la tienda. Si lo dejas vacío, lleva a la tienda general (la del botón «Tienda» de la cabecera).
+               */
+              enlaceTienda?: string | null;
               id?: string | null;
             }[]
           | null;
@@ -2994,6 +3010,7 @@ export interface ModelosRepuestoSelect<T extends boolean = true> {
   nombre?: T;
   marca?: T;
   tipo?: T;
+  enlaceTienda?: T;
   codigo?: T;
   serie?: T;
   descripcion?: T;
@@ -3098,6 +3115,7 @@ export interface CategoriasTecnicasSelect<T extends boolean = true> {
   nombre?: T;
   colorMarca?: T;
   descripcion?: T;
+  enlaceTienda?: T;
   tituloPortada?: T;
   enlace?: T;
   tituloGrupos?: T;
@@ -3108,10 +3126,12 @@ export interface CategoriasTecnicasSelect<T extends boolean = true> {
         mostrar?: T;
         imagen?: T;
         descripcion?: T;
+        enlaceTienda?: T;
         productos?:
           | T
           | {
               texto?: T;
+              enlaceTienda?: T;
               id?: T;
             };
         id?: T;

@@ -58,6 +58,7 @@ export function tarjetasDeCategorias(categorias: CategoriasTecnica[]): TarjetaMa
             }
           : undefined,
         soloEscritorio: false,
+        enlaceTienda: c.enlaceTienda ?? null,
       };
     });
 }

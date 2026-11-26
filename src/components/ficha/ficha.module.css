@@ -194,6 +194,26 @@
   object-fit: cover;
 }
 
+/*
+ * Foto vertical o de otra proporción (tanda 25, t5): entera, sin recortar la máquina, sobre la
+ * misma foto desenfocada (y, mientras llega, un gris neutro).
+ */
+.diapositiva:has(> .fondoDiapositiva) {
+  overflow: hidden;
+  background: #d9d9d9;
+}
+
+.fondoDiapositiva {
+  object-fit: cover;
+  filter: blur(20px) saturate(1.05);
+  transform: scale(1.15);
+  opacity: 0.85;
+}
+
+.fotoEntera {
+  object-fit: contain;
+}
+
 /* Reproducir y pantalla completa, arriba a la izquierda como en ux-9. */
 .controlesVisor {
   position: absolute;
@@ -826,8 +846,14 @@
     padding: 2.82cqi 2.82cqi calc(2.82cqi - 3px);
   }
 
+  /*
+   * Hasta 1024 px la foto grande es una caja 4:3 (tanda 25, t5), la proporción de casi todas las
+   * fotos de usados: antes, 270 px de alto en tablet (una franja) y 400 en móvil (casi cuadrada),
+   * y las fotos apaisadas se recortaban. La proporción va desde el primer pintado: sin CLS.
+   */
   .visor {
-    height: 270px;
+    height: auto;
+    aspect-ratio: 4 / 3;
   }
 
   /* En tablet la foto grande mide 270 px: la miniatura, un alto fijo menor. */
@@ -880,10 +906,6 @@
 @media (max-width: 767px) {
   .columnaGaleria {
     padding: 4.7cqi 4.7cqi calc(4.7cqi - 3px);
-  }
-
-  .visor {
-    height: 400px;
   }
 
   .miniatura {

@@ -86,12 +86,27 @@ export function destinoAvisos(
   correoEmpresa: string,
   env: Entorno = process.env,
   correoDelPanel?: string | null,
+  buzonPruebasDelPanel?: string | null,
 ): string | null {
   const delPanel = correoDelPanel?.trim() ?? "";
   if (env.VERCEL_ENV === "production" && delPanel) return delPanel;
+  // Fuera de producción: el buzón de pruebas del panel y, vacío, la variable. Nada más.
+  if (env.VERCEL_ENV !== "production") return buzonDePruebas(env, buzonPruebasDelPanel) || null;
   const propio = leer(env, "SOLICITUDES_EMAIL_TO");
   if (propio) return propio;
-  return env.VERCEL_ENV === "production" ? correoEmpresa || null : null;
+  return correoEmpresa || null;
+}
+
+/**
+ * EL BUZÓN DE PRUEBAS (2026-11-26, el cliente: pruebas de rendimiento): adónde van los avisos y la
+ * respuesta automática FUERA del sitio publicado, porque la base del preview es un clon con
+ * correos reales. Primero el campo «Buzón de pruebas» de «Correo y formularios» (solo
+ * administradores) y, vacío, la variable `SOLICITUDES_EMAIL_TO`. En producción NUNCA se usa el del
+ * panel: devuelve solo la variable, como siempre (sin ella, vacío).
+ */
+export function buzonDePruebas(env: Entorno, buzonDelPanel?: string | null): string {
+  if (env.VERCEL_ENV === "production") return leer(env, "SOLICITUDES_EMAIL_TO");
+  return buzonDelPanel?.trim() || leer(env, "SOLICITUDES_EMAIL_TO");
 }
 
 /**

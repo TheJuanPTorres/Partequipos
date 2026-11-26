@@ -4786,6 +4786,10 @@ export interface CorreoFormulario {
    * A este correo llegan las hojas de vida de «Trabaja con nosotros» («Enviar HV»), con el PDF adjunto (no se guarda en el sitio). Vacío, el correo para solicitudes. Solo cuenta en el sitio publicado.
    */
   correoHojasDeVida?: string | null;
+  /**
+   * Solo para administradores. A este correo llegan los avisos y la respuesta automática de los formularios en los PREVIEWS (nunca en el sitio publicado, donde este campo no se usa): la base de un preview es una copia con correos reales, así que allí no se escribe a nadie más. Vacío, se usa la variable SOLICITUDES_EMAIL_TO de Vercel; sin ninguna, no se envía nada.
+   */
+  buzonPruebas?: string | null;
   respuestaActiva?: boolean | null;
   respuestaAsunto?: string | null;
   /**
@@ -5172,6 +5176,7 @@ export interface BuscadorSelect<T extends boolean = true> {
 export interface CorreoFormulariosSelect<T extends boolean = true> {
   correoSolicitudes?: T;
   correoHojasDeVida?: T;
+  buzonPruebas?: T;
   respuestaActiva?: T;
   respuestaAsunto?: T;
   respuestaTexto?: T;

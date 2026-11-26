@@ -110,7 +110,7 @@ export default async function UnidadUsadaPage({ params }: { params: Promise<Para
   const fotos: FotoFicha[] = (Array.isArray(unidad.imagenes) ? unidad.imagenes : [])
     .map((img) => imagenDeMedia(img, unidad.nombre))
     .filter((img): img is NonNullable<typeof img> => img !== null)
-    .map(({ url, alt, width, height }) => ({ url, alt, width, height }));
+    .map(({ url, alt, width, height, posicion }) => ({ url, alt, width, height, posicion }));
 
   const datos = datosDeUnidad({
     ...unidad,

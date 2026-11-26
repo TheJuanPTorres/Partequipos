@@ -92,22 +92,14 @@
   width: min(820px, 100vw - 2 * var(--mega-curva) - 20px);
   pointer-events: none;
   /*
-   * ABRIR Y CERRAR, EN ESPEJO (tanda 24, Juan Pablo): el panel se DESPLIEGA desde la barra hacia
-   * abajo (un recorte que se abre: `clip-path`, sin tocar la maqueta, CLS 0) y al cerrar se
-   * RECOGE hacia la barra, mientras su contenido se funde (`.caja`). Antes el contenido se fundía
-   * y el fondo blanco se quedaba entero hasta desaparecer de golpe. Son transiciones CSS de un
-   * valor a otro: si el ratón vuelve a mitad del cierre (o se va a mitad de la apertura), siguen
-   * desde donde estaban, sin salto. Al abrir, salida suave; al cerrar, entrada suave. Los lados del recorte
-   * van holgados: las curvas de arriba salen 20 px por cada lado. Abajo, en %: así el valor a mitad
-   * de la transición es un porcentaje y se puede medir (`qa:menu-animacion`).
+   * ABRIR Y CERRAR, EN ESPEJO (tanda 24, Juan Pablo; tanda 25, tarea 4): el panel se DESPLIEGA
+   * desde la barra hacia abajo y al cerrar se RECOGE hacia ella, mientras su contenido se funde
+   * (`.caja`). Lo que cambia es el ALTO REAL del contorno (`.forma`, que lleva el filete y las
+   * esquinas redondeadas nativas) y, con él, el recorte redondeado del contenido: lo interpola
+   * `MarcoMegamenu` fotograma a fotograma (280 ms al abrir, 220 al cerrar; nada cambia de sitio
+   * en la maqueta: CLS 0). Hasta la tanda 25 era un recorte RECTO de este lienzo, que al cerrar
+   * cortaba las esquinas de abajo y se llevaba el filete.
    */
-  clip-path: inset(0 -40px 100% -40px);
-  transition: clip-path 0.22s cubic-bezier(0.4, 0, 1, 1);
-}
-
-.marco[data-abierto="si"] .lienzo {
-  clip-path: inset(0 -40px 0% -40px);
-  transition: clip-path 0.28s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .contorno {
@@ -145,7 +137,14 @@
   position: absolute;
   top: 0;
   width: calc(var(--mega-curva) + 1px);
-  height: var(--mega-curva);
+  /*
+   * Con el contorno más bajo que la curva (el final del cierre), la curva no asoma por debajo:
+   * se queda con su parte de arriba (el fondo va anclado arriba, a su tamaño de siempre).
+   */
+  height: min(var(--mega-curva), var(--mega-alto, var(--mega-curva)));
+  background-repeat: no-repeat;
+  background-position: top;
+  background-size: 100% var(--mega-curva);
 }
 
 .forma::before {
@@ -229,7 +228,7 @@
 
 /*
  * EL FUNDIDO va SOLO en el contenido. El fondo y el filete no se funden: el panel es blanco
- * SÓLIDO (dirección, 2026-10-17) y se despliega o se recoge con el recorte de `.lienzo`. Al
+ * SÓLIDO (dirección, 2026-10-17) y se despliega o se recoge con el alto de `.forma`. Al
  * abrir, el contenido aparece un instante después de que empiece a bajar el panel; al cerrar,
  * se funde a la vez que el panel sube (el orden inverso), y acaba con él.
  */
@@ -255,9 +254,7 @@
     transition: none;
   }
 
-  /* El panel no se despliega y el contenido no se funde: aparecen y desaparecen. */
-  .lienzo,
-  .marco[data-abierto="si"] .lienzo,
+  /* El panel no se despliega (lo decide `MarcoMegamenu`) y el contenido no se funde. */
   .caja,
   .marco[data-abierto="si"] .caja {
     transition: none;

@@ -29,14 +29,16 @@ export function encajeDeFoto(foto: FotoFicha): "cubrir" | "entera" {
 }
 
 /**
- * El `sizes` de una foto. Hasta 1024 px la caja es 4:3: una foto que la cubre y es más ancha
- * (3:2) se pinta más ancha que la caja, así que esos valores se multiplican por lo que sobresale.
- * El de escritorio (el primero, `min-width: 1025px`), tal cual: allí la caja tiene su alto fijo.
+ * El `sizes` de una foto. Hasta 1024 px la caja es 4:3 y lo pintado depende del encaje: una foto
+ * que la cubre y es más ancha (3:2) sobresale de la caja, y una entera más estrecha (vertical,
+ * cuadrada) ocupa solo su parte; esos valores se multiplican por esa fracción. El de escritorio
+ * (el primero, `min-width: 1025px`), tal cual: allí la caja tiene su alto fijo.
  */
 export function sizesDeFoto(sizes: string, foto: FotoFicha): string {
-  if (encajeDeFoto(foto) !== "cubrir") return sizes;
-  const factor = foto.width / foto.height / PROPORCION_VISOR;
-  if (factor <= 1.01) return sizes;
+  if (!foto.width || !foto.height) return sizes;
+  const relacion = foto.width / foto.height / PROPORCION_VISOR;
+  const factor = encajeDeFoto(foto) === "cubrir" ? Math.max(1, relacion) : Math.min(1, relacion);
+  if (Math.abs(factor - 1) <= 0.01) return sizes;
   const k = Math.ceil(factor * 1000) / 1000;
   return partesDeSizes(sizes)
     .map((parte) => {

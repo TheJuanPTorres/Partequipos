@@ -21,9 +21,16 @@ describe("encajeDeFoto (caja 4:3 de la galería)", () => {
 });
 
 describe("sizesDeFoto", () => {
-  it("una 4:3 o una entera, el sizes tal cual", () => {
+  it("una 4:3 o una 16:9 entera (llena el ancho), el sizes tal cual", () => {
     assert.equal(sizesDeFoto(SIZES, foto(1600, 1200)), SIZES);
-    assert.equal(sizesDeFoto(SIZES, foto(1536, 2048)), SIZES);
+    assert.equal(sizesDeFoto(SIZES, foto(1920, 1080)), SIZES);
+  });
+
+  it("una vertical entera pide solo su parte de la caja en tablet y móvil", () => {
+    assert.equal(
+      sizesDeFoto(SIZES, foto(1536, 2048)),
+      "(min-width: 1025px) max(810px, 50.625vw), (min-width: 768px) calc(88vw * 0.563), calc(85vw * 0.563)",
+    );
   });
 
   it("una 3:2 pide lo que sobresale en tablet y móvil, no en escritorio", () => {

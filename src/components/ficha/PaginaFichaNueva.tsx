@@ -94,7 +94,7 @@ export async function PaginaFichaNueva({
   const fotos: FotoFicha[] = (Array.isArray(equipo.imagenes) ? equipo.imagenes : [])
     .map((img) => imagenDeMedia(img, equipo.nombre))
     .filter((img): img is NonNullable<typeof img> => img !== null)
-    .map(({ url, alt, width, height }) => ({ url, alt, width, height }));
+    .map(({ url, alt, width, height, posicion }) => ({ url, alt, width, height, posicion }));
 
   // Máximo 5 características (regla del cliente): las de prioridad y, si faltan, otras reales.
   // «Atributos destacados» del panel; sin ninguno, los de siempre (los elige el código de la ficha técnica).

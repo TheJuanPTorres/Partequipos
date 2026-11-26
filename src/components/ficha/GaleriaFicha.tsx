@@ -12,7 +12,7 @@ import Image from "next/image";
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 
 import estilos from "./ficha.module.css";
-import { sizesDeFoto, type FotoFicha } from "@/lib/ficha/sizesGaleria";
+import { encajeDeFoto, sizesDeFoto, type FotoFicha } from "@/lib/ficha/sizesGaleria";
 
 /**
  * GALERÍA DE LA FICHA (ux-9, ficha V2: `uc_slider_image` + `remote_tabs`).
@@ -46,18 +46,11 @@ export function GaleriaFicha({
   nombre,
   sinFondo = false,
   sizesFoto = SIZES_FOTO,
-  altoMovil,
 }: {
   fotos: FotoFicha[];
   nombre: string;
-  /** Lo que pinta la foto grande (con `cover`, puede ser más que su caja). */
+  /** Lo que pinta la foto grande. Hasta 1024 px la caja es 4:3 (`sizesDeFoto` ajusta las 3:2). */
   sizesFoto?: string;
-  /**
-   * El alto de la foto grande en móvil (≤ 767), si con `cover` se pinta más ancha que la pantalla:
-   * entonces se pide a ese alto × la proporción de cada foto (la CX130D, 400 px de alto: 752 de
-   * ancho a 390, y con «85vw» se pedía a 384). Sin él, el `sizes` tal cual.
-   */
-  altoMovil?: number;
   /** Sin el fondo desenfocado de la tarjeta (ficha de maquinaria nueva, fondo neutro). */
   sinFondo?: boolean;
 }) {
@@ -211,13 +204,33 @@ export function GaleriaFicha({
                 aria-roledescription="diapositiva"
                 aria-label={`${i + 1} de ${total}`}
               >
+                {/*
+                  Una foto que no cabe en la caja sin perder más del 15 % (vertical, cuadrada,
+                  16:9) va ENTERA sobre la misma foto desenfocada; las demás la cubren con su
+                  punto focal (tanda 25, t5).
+                */}
+                {encajeDeFoto(f) === "entera" ? (
+                  <Image
+                    src={f.url}
+                    alt=""
+                    aria-hidden="true"
+                    fill
+                    sizes="max(64px, 4vw)"
+                    className={estilos.fondoDiapositiva}
+                  />
+                ) : null}
                 <Image
                   src={f.url}
                   alt={f.alt}
                   fill
                   priority={i === 0}
-                  sizes={sizesDeFoto(sizesFoto, altoMovil, f)}
-                  className={estilos.fotoVisor}
+                  sizes={sizesDeFoto(sizesFoto, f)}
+                  className={
+                    encajeDeFoto(f) === "entera"
+                      ? `${estilos.fotoVisor} ${estilos.fotoEntera}`
+                      : estilos.fotoVisor
+                  }
+                  style={f.posicion ? { objectPosition: f.posicion } : undefined}
                 />
               </li>
             ))}

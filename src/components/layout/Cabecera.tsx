@@ -944,6 +944,7 @@ export function Cabecera({
         ref={cabecera}
         className={estilos.cabecera}
         data-portada={esPortada ? "si" : "no"}
+        data-diag-ruta={ruta}
         data-modo={modoCabecera({
           esPortada,
           arriba,

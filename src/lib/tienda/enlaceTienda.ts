@@ -58,4 +58,4 @@ export type OrigenTienda = "modelo" | "categoria" | "tipo-repuesto" | "producto"
 
 /** El texto de ayuda de «Enlace en la tienda», igual en los cuatro sitios del panel. */
 export const AYUDA_ENLACE_TIENDA = (que: string) =>
-  `Opcional. La dirección (https://…) de la página de ${que} en la tienda, por ejemplo https://… página de este producto en la tienda. Si lo dejas vacío, lleva a la tienda general (la del botón «Tienda» de la cabecera).`;
+  `Opcional. La dirección (https://…) de la página de ${que} en la tienda. Si lo dejas vacío, lleva a la tienda general (la del botón «Tienda» de la cabecera).`;

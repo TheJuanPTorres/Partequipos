@@ -10,7 +10,7 @@ export function campoEnlaceTienda(que: string): TextField {
     label: "Enlace en la tienda",
     validate: validarEnlaceTienda,
     admin: {
-      placeholder: "https://… página de este producto en la tienda",
+      placeholder: `https://… página de ${que} en la tienda`,
       description: AYUDA_ENLACE_TIENDA(que),
     },
   };

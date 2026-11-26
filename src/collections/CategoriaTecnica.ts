@@ -1,4 +1,5 @@
 import type { CollectionConfig, RelationshipFieldSingleValidation, Where } from "payload";
+import { campoEnlaceTienda } from "../lib/tienda/campo";
 import { ocultoSinUso } from "../lib/fields/ocultoSinUso";
 
 import { validarColor } from "../lib/fields/tipografiaTitulo";
@@ -173,6 +174,7 @@ export const CategoriaTecnica: CollectionConfig = {
         type: "textarea",
         label: "Descripción",
       },
+      campoEnlaceTienda("esta categoría"),
       /*
        * Fase B de la home: tarjeta apilada de la sección 5 de ux-9. Opcional.
        *
@@ -372,6 +374,7 @@ export const CategoriaTecnica: CollectionConfig = {
                 "Opcional. Una o dos frases bajo el nombre, en su tarjeta (p. ej. para qué sirve ese tipo de filtro). Un grupo con descripción sale aunque no tenga productos.",
             },
           },
+          campoEnlaceTienda("este tipo de repuesto"),
           {
             name: "productos",
             type: "array",
@@ -379,7 +382,10 @@ export const CategoriaTecnica: CollectionConfig = {
             labels: { singular: "Producto", plural: "Productos" },
             maxRows: 40,
             admin: { initCollapsed: true },
-            fields: [{ name: "texto", type: "text", required: true, label: "Producto" }],
+            fields: [
+              { name: "texto", type: "text", required: true, label: "Producto" },
+              campoEnlaceTienda("este producto"),
+            ],
           },
         ],
       },

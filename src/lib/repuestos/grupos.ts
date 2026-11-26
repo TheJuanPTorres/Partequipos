@@ -18,13 +18,20 @@ export type GrupoVista = {
   descripcion: string | null;
   imagen: ImagenLista | null;
   productos: string[];
+  /** «Enlace en la tienda» propio del grupo (tipo de repuesto), sin resolver; `null` = el general. */
+  enlaceTienda: string | null;
+  /** Lo mismo de cada producto, en el orden de `productos`. */
+  enlacesProductos: (string | null)[];
 };
 
 export function gruposDeCategoria(categoria: CategoriasTecnica): GrupoVista[] {
   const grupos: GrupoVista[] = [];
   (categoria.grupos ?? []).forEach((g, i) => {
     const nombre = g.nombre?.trim() ?? "";
-    const productos = (g.productos ?? []).map((p) => p.texto?.trim() ?? "").filter(Boolean);
+    const filas = (g.productos ?? [])
+      .map((p) => ({ texto: p.texto?.trim() ?? "", enlace: p.enlaceTienda?.trim() || null }))
+      .filter((p) => p.texto);
+    const productos = filas.map((p) => p.texto);
     const descripcion = g.descripcion?.trim() || null;
     if (g.mostrar === false || !nombre || (productos.length === 0 && !descripcion)) return;
     grupos.push({
@@ -33,6 +40,8 @@ export function gruposDeCategoria(categoria: CategoriasTecnica): GrupoVista[] {
       descripcion,
       imagen: imagenDeMedia(g.imagen, `${nombre} para maquinaria pesada`),
       productos,
+      enlaceTienda: g.enlaceTienda?.trim() || null,
+      enlacesProductos: filas.map((p) => p.enlace),
     });
   });
   return grupos;

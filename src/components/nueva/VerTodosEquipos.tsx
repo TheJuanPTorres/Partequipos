@@ -23,6 +23,7 @@ import {
   type ReactNode,
 } from "react";
 
+import { BotonTienda } from "@/components/tienda/BotonTienda";
 import type { ConfigFormulario } from "@/lib/formularios/configFormulario";
 import { tituloDeVentana } from "@/lib/formularios/tituloVentana";
 import { coincideModelo, enOrdenNatural, normalizarBusqueda } from "@/lib/repuestos/buscarModelo";
@@ -46,6 +47,8 @@ export type ElementoPanel = {
   nombre: string;
   href: string | null;
   imagen?: ImagenLista | null;
+  /** Productos (con `cotizar`): su destino de «Ver en la tienda», ya resuelto; sin él, sin botón. */
+  tienda?: string | null;
 };
 
 /** Sin la barra final ni el ancla, para comparar una ruta con la página en la que se está. */
@@ -277,7 +280,11 @@ export function VerTodosEquipos({
               {cotizar ? (
                 <ul className={`${panel.lista} ${panel.listaFilas}`}>
                   {visibles.map((e, i) => (
-                    <li key={e.id} style={{ "--i": Math.min(i, 12) } as CSSProperties}>
+                    <li
+                      key={e.id}
+                      className={panel.filaProducto}
+                      style={{ "--i": Math.min(i, 12) } as CSSProperties}
+                    >
                       <button
                         type="button"
                         className={panel.fila}
@@ -295,10 +302,26 @@ export function VerTodosEquipos({
                           {e.nombre}
                           <span className="sr-only">: cotizar</span>
                         </span>
-                        <span className={panel.flecha} aria-hidden="true">
-                          <IconMessageCircle focusable="false" stroke={2} size={22} />
-                        </span>
+                        {/* Sin tienda (el panel no tiene su enlace), el icono de mensaje de siempre. */}
+                        {e.tienda ? null : (
+                          <span className={panel.flecha} aria-hidden="true">
+                            <IconMessageCircle focusable="false" stroke={2} size={22} />
+                          </span>
+                        )}
                       </button>
+                      {/*
+                       * «Ver en la tienda» (2026-11-26): el icono de la derecha pasa a ser un botón
+                       * de fondo oscuro con el icono de la tienda, de 44 px, aparte del nombre: el
+                       * nombre abre el formulario de cotización y este botón lleva a la tienda.
+                       */}
+                      {e.tienda ? (
+                        <BotonTienda
+                          href={e.tienda}
+                          origen="producto"
+                          nombre={e.nombre}
+                          className={panel.tienda}
+                        />
+                      ) : null}
                     </li>
                   ))}
                 </ul>

@@ -162,7 +162,11 @@ export function FichaProducto({
           {/* Cabecera (migas + título): en móvil lleva un velo oscuro para que el título blanco se lea con cualquier foto. */}
           <div className={estilos.cabeceraDatos}>
             {/* Migas: la ruta COMPLETA en la píldora (desviación aprobada, decisiones-ficha.md). */}
-            <nav aria-label="Ruta de navegación" className={estilos.migas}>
+            {/* Con su copia oculta, que reserva el alto que tendrán con Inter (`migasReserva`). */}
+            <nav
+              aria-label="Ruta de navegación"
+              className={`${estilos.migas} ${estilos.migasReserva}`}
+            >
               <ol>
                 {migas.map((m, i) =>
                   i === migas.length - 1 ? (
@@ -176,6 +180,14 @@ export function FichaProducto({
                     </li>
                   ),
                 )}
+              </ol>
+              <ol aria-hidden="true" className={estilos.copiaMigas}>
+                {migas.map((m, i) => (
+                  <li key={m.path}>
+                    {m.nombre}
+                    {i < migas.length - 1 ? " / " : null}
+                  </li>
+                ))}
               </ol>
             </nav>
 

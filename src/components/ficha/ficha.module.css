@@ -376,6 +376,29 @@
 }
 
 /*
+ * LAS MIGAS RESERVAN SU ALTO (#390 en nueva; usados desde la tanda 25): la lista y una copia
+ * oculta en «Inter Fallback» ensanchada, en la misma celda. La celda mide lo que la más alta de
+ * las dos, así que al llegar Inter no cambia: antes, a 390, la ficha de usada perdía una línea
+ * de migas (75 → 56 px) y el título subía 18 px (CLS 0,03).
+ */
+.migasReserva {
+  display: grid;
+}
+
+.migasReserva > ol {
+  grid-area: 1 / 1;
+  align-self: start;
+}
+
+/* La copia: las mismas líneas que en la fuente de respaldo ensanchada, que ocupa más que Inter. */
+.migasReserva > .copiaMigas {
+  visibility: hidden;
+  pointer-events: none;
+  font-family: "Inter Fallback", ui-sans-serif, system-ui, sans-serif;
+  letter-spacing: 0.04em;
+}
+
+/*
  * EN TABLET, LAS MIGAS EN UNA SOLA LÍNEA (F15, 2026-10-16). Con una ruta que
  * llena justo la línea («… / Aditamentos para excavadoras / Pontones para
  * excavadoras» a 1010), la fuente de respaldo la partía en dos y, al llegar

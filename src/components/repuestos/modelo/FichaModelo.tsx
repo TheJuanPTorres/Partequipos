@@ -4,6 +4,7 @@ import { IconBrandWhatsapp, IconMessageCircle } from "@tabler/icons-react";
 import { Breadcrumbs } from "@/components/catalog/Breadcrumbs";
 import { CategoriasFicha } from "@/components/repuestos/CategoriasFicha";
 import { BotonFormulario } from "@/components/forms/BotonFormulario";
+import { BotonTienda } from "@/components/tienda/BotonTienda";
 import { LogoOpticoServidor } from "@/components/marca/LogoOpticoServidor";
 import type { ConfigFormulario } from "@/lib/formularios/configFormulario";
 import type { LogoConAlt } from "@/lib/marca/logoMarca";
@@ -27,7 +28,8 @@ const CAJA_LOGO_FICHA: CajaRelativa = { proporcion: 3.5, area: 0.54, tope: 0.92 
  *
  * 1. Las migas.
  * 2. El logo de la marca, una línea de separación y el `<h1>` con su línea de descripción.
- * 3. «Pedir cotización» (abre la VENTANA del formulario del sitio con el modelo ya puesto) y el
+ * 3. «Pedir cotización» (abre la VENTANA del formulario del sitio con el modelo ya puesto), «Ver en
+ *    la tienda» (2026-11-26, botón oscuro con el icono de la tienda) y el
  *    botón verde de WhatsApp, a la derecha desde xl (1280 px) y debajo en pantallas menores.
  * 4. Los tipos de repuesto del tipo de máquina como tarjetas con panel del tono de la marca,
  *    DEBAJO y a todo el ancho.
@@ -44,6 +46,8 @@ export function FichaModelo({
   tituloCategorias,
   formulario,
   whatsapp,
+  tienda,
+  tiendaGeneral,
 }: {
   migas: BreadcrumbItem[];
   titulo: string;
@@ -57,6 +61,10 @@ export function FichaModelo({
   formulario: ConfigFormulario;
   /** El enlace de WhatsApp con el modelo en el mensaje; sin número, no hay botón. */
   whatsapp?: string;
+  /** El destino de «Ver en la tienda» del modelo (el suyo o el general); sin él, no hay botón. */
+  tienda?: string | null;
+  /** La tienda general, para las tarjetas de categoría que no tienen enlace propio. */
+  tiendaGeneral?: string | null;
 }) {
   return (
     <section className={estilos.ficha} aria-labelledby="modelo-titulo">
@@ -106,6 +114,11 @@ export function FichaModelo({
             <IconMessageCircle aria-hidden="true" focusable="false" stroke={2} size={20} />
             Pedir cotización
           </BotonFormulario>
+          {tienda ? (
+            <BotonTienda href={tienda} origen="modelo" className={estilos.botonTienda}>
+              Ver en la tienda
+            </BotonTienda>
+          ) : null}
           {whatsapp ? (
             <a
               href={whatsapp}
@@ -122,7 +135,12 @@ export function FichaModelo({
         </div>
       </div>
 
-      <CategoriasFicha id="modelo-categorias" titulo={tituloCategorias} categorias={categorias} />
+      <CategoriasFicha
+        id="modelo-categorias"
+        titulo={tituloCategorias}
+        categorias={categorias}
+        tiendaGeneral={tiendaGeneral}
+      />
     </section>
   );
 }

@@ -103,6 +103,7 @@
 }
 
 .botonCotizar,
+.botonTienda,
 .botonWhatsapp {
   display: inline-flex;
   min-height: 48px;
@@ -129,6 +130,15 @@
   background: #c81e26;
 }
 
+/* «Ver en la tienda» (2026-11-26): oscuro, entre el rojo de cotizar y el verde de WhatsApp. */
+.botonTienda {
+  background: #1f1f1f;
+}
+
+.botonTienda:hover {
+  background: #3a3a3a;
+}
+
 /* #0F7B45 con texto blanco da 5,3:1 (AA), como el de los formularios. */
 .botonWhatsapp {
   background: #0f7b45;
@@ -139,6 +149,7 @@
 }
 
 .botonCotizar:focus-visible,
+.botonTienda:focus-visible,
 .botonWhatsapp:focus-visible {
   outline: 3px solid var(--color-texto);
   outline-offset: 3px;
@@ -190,6 +201,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .botonCotizar,
+  .botonTienda,
   .botonWhatsapp {
     transition: none;
   }

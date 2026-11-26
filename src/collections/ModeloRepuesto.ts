@@ -1,4 +1,5 @@
 import type { CollectionConfig } from "payload";
+import { campoEnlaceTienda } from "../lib/tienda/campo";
 import { ocultoSinUso } from "../lib/fields/ocultoSinUso";
 
 import { seoField } from "../lib/fields/seoField";
@@ -121,6 +122,7 @@ export const ModeloRepuesto: CollectionConfig = {
           return marca ? { marca: { equals: marca } } : true;
         },
       },
+      campoEnlaceTienda("este modelo"),
       {
         name: "codigo",
         type: "text",

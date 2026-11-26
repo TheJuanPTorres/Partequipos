@@ -1,4 +1,6 @@
 import { ContextoWhatsApp } from "@/components/layout/ContextoWhatsApp";
+import { getCabecera } from "@/lib/queries/getCabecera";
+import { destinoTienda, enlaceTiendaGeneral } from "@/lib/tienda/enlaceTienda";
 import type { Metadata } from "next";
 
 import { PieSinTarjeta } from "@/components/layout/PieSinTarjeta";
@@ -69,7 +71,13 @@ export async function PaginaModeloRepuesto({
   tipo: TiposEquipo;
   modelo: ModelosRepuesto;
 }) {
-  const [categorias, empresa] = await Promise.all([getCategoriasParaMarca(), getEmpresa()]);
+  const [categorias, empresa, cabecera] = await Promise.all([
+    getCategoriasParaMarca(),
+    getEmpresa(),
+    getCabecera(),
+  ]);
+  // «Ver en la tienda» (2026-11-26): el enlace del modelo o, vacío, la tienda general del panel.
+  const tiendaGeneral = enlaceTiendaGeneral(cabecera.enlaces);
   const seg = segmentoDeTipo(tipo);
   const padre = poblado<TiposEquipo>(tipo.tipoPadre);
   const ruta = rutas.modelo(marca.slug, seg, modelo.slug);
@@ -129,6 +137,8 @@ export async function PaginaModeloRepuesto({
           logo={logo}
           linea={lineaDeTexto(modelo.descripcion)}
           whatsapp={whatsappConModelo?.href}
+          tienda={destinoTienda(modelo.enlaceTienda, tiendaGeneral)}
+          tiendaGeneral={tiendaGeneral}
           formulario={configContactoMarca({
             origen: ruta,
             siteKey: turnstileSiteKey(),

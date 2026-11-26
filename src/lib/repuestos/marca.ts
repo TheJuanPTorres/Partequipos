@@ -118,6 +118,8 @@ export type TarjetaMarca = {
   pieza?: LogoMarca;
   /** Con él, «Ver todo» abre el panel con la lista; sin JavaScript sigue llevando a `href`. */
   panel?: PanelTarjeta;
+  /** «Enlace en la tienda» propio de la tarjeta (categoría técnica), sin resolver (2026-11-26). */
+  enlaceTienda?: string | null;
 };
 
 /**

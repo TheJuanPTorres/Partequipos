@@ -90,3 +90,33 @@ describe("mensajeCotizar", () => {
     assert.equal(enFrase(" BOMBAS "), "Bombas");
   });
 });
+
+describe("gruposDeCategoria: enlaces de la tienda", () => {
+  it("lleva el del grupo y el de cada producto, en su orden; vacío, null", () => {
+    const [g] = gruposDeCategoria(
+      categoria([
+        {
+          id: "a",
+          nombre: "Cadena",
+          enlaceTienda: " https://tienda.ejemplo.test/cadenas ",
+          productos: [
+            { texto: "Cadena A" },
+            { texto: "Cadena B", enlaceTienda: "https://tienda.ejemplo.test/b" },
+            { texto: "  " },
+            { texto: "Cadena C", enlaceTienda: "" },
+          ],
+        },
+      ]),
+    );
+    assert.equal(g?.enlaceTienda, "https://tienda.ejemplo.test/cadenas");
+    assert.deepEqual(g?.productos, ["Cadena A", "Cadena B", "Cadena C"]);
+    assert.deepEqual(g?.enlacesProductos, [null, "https://tienda.ejemplo.test/b", null]);
+  });
+  it("sin ningún enlace, todo null (la web usa la tienda general)", () => {
+    const [g] = gruposDeCategoria(
+      categoria([{ id: "a", nombre: "Cadena", productos: [{ texto: "X" }] }]),
+    );
+    assert.equal(g?.enlaceTienda, null);
+    assert.deepEqual(g?.enlacesProductos, [null]);
+  });
+});

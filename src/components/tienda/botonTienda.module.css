@@ -1,0 +1,33 @@
+/*
+ * El botón «Ver en la tienda» de solo icono: cuadrado de 44 px (área de pulsación mínima), fondo
+ * oscuro e icono claro. Tamaño fijo en las dos direcciones a propósito: es un icono, no texto.
+ */
+.icono {
+  display: inline-flex;
+  width: 44px;
+  height: 44px;
+  flex: none;
+  box-sizing: border-box;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  background: #1f1f1f;
+  color: #fff;
+  text-decoration: none;
+  transition: background-color 0.25s;
+}
+
+.icono:hover {
+  background: #e5242d;
+}
+
+.icono:focus-visible {
+  outline: 3px solid var(--color-texto, #1a1a1a);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .icono {
+    transition: none;
+  }
+}

@@ -8,6 +8,7 @@
  * | `clic_whatsapp`          | Clic en un enlace de WhatsApp de la empresa              | `ubicacion`            |
  * | `clic_llamada`           | Clic en un teléfono (`tel:`)                             | —                      |
  * | `clic_cotizar`           | Clic en un botón «Cotizar…»                              | —                      |
+ * | `clic_tienda`            | Clic en un botón «Ver en la tienda» (2026-11-26)         | `elemento`             |
  * | `ficha_tecnica`          | Abrir o descargar una ficha técnica (PDF)                | `accion`, `archivo`    |
  * | `envio_formulario`       | Un formulario enviado con éxito                          | `formulario`           |
  * | `busqueda`               | Una búsqueda (página de resultados o panel de la lupa)   | `termino`, `resultados`|
@@ -17,6 +18,7 @@ export type Evento =
   | { nombre: "clic_whatsapp"; parametros: { ubicacion: "flotante" | "boton" } }
   | { nombre: "clic_llamada"; parametros: Record<string, never> }
   | { nombre: "clic_cotizar"; parametros: Record<string, never> }
+  | { nombre: "clic_tienda"; parametros: { elemento: string } }
   | { nombre: "ficha_tecnica"; parametros: { accion: "ver" | "descargar"; archivo: string } };
 
 /** Lo que se mira del enlace o botón pulsado. */
@@ -76,6 +78,11 @@ export function clasificarClic(p: Pulsado): Evento | null {
       parametros: { accion: p.abreVentana ? "ver" : "descargar", archivo: fichero(u) },
     };
   }
+
+  // «Ver en la tienda»: `data-analitica="tienda:<elemento de origen>"` (modelo, categoria,
+  // tipo-repuesto o producto). Va antes que «cotizar»: el nombre del botón no lo confunde.
+  const tienda = /^tienda:([a-z-]{1,30})$/.exec(p.marca ?? "");
+  if (tienda) return { nombre: "clic_tienda", parametros: { elemento: tienda[1]! } };
 
   if (p.marca === "cotizar" || /^\s*cotiza/i.test(p.texto)) {
     return { nombre: "clic_cotizar", parametros: {} };

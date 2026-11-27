@@ -10,12 +10,16 @@
  *   cita, enlace e imagen con texto alternativo; comprueba que tiene 1 versión, la vuelve a guardar
  *   con un cambio y comprueba que tiene 2. Por último, que un BORRADOR con una imagen pegada sin
  *   fichero también se rechaza.
- * - `retirar`: borra «prueba-pagina-libre» (y sus versiones) y comprueba que no queda nada.
+ * - `retirar [prueba-…]`: borra «prueba-pagina-libre» y las otras páginas «prueba-…» que se le
+ *   pasen (con sus versiones) y comprueba que no queda nada.
  */
 import { errorDeFormato, errorDeReservada } from "../../src/lib/paginas/direccion";
 import { veredictoEntornoPreview } from "../../src/lib/preview/entornoPreview";
 
 const SLUG = "prueba-pagina-libre";
+// `retirar` borra también otras páginas de prueba del preview que se le pasen, solo si empiezan por
+// «prueba-» (p. ej. «prueba-pegado-c», la del apoyo de C, que el editor no puede borrar).
+const OTRAS = process.argv.filter((a) => /^prueba-[a-z0-9-]+$/.test(a) && a !== SLUG);
 const modo = process.argv.find((a) => a === "crear" || a === "retirar");
 if (!modo) throw new Error("Uso: crear | retirar");
 if (process.env.ENTORNO_PREVIEW !== "1") {
@@ -219,7 +223,7 @@ if (modo === "crear") {
 } else {
   const { docs } = await payload.find({
     collection: "paginas",
-    where: { slug: { equals: SLUG } },
+    where: { slug: { in: [SLUG, ...OTRAS] } },
     depth: 0,
     overrideAccess: true,
   });
@@ -228,11 +232,12 @@ if (modo === "crear") {
   }
   const queda = await payload.count({
     collection: "paginas",
-    where: { slug: { equals: SLUG } },
+    where: { slug: { in: [SLUG, ...OTRAS] } },
     overrideAccess: true,
   });
-  const versiones = docs.length ? await contarVersiones(docs[0]!.id) : 0;
+  let versiones = 0;
+  for (const d of docs) versiones += await contarVersiones(d.id);
   console.log(
-    `✓ retirada: borradas ${docs.length}; quedan ${queda.totalDocs} páginas y ${versiones} versiones (esperado 0 y 0)`,
+    `✓ retirada: borradas ${docs.length} (${docs.map((d) => d.slug).join(", ")}); quedan ${queda.totalDocs} páginas y ${versiones} versiones (esperado 0 y 0)`,
   );
 }

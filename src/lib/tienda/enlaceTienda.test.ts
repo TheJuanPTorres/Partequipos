@@ -2,7 +2,12 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
 import {
+  destinoPorNombre,
   destinoTienda,
+  esBusquedaTiendaValida,
+  nombreCorto,
+  urlBusqueda,
+  validarBusquedaTienda,
   enlaceTiendaGeneral,
   esEnlaceTiendaValido,
   validarEnlaceTienda,
@@ -83,6 +88,102 @@ describe("destino de un botón", () => {
     assert.equal(
       destinoTienda("https://tienda.ejemplo.test/p/1", null),
       "https://tienda.ejemplo.test/p/1",
+    );
+  });
+});
+
+const BUSQUEDA = "https://tienda.ejemplo.test/catalogsearch/result/?q=";
+const GENERAL = "https://tienda.ejemplo.test/";
+
+describe("la búsqueda de la tienda", () => {
+  it("el campo del panel: https y terminada en el parámetro; vacío vale", () => {
+    assert.equal(esBusquedaTiendaValida(BUSQUEDA), true);
+    assert.equal(validarBusquedaTienda(""), true);
+    assert.equal(validarBusquedaTienda(null), true);
+    assert.equal(validarBusquedaTienda(BUSQUEDA), true);
+    for (const mala of [
+      "https://tienda.ejemplo.test/buscar",
+      "http://tienda.ejemplo.test/?q=",
+      "tienda?q=",
+      "/buscar?q=",
+    ]) {
+      assert.match(String(validarBusquedaTienda(mala)), /https:\/\//, mala);
+    }
+  });
+
+  it("el nombre corto quita «para maquinaria pesada» del final", () => {
+    assert.equal(nombreCorto("CADENA PARA MAQUINARIA PESADA"), "CADENA");
+    assert.equal(nombreCorto("CADENA PARA EXCAVADORA MAQUINARIA PESADA"), "CADENA PARA EXCAVADORA");
+    assert.equal(nombreCorto("  Filtro   de aire para maquinaria  pesada "), "Filtro de aire");
+    assert.equal(nombreCorto("Tren de Rodaje"), "Tren de Rodaje");
+    assert.equal(nombreCorto("Maquinaria pesada"), "Maquinaria pesada");
+    assert.equal(nombreCorto("Bulldozer maquinaria pesada ZX"), "Bulldozer maquinaria pesada ZX");
+    assert.equal(nombreCorto(null), "");
+  });
+
+  it("la URL lleva el nombre codificado: tildes, espacios y «&»", () => {
+    assert.equal(urlBusqueda(BUSQUEDA, "CADENA PARA MAQUINARIA PESADA"), `${BUSQUEDA}CADENA`);
+    assert.equal(
+      urlBusqueda(BUSQUEDA, "Sección de cadena para maquinaria pesada"),
+      `${BUSQUEDA}Secci%C3%B3n%20de%20cadena`,
+    );
+    assert.equal(
+      urlBusqueda(BUSQUEDA, "Pin & buje para maquinaria pesada"),
+      `${BUSQUEDA}Pin%20%26%20buje`,
+    );
+    assert.equal(urlBusqueda(BUSQUEDA, "Rodillo #1 +2"), `${BUSQUEDA}Rodillo%20%231%20%2B2`);
+  });
+
+  it("sin base válida o sin nombre, no hay búsqueda", () => {
+    assert.equal(urlBusqueda(null, "Cadena"), null);
+    assert.equal(urlBusqueda("https://tienda.ejemplo.test/buscar", "Cadena"), null);
+    assert.equal(urlBusqueda(BUSQUEDA, "  "), null);
+  });
+});
+
+describe("destinoPorNombre: propio → búsqueda → grupo → general", () => {
+  const conTodo = { general: GENERAL, busqueda: BUSQUEDA };
+  it("el enlace propio gana a todo", () => {
+    assert.equal(
+      destinoPorNombre(
+        "https://tienda.ejemplo.test/p/1",
+        "Cadena",
+        conTodo,
+        "https://tienda.ejemplo.test/g",
+      ),
+      "https://tienda.ejemplo.test/p/1",
+    );
+  });
+  it("sin propio, la búsqueda con el nombre corto (gana al del grupo)", () => {
+    assert.equal(
+      destinoPorNombre(
+        "",
+        "CADENA PARA MAQUINARIA PESADA",
+        conTodo,
+        "https://tienda.ejemplo.test/g",
+      ),
+      `${BUSQUEDA}CADENA`,
+    );
+    assert.equal(destinoPorNombre("http://mal.test", "Cadena", conTodo), `${BUSQUEDA}Cadena`);
+  });
+  it("sin búsqueda en el panel, como antes: propio → grupo → general", () => {
+    const sin = { general: GENERAL, busqueda: null };
+    assert.equal(
+      destinoPorNombre(null, "Cadena", sin, "https://tienda.ejemplo.test/g"),
+      "https://tienda.ejemplo.test/g",
+    );
+    assert.equal(destinoPorNombre(null, "Cadena", sin), GENERAL);
+    assert.equal(
+      destinoPorNombre(null, "Cadena", { general: GENERAL, busqueda: "https://x.test/buscar" }),
+      GENERAL,
+    );
+  });
+  it("sin nombre se salta la búsqueda; sin nada, ningún botón", () => {
+    assert.equal(destinoPorNombre(null, "", conTodo), GENERAL);
+    assert.equal(destinoPorNombre(null, "Cadena", { general: null, busqueda: null }), null);
+    assert.equal(
+      destinoPorNombre(null, "Cadena", { general: null, busqueda: BUSQUEDA }),
+      `${BUSQUEDA}Cadena`,
     );
   });
 });

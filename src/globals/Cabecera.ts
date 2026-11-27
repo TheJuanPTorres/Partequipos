@@ -1,5 +1,6 @@
 import type { Field, GlobalConfig } from "payload";
 
+import { validarBusquedaTienda } from "../lib/tienda/enlaceTienda";
 import {
   APARTADOS_POR_DEFECTO,
   TIPO_ENLACE,
@@ -150,6 +151,19 @@ export const Cabecera: GlobalConfig = {
           ],
         },
       ],
+    },
+    {
+      // Los botones «Ver en la tienda» de repuestos (2026-11-27): el nombre corto del elemento se
+      // añade al final y se abre la búsqueda de la tienda. Vacío, van a la tienda general («Tienda»).
+      name: "busquedaTienda",
+      type: "text",
+      label: "Búsqueda de la tienda",
+      validate: validarBusquedaTienda,
+      admin: {
+        placeholder: "https://tienda.partequipos.com/catalogsearch/result/?q=",
+        description:
+          "Opcional. La dirección de la búsqueda de la tienda, terminada en el parámetro de la consulta, por ejemplo https://tienda.partequipos.com/catalogsearch/result/?q= . Los botones «Ver en la tienda» de repuestos le añaden el nombre del repuesto (sin «para maquinaria pesada») y abren esa búsqueda, salvo los que tengan su propio «Enlace en la tienda». Si lo dejas vacío, van a la tienda general (el enlace «Tienda» del menú).",
+      },
     },
     {
       type: "row",

@@ -185,7 +185,10 @@ export default async function CategoriaRepuestosPage({ params }: { params: Promi
             titulo={tituloDeGrupos(categoria.tituloGrupos, nombre, true)}
             categoria={nombre}
             grupos={gruposDeCategoria(categoria)}
-            tiendaGeneral={enlaceTiendaGeneral(cabecera.enlaces)}
+            tienda={{
+              general: enlaceTiendaGeneral(cabecera.enlaces),
+              busqueda: cabecera.busquedaTienda,
+            }}
             formulario={formulario}
             anclaContacto={ANCLA_CONTACTO}
           />

@@ -664,6 +664,17 @@ a.pildora:hover {
   }
 }
 
+/* «Ver en la tienda» (2026-11-27): redondo, de la altura de «Cotizar» y «Ver productos» (40 px; 37 hasta 1024). */
+.tiendaGrupo {
+  --tamano-tienda: 40px;
+}
+
+@media (max-width: 1024px) {
+  .tiendaGrupo {
+    --tamano-tienda: 37px;
+  }
+}
+
 .botonSecundario,
 .tarjetasIndice .botonSecundario {
   border: 1px solid var(--color-texto);

@@ -36,7 +36,7 @@ import { articuloDefinido } from "@/lib/seo/porDefecto";
 import { buildBreadcrumbJsonLd, buildProductJsonLd } from "@/lib/seo/jsonLd";
 import { turnstileSiteKey } from "@/lib/turnstile";
 import { imagenDeMedia, poblado } from "@/lib/utils/relations";
-import { enlaceWhatsApp } from "@/lib/whatsapp";
+import { enlaceWhatsApp, mensajeExperto } from "@/lib/whatsapp";
 import type { EquiposNuevo, MarcasMaquinaria, Media, TiposMaquinaria } from "@/payload-types";
 
 /*
@@ -109,7 +109,7 @@ export async function PaginaFichaNueva({
   const articulo = articuloDefinido(tipo.nombre);
   const experto = enlaceWhatsApp(
     empresa.whatsapp,
-    `Hola, quiero hablar con un experto sobre ${articulo} ${equipo.nombre}: ${urlFicha}`,
+    mensajeExperto(articulo, equipo.nombre, urlFicha),
   );
   const whatsapp = enlaceWhatsApp(
     empresa.whatsapp,

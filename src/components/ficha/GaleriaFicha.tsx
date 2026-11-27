@@ -12,7 +12,7 @@ import Image from "next/image";
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 
 import estilos from "./ficha.module.css";
-import { encajeDeFoto, sizesDeFoto, type FotoFicha } from "@/lib/ficha/sizesGaleria";
+import { encajeDeFoto, sizesDeFoto, teclaGaleria, type FotoFicha } from "@/lib/ficha/sizesGaleria";
 
 /**
  * GALERÍA DE LA FICHA (ux-9, ficha V2: `uc_slider_image` + `remote_tabs`).
@@ -65,6 +65,8 @@ export function GaleriaFicha({
   const dialogo = useRef<HTMLDialogElement>(null);
   const botonCompleta = useRef<HTMLButtonElement>(null);
   const inicioToque = useRef<number | null>(null);
+  const inicioToquePantalla = useRef<number | null>(null);
+  const region = useRef<HTMLDivElement>(null);
   const total = fotos.length;
 
   const carril = useRef<HTMLUListElement>(null);
@@ -176,12 +178,27 @@ export function GaleriaFicha({
         onPointerLeave={() => setEncima(false)}
         onFocus={(e) => setConFoco(e.target.matches(":focus-visible"))}
         onBlur={() => setConFoco(false)}
+        /*
+         * Flechas ←/→ (y Inicio/Fin) con el foco DENTRO de la galería: la foto, las miniaturas o
+         * sus botones (tanda 26, t3; patrón de carrusel accesible). Nunca en toda la página, y con
+         * una sola foto, nada.
+         */
+        onKeyDown={(e) => {
+          const destino = teclaGaleria(e.key, actual, total, e.altKey || e.ctrlKey || e.metaKey);
+          if (destino === null) return;
+          e.preventDefault();
+          setReproduciendo(false);
+          ir(destino);
+        }}
       >
         <div
+          ref={region}
           className={estilos.visor}
           role="region"
           aria-roledescription="carrusel"
           aria-label={`Fotos de ${nombre}`}
+          // Enfocable: las flechas funcionan con la foto, y al hacer clic en ella queda enfocada.
+          tabIndex={total > 1 ? 0 : undefined}
           onPointerDown={(e) => {
             inicioToque.current = e.clientX;
           }}
@@ -192,10 +209,17 @@ export function GaleriaFicha({
             if (Math.abs(dx) > 40) {
               setReproduciendo(false);
               ir(actual + (dx < 0 ? 1 : -1));
+            } else if (total > 1 && !(e.target as Element).closest("button")) {
+              region.current?.focus({ preventScroll: true });
             }
           }}
         >
-          <ul className={estilos.pista} style={{ transform: `translateX(-${actual * 100}%)` }}>
+          <ul
+            className={estilos.pista}
+            style={{ transform: `translateX(-${actual * 100}%)` }}
+            // Con las fotos pasando solas, sin anunciar; quietas, se anuncia la que entra.
+            aria-live={sonando ? "off" : "polite"}
+          >
             {fotos.map((f, i) => (
               <li
                 key={f.url}
@@ -328,22 +352,38 @@ export function GaleriaFicha({
         // Flechas del teclado: foto anterior y siguiente (tanda 22, punto 31). Escape ya lo
         // cierra el propio <dialog>. Con una sola foto no hay adónde ir.
         onKeyDown={(e) => {
-          if (total < 2 || e.altKey || e.ctrlKey || e.metaKey) return;
-          if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
+          const destino = teclaGaleria(e.key, actual, total, e.altKey || e.ctrlKey || e.metaKey);
+          if (destino === null) return;
           e.preventDefault();
-          ir(actual + (e.key === "ArrowRight" ? 1 : -1));
+          ir(destino);
         }}
         onClick={(e) => {
           if (e.target === e.currentTarget) cerrar();
         }}
       >
-        <div className={estilos.pantallaMarco}>
+        {/*
+          PANTALLA COMPLETA (tanda 26, t3): la foto ocupa todo lo que puede de la pantalla sin
+          recortarse (`contain`), pedida a todo el ancho; los controles van SOBRE la foto, con
+          fondo oscuro para leerse sobre cualquier foto. Se pasa también deslizando el dedo.
+        */}
+        <div
+          className={estilos.pantallaMarco}
+          onPointerDown={(e) => {
+            inicioToquePantalla.current = e.clientX;
+          }}
+          onPointerUp={(e) => {
+            if (inicioToquePantalla.current === null) return;
+            const dx = e.clientX - inicioToquePantalla.current;
+            inicioToquePantalla.current = null;
+            if (total > 1 && Math.abs(dx) > 40) ir(actual + (dx < 0 ? 1 : -1));
+          }}
+        >
           <Image
+            key={foto.url}
             src={foto.url}
             alt={foto.alt}
-            width={foto.width}
-            height={foto.height}
-            sizes="90vw"
+            fill
+            sizes="100vw"
             className={estilos.pantallaFoto}
           />
           <button
@@ -372,6 +412,9 @@ export function GaleriaFicha({
               >
                 <IconChevronRight aria-hidden="true" stroke={2} />
               </button>
+              <p className={estilos.contadorPantalla} aria-live="polite">
+                {actual + 1} / {total}
+              </p>
             </>
           ) : null}
         </div>

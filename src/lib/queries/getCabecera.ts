@@ -4,11 +4,17 @@ import config from "@payload-config";
 import { getPayload } from "payload";
 
 import { enlacesDeCabecera, type EnlaceCabecera } from "../cabecera/enlaces";
+import { esBusquedaTiendaValida } from "../tienda/enlaceTienda";
 import { CLAVE_DESPLIEGUE, ETIQUETAS_DATOS } from "../cacheDatos";
 
 export type { EnlaceCabecera };
 
-type Cabecera = { enlaces: EnlaceCabecera[]; boton: EnlaceCabecera | null };
+type Cabecera = {
+  enlaces: EnlaceCabecera[];
+  boton: EnlaceCabecera | null;
+  /** La búsqueda de la tienda del panel (válida y terminada en `=`), para los botones de repuestos. */
+  busquedaTienda: string | null;
+};
 
 /**
  * El global `cabecera` (menú y botón), listo para pintar. Un enlace sin texto,
@@ -24,7 +30,10 @@ const cabeceraEnCache = unstable_cache(
       c.botonTexto?.trim() && c.botonEnlace?.trim()
         ? { etiqueta: c.botonTexto.trim(), href: c.botonEnlace.trim() }
         : null;
-    return { enlaces, boton };
+    const busquedaTienda = esBusquedaTiendaValida(c.busquedaTienda)
+      ? c.busquedaTienda.trim()
+      : null;
+    return { enlaces, boton, busquedaTienda };
   },
   ["cabecera", CLAVE_DESPLIEGUE],
   { tags: [ETIQUETAS_DATOS.marco] },

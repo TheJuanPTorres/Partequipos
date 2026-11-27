@@ -10,6 +10,7 @@ import type { ConfigFormulario } from "@/lib/formularios/configFormulario";
 import type { LogoConAlt } from "@/lib/marca/logoMarca";
 import type { CajaRelativa } from "@/lib/marca/tamanoOptico";
 import type { TarjetaMarca } from "@/lib/repuestos/marca";
+import type { ConfigTienda } from "@/lib/tienda/enlaceTienda";
 import type { BreadcrumbItem } from "@/lib/seo/jsonLd";
 
 import estilos from "./fichaModelo.module.css";
@@ -46,8 +47,8 @@ export function FichaModelo({
   tituloCategorias,
   formulario,
   whatsapp,
+  tiendaModelo,
   tienda,
-  tiendaGeneral,
 }: {
   migas: BreadcrumbItem[];
   titulo: string;
@@ -62,9 +63,9 @@ export function FichaModelo({
   /** El enlace de WhatsApp con el modelo en el mensaje; sin número, no hay botón. */
   whatsapp?: string;
   /** El destino de «Ver en la tienda» del modelo (el suyo o el general); sin él, no hay botón. */
-  tienda?: string | null;
-  /** La tienda general, para las tarjetas de categoría que no tienen enlace propio. */
-  tiendaGeneral?: string | null;
+  tiendaModelo?: string | null;
+  /** La tienda del panel (general y búsqueda), para las tarjetas de categoría. */
+  tienda?: ConfigTienda;
 }) {
   return (
     <section className={estilos.ficha} aria-labelledby="modelo-titulo">
@@ -105,20 +106,26 @@ export function FichaModelo({
           </div>
         </div>
         <div className={estilos.acciones} id="modelo-contacto">
-          <BotonFormulario
-            href="/contactanos/"
-            className={estilos.botonCotizar}
-            formulario={formulario}
-            titulo="Pedir cotización"
-          >
-            <IconMessageCircle aria-hidden="true" focusable="false" stroke={2} size={20} />
-            Pedir cotización
-          </BotonFormulario>
-          {tienda ? (
-            <BotonTienda href={tienda} origen="modelo" className={estilos.botonTienda}>
-              Ver en la tienda
-            </BotonTienda>
-          ) : null}
+          {/* «Pedir cotización» y el botón de la tienda, juntos en una fila (también en el móvil). */}
+          <div className={estilos.filaCotizar}>
+            <BotonFormulario
+              href="/contactanos/"
+              className={estilos.botonCotizar}
+              formulario={formulario}
+              titulo="Pedir cotización"
+            >
+              <IconMessageCircle aria-hidden="true" focusable="false" stroke={2} size={20} />
+              Pedir cotización
+            </BotonFormulario>
+            {tiendaModelo ? (
+              <BotonTienda
+                href={tiendaModelo}
+                origen="modelo"
+                nombre={titulo}
+                className={estilos.botonTienda}
+              />
+            ) : null}
+          </div>
           {whatsapp ? (
             <a
               href={whatsapp}
@@ -139,7 +146,7 @@ export function FichaModelo({
         id="modelo-categorias"
         titulo={tituloCategorias}
         categorias={categorias}
-        tiendaGeneral={tiendaGeneral}
+        tienda={tienda}
       />
     </section>
   );

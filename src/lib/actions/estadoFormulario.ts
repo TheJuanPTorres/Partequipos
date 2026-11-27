@@ -37,7 +37,9 @@ export const CAMPOS_VISIBLES = [
   "mensaje",
 ] as const;
 export type CampoVisible = (typeof CAMPOS_VISIBLES)[number];
-export type ValoresFormulario = Partial<Record<CampoVisible | "interes" | "perfil", string>>;
+export type ValoresFormulario = Partial<
+  Record<CampoVisible | "interes" | "perfil" | "autorizacion", string>
+>;
 
 /**
  * Valores para volver a rellenar el formulario tras un error.
@@ -57,5 +59,7 @@ export function valoresParaReintento(formData: FormData): ValoresFormulario {
     const v = formData.get(campo);
     if (typeof v === "string" && v !== "") valores[campo] = v.slice(0, 40);
   }
+  // La casilla de autorización, si ya la había marcado: se le devuelve marcada (no se le pide dos veces).
+  if (formData.get("autorizacion") === "on") valores.autorizacion = "on";
   return valores;
 }

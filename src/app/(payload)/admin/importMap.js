@@ -1,6 +1,7 @@
 import { default as default_7d4eccb57b337121abb97170a6625d97 } from '../../../components/admin/celdas/CeldaFecha'
 import { default as default_4fdf05aabfcf02e659803b82d700369d } from '../../../components/admin/celdas/CeldaSolicitud'
 import { default as default_2d2b3b1a9ba08c290690127a2b7ca4ef } from '../../../components/admin/celdas/CeldaTituloEnlace'
+import { default as default_9cbbbe6c2ef2f8e5217bab8672cfd1e6 } from '../../../components/admin/celdas/CeldaAutorizo'
 import { default as default_0c32825fe60d0fe4ee2f9fbf6df19841 } from '../../../components/admin/aviso/AvisoSolicitudes'
 import { default as default_995c62da4474a980dc2501c7f5652493 } from '../../../components/admin/ResumenWeb'
 import { default as default_c3a501d4d9c91de728cb4e1b04127878 } from '../../../components/admin/Nada'
@@ -79,6 +80,7 @@ export const importMap = {
   "/components/admin/celdas/CeldaFecha#default": default_7d4eccb57b337121abb97170a6625d97,
   "/components/admin/celdas/CeldaSolicitud#default": default_4fdf05aabfcf02e659803b82d700369d,
   "/components/admin/celdas/CeldaTituloEnlace#default": default_2d2b3b1a9ba08c290690127a2b7ca4ef,
+  "/components/admin/celdas/CeldaAutorizo#default": default_9cbbbe6c2ef2f8e5217bab8672cfd1e6,
   "/components/admin/aviso/AvisoSolicitudes#default": default_0c32825fe60d0fe4ee2f9fbf6df19841,
   "/components/admin/ResumenWeb#default": default_995c62da4474a980dc2501c7f5652493,
   "/components/admin/Nada#default": default_c3a501d4d9c91de728cb4e1b04127878,

@@ -23,6 +23,8 @@ export const Solicitud: CollectionConfig = {
   labels: { singular: "Solicitud", plural: "Solicitudes" },
   admin: {
     useAsTitle: "nombre",
+    // «Autorizó» (2026-11-27): quién autorizó el tratamiento de datos, a la vista en la bandeja.
+    defaultColumns: ["nombre", "tipo", "estado", "autorizacionDatos", "createdAt"],
     group: "Mensajes recibidos",
     description:
       "Formularios enviados desde el sitio. Contienen datos personales: no se publican y solo son visibles aquí.",
@@ -189,6 +191,36 @@ export const Solicitud: CollectionConfig = {
       admin: {
         description: "Página desde la que se envió el formulario.",
         readOnly: true,
+      },
+    },
+    /*
+     * PRUEBA DE LA AUTORIZACIÓN DEL TRATAMIENTO DE DATOS (Ley 1581 de 2012, 2026-11-27): la casilla
+     * es obligatoria en todos los formularios, así que una solicitud nueva siempre la lleva en
+     * «Sí». Las anteriores (sin el campo) se ven con «—». La fecha de la autorización es la de
+     * la solicitud (`createdAt`). Solo las escribe el servidor al crear: nadie las cambia después.
+     */
+    {
+      name: "autorizacionDatos",
+      type: "checkbox",
+      label: "Autorizó el tratamiento de datos",
+      access: { update: () => false },
+      admin: {
+        readOnly: true,
+        position: "sidebar",
+        components: { Cell: "/components/admin/celdas/CeldaAutorizo" },
+        description:
+          "Si la persona marcó la casilla de autorización (Ley 1581 de 2012) al enviar el formulario. Las solicitudes anteriores al 27 de noviembre de 2026 no lo registran.",
+      },
+    },
+    {
+      name: "autorizacionTexto",
+      type: "text",
+      label: "Texto que aceptó",
+      access: { update: () => false },
+      admin: {
+        readOnly: true,
+        position: "sidebar",
+        description: "El texto de la casilla que aceptó. La fecha es la de la solicitud.",
       },
     },
   ],

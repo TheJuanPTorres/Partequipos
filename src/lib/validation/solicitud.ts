@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { MENSAJE_TELEFONO, telefonoValido } from "@/lib/validation/telefono";
 
+import { CAMPO_AUTORIZACION, MENSAJE_AUTORIZACION } from "@/lib/formularios/autorizacionDatos";
 import {
   INTERESES,
   MAX,
@@ -96,6 +97,12 @@ export const esquemaSolicitud = z.object({
     .or(z.literal("").transform(() => undefined)),
 
   /*
+   * AUTORIZACIÓN DEL TRATAMIENTO DE DATOS (Ley 1581 de 2012, 2026-11-27): obligatoria. Una casilla
+   * marcada llega como «on»; sin ella (o con cualquier otro valor) el envío se rechaza.
+   */
+  autorizacion: z.literal("on", { message: MENSAJE_AUTORIZACION }),
+
+  /*
    * Campos que NO escribe el usuario: los pone la página. Se validan igual,
    * porque llegan por el mismo POST y nada impide manipularlos.
    */
@@ -142,6 +149,7 @@ export function desdeFormData(formData: FormData): Record<string, unknown> {
     empresa: leer("empresa"),
     ciudad: leer("ciudad"),
     mensaje: leer("mensaje"),
+    autorizacion: leer(CAMPO_AUTORIZACION),
     interes: leer("interes"),
     perfil: leer("perfil"),
     referenciaTipo: leer("referenciaTipo"),

@@ -32,6 +32,7 @@ function formulario(extra: Record<string, string> = {}) {
     telefono: "000 000 0000",
     empresa: "Empresa ficticia",
     mensaje: MENSAJE_LARGO,
+    autorizacion: "on",
     "cf-turnstile-response": "XXXX.DUMMY.TOKEN.XXXX",
     // Mostrado hace un minuto: pasa el tiempo mínimo.
     [CAMPO_TIEMPO]: String(Date.now() - 60_000),
@@ -61,6 +62,7 @@ const ESPERADOS = {
   telefono: "000 000 0000",
   empresa: "Empresa ficticia",
   mensaje: MENSAJE_LARGO,
+  autorizacion: "on",
 };
 
 describe("procesarSolicitud: el formulario no se vacía al fallar", () => {
@@ -184,7 +186,14 @@ describe("procesarSolicitud: anti-spam", () => {
 describe("valoresParaReintento", () => {
   it("solo los campos visibles: ni ocultos ni el token", () => {
     const v = valoresParaReintento(formulario());
-    assert.deepEqual(Object.keys(v).sort(), ["correo", "empresa", "mensaje", "nombre", "telefono"]);
+    assert.deepEqual(Object.keys(v).sort(), [
+      "autorizacion",
+      "correo",
+      "empresa",
+      "mensaje",
+      "nombre",
+      "telefono",
+    ]);
   });
 
   it("corta a la longitud máxima: un POST enorme no se devuelve entero", () => {
@@ -199,5 +208,47 @@ describe("valoresParaReintento", () => {
     const v = valoresParaReintento(formulario({ empresa: "", nombre: "  Ana  " }));
     assert.equal(v.nombre, "  Ana  ");
     assert.equal("empresa" in v, false);
+  });
+});
+
+describe("procesarSolicitud: autorización del tratamiento de datos (Ley 1581)", () => {
+  it("sin la casilla NO se guarda y se dice junto a la casilla", async () => {
+    const { deps, guardados } = dependencias(true);
+    const f = formulario();
+    f.delete("autorizacion");
+    const r = await procesarSolicitud(f, deps);
+    assert.equal(r.estado, "error");
+    assert.equal(r.mensaje, ERROR_VALIDACION);
+    assert.match(r.errores?.autorizacion ?? "", /autorizar el tratamiento de tus datos/);
+    assert.equal(guardados.length, 0);
+  });
+
+  it("no se pregunta a Turnstile ni se guarda si falta (la validación va antes)", async () => {
+    let preguntado = false;
+    const { deps, guardados } = dependencias(true);
+    deps.verificar = async () => ((preguntado = true), true);
+    const f = formulario({ autorizacion: "off" });
+    const r = await procesarSolicitud(f, deps);
+    assert.equal(r.estado, "error");
+    assert.equal(preguntado, false);
+    assert.equal(guardados.length, 0);
+  });
+
+  it("con la casilla, se guarda; y si falla otra cosa, vuelve marcada (no se pide dos veces)", async () => {
+    const ok = dependencias(true);
+    assert.equal((await procesarSolicitud(formulario(), ok.deps)).estado, "ok");
+    assert.equal(ok.guardados.length, 1);
+    const mal = dependencias(true);
+    const r = await procesarSolicitud(formulario({ nombre: "" }), mal.deps);
+    assert.equal(r.estado, "error");
+    assert.equal(r.valores?.autorizacion, "on");
+  });
+
+  it("si no la había marcado, no vuelve marcada", async () => {
+    const { deps } = dependencias(true);
+    const f = formulario({ nombre: "" });
+    f.delete("autorizacion");
+    const r = await procesarSolicitud(f, deps);
+    assert.equal(r.valores?.autorizacion, undefined);
   });
 });

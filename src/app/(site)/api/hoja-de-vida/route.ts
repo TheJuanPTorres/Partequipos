@@ -2,6 +2,7 @@ import config from "@payload-config";
 import { NextResponse } from "next/server";
 import { getPayload } from "payload";
 
+import { TEXTO_AUTORIZACION } from "@/lib/formularios/autorizacionDatos";
 import { leerSmtpEnVigor } from "@/lib/correo/servidor";
 import { destinoHojasDeVida } from "@/lib/hojaDeVida/destino";
 import { procesarHojaDeVida } from "@/lib/hojaDeVida/procesar";
@@ -82,6 +83,9 @@ export async function POST(peticion: Request) {
           tipo: "contacto",
           estado: "nueva",
           perfil: "empleado",
+          // Su casilla de autorización es obligatoria: aquí siempre está marcada.
+          autorizacionDatos: true,
+          autorizacionTexto: TEXTO_AUTORIZACION,
           nombre: datos.nombre,
           correo: datos.correo,
           telefono: datos.telefono,

@@ -2,7 +2,7 @@ import { COLECCIONES_CON_BORRADORES } from "./borradores";
 
 /**
  * LA VERSIÓN INICIAL QUE FALTA (2026-11-26, Juan Pablo; urgente). Con borradores, la lista del
- * panel de Payload 3.89 pide `find` con `draft: true`, que lee la tabla de versiones (`_<col>_v`)
+ * panel de Payload 3.89 pide `find` pidiendo borradores (`draft` a verdadero), que lee la tabla de versiones (`_<col>_v`)
  * con `latest = true`: un documento SIN ninguna versión no sale en la lista. Las migraciones que
  * activaron los borradores (artículos, #521; páginas, #528) no crearon versiones, así que lo
  * importado antes solo aparece después de que alguien lo guarde en el panel.

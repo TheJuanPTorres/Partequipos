@@ -1,0 +1,162 @@
+/*
+ * LA PÁGINA DE SOLO TEXTO (`PaginaTexto.tsx`). Solo tokens del kit (`globals.css`): colores,
+ * escala tipográfica, `--espacio-seccion` entre partes y `--espacio-interno` dentro de la tarjeta.
+ * Los anchos de lectura y los grosores de línea son medidas de forma, no huecos.
+ *
+ * Contraste (AA): el texto va en `--color-texto` y `--color-texto-suave` sobre blanco (≥ 7:1). El
+ * rojo de la marca sobre blanco da 4,4:1 y no basta para texto normal: los enlaces van en
+ * `--color-texto-fuerte` subrayados, y el rojo queda para adornos (viñetas, borde de la cita).
+ */
+
+/* Sin aire propio antes del pie: manda el espaciado común del pie. */
+.pagina {
+  padding-bottom: 0;
+}
+
+.tarjeta {
+  margin-inline: var(--espacio-interno);
+  padding: var(--espacio-seccion) var(--espacio-interno);
+  border-radius: var(--radius-xl);
+  background: var(--color-fondo);
+  scroll-margin-top: var(--espacio-seccion);
+}
+
+/* El ancho de lectura (~70 caracteres); el texto nunca se sale (palabras o URL largas). */
+.texto {
+  max-width: 760px;
+  margin-inline: auto;
+  color: var(--color-texto-suave);
+  font-size: var(--texto-cuerpo);
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+  min-width: 0;
+}
+
+/* Entre las partes del texto (la entradilla, el `RichText` y sus párrafos, listas, citas…). */
+.texto > * + *,
+.texto > div > * + * {
+  margin-top: var(--espacio-interno);
+}
+
+.entradilla {
+  margin: 0;
+  color: var(--color-texto);
+  font-size: var(--texto-destacado);
+  line-height: 1.5;
+  font-weight: 500;
+}
+
+/* Los títulos del texto, en la escala del kit y sin saltar el orden (h2 → h3 → h4). */
+.texto h2,
+.texto h3,
+.texto h4 {
+  color: var(--color-texto);
+  font-weight: 600;
+  line-height: 1.25;
+  scroll-margin-top: var(--espacio-seccion);
+}
+
+.texto h2 {
+  margin-top: var(--espacio-seccion);
+  font-size: var(--texto-titulo-4);
+}
+
+.texto h3 {
+  margin-top: var(--espacio-seccion);
+  font-size: var(--texto-destacado);
+}
+
+.texto h4 {
+  margin-top: var(--espacio-interno);
+  font-size: var(--texto-cuerpo);
+}
+
+.texto strong {
+  color: var(--color-texto);
+}
+
+.texto a {
+  color: var(--color-texto-fuerte);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.texto a:hover {
+  color: var(--color-marca);
+}
+
+.texto a:focus-visible {
+  outline: 3px solid var(--color-texto);
+  outline-offset: 2px;
+}
+
+.texto ul,
+.texto ol {
+  padding-left: 1.4em;
+}
+
+.texto ul {
+  list-style: disc;
+}
+
+.texto ol {
+  list-style: decimal;
+}
+
+.texto li + li {
+  margin-top: 0.4em;
+}
+
+.texto li::marker {
+  color: var(--color-marca);
+}
+
+.texto blockquote {
+  margin-inline: 0;
+  padding: var(--espacio-interno);
+  border-left: 4px solid var(--color-marca);
+  border-radius: 0 var(--radius-xl) var(--radius-xl) 0;
+  background: var(--color-fondo-seccion);
+  color: var(--color-texto);
+  font-size: var(--texto-destacado);
+  font-style: italic;
+  line-height: 1.55;
+}
+
+.texto img {
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--radius-xl);
+}
+
+.texto hr {
+  border: 0;
+  border-top: 1px solid var(--color-fondo-seccion);
+}
+
+/* El índice de «Secciones con ancla». */
+.indice {
+  padding: var(--espacio-interno);
+  border: 1px solid var(--color-fondo-seccion);
+  border-radius: var(--radius-xl);
+}
+
+.indice h2 {
+  margin: 0;
+  font-size: var(--texto-etiqueta);
+}
+
+.indice ul {
+  margin-top: 0.5em;
+  padding: 0;
+  list-style: none;
+}
+
+.indice li::marker {
+  content: none;
+}
+
+.seccion {
+  margin-top: var(--espacio-seccion);
+  scroll-margin-top: var(--espacio-seccion);
+}

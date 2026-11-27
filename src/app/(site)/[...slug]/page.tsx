@@ -11,6 +11,7 @@ import { PieSinTarjeta } from "@/components/layout/PieSinTarjeta";
 import { RichText } from "@/components/layout/RichText";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { PaginaPolitica } from "@/components/politica/PaginaPolitica";
+import { PaginaTexto } from "@/components/paginas/PaginaTexto";
 import { PlantillaServicioTecnico } from "@/components/servicioTecnico/PlantillaServicioTecnico";
 import { idsDeVideos, vistaDeBloques } from "@/lib/bloques/desdePayload";
 import { getArticuloPorSlug, getArticulos } from "@/lib/queries/getBlog";
@@ -245,6 +246,24 @@ export default async function PaginaRaizPage({ params }: { params: Promise<Param
   if (clave === SLUG_POLITICA_GARANTIA) {
     return (
       <PaginaPolitica
+        titulo={pagina.titulo}
+        entradilla={pagina.entradilla}
+        contenido={pagina.contenido}
+        secciones={secciones}
+        migas={breadcrumbs}
+        fondo={imagenDeMedia(pagina.fotoCabecera, "")}
+      />
+    );
+  }
+
+  /*
+   * LA PÁGINA DE SOLO TEXTO (tanda 26, tarea 6): las legales y las páginas nuevas, con la cabecera
+   * baja y el texto con los tokens del kit (`PaginaTexto`). Contáctanos (sin datos de la empresa)
+   * se queda con la plantilla de antes, que es la que pinta su horario.
+   */
+  if (clave !== SLUG_CONTACTO) {
+    return (
+      <PaginaTexto
         titulo={pagina.titulo}
         entradilla={pagina.entradilla}
         contenido={pagina.contenido}

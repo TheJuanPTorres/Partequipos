@@ -27,7 +27,7 @@ import { camposDeAditamento } from "@/lib/usados/aditamentos";
 import { datosDeUnidad, parrafos } from "@/lib/usados/ficha";
 import { sinTelefonoDeEmpresa } from "@/lib/usados/telefonoEnDescripcion";
 import { imagenDeMedia, poblado, posicionFocal, type ImagenLista } from "@/lib/utils/relations";
-import { enlaceWhatsApp } from "@/lib/whatsapp";
+import { enlaceWhatsApp, mensajeExperto } from "@/lib/whatsapp";
 import type { Documento, Media } from "@/payload-types";
 
 /*
@@ -125,7 +125,7 @@ export default async function UnidadUsadaPage({ params }: { params: Promise<Para
   const articulo = articuloDefinido(categoria.nombre);
   const experto = enlaceWhatsApp(
     empresa.whatsapp,
-    `Hola, quiero hablar con un experto sobre ${articulo} ${unidad.nombre}: ${urlFicha}`,
+    mensajeExperto(articulo, unidad.nombre, urlFicha),
   );
 
   const migas = [

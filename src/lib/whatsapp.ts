@@ -100,6 +100,18 @@ export function mensajeConUrl(mensaje: string, url: string): string {
 }
 
 /**
+ * El mensaje de «Habla con un experto» de una ficha: lo que se mira, con su artículo («la
+ * Excavadora…», «el Compactador…») y, en su propia línea, la dirección de la ficha (Juan Pablo,
+ * 2026-11-27; antes iba detrás de dos puntos, en la misma línea).
+ */
+export function mensajeExperto(articulo: string, nombre: string, url: string): string {
+  return mensajeConUrl(
+    `Hola, quiero hablar con un experto sobre ${articulo} ${nombre.trim()}.`,
+    url,
+  );
+}
+
+/**
  * Un enlace de WhatsApp A LA EMPRESA con mensaje escrito (`wa.me/<número>?text=…`), con la URL de
  * la página al final del mensaje. Cualquier otro enlace vuelve tal cual: uno sin mensaje (no se
  * le inventa), «compartir por WhatsApp» (`wa.me/?text=…`, sin número: ya lleva su URL) u otro

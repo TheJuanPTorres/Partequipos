@@ -1,24 +1,31 @@
 /*
- * El botón «Ver en la tienda» de solo icono: cuadrado de 44 px (área de pulsación mínima), fondo
- * oscuro e icono claro. Tamaño fijo en las dos direcciones a propósito: es un icono, no texto.
+ * El botón «Ver en la tienda» (diseño nuevo, 2026-11-27): redondo, solo icono, fondo tinta e icono
+ * rojo. El tamaño lo da `--tamano-tienda` de quien lo usa (44 px por defecto; 32 px en el panel de
+ * productos), con un mínimo de 24 px de objetivo táctil. El icono ocupa algo más de la mitad.
+ * Contraste del icono (#e5242d) sobre la tinta (#100f0f): 4,2:1 (AA para un icono, 3:1).
  */
 .icono {
   display: inline-flex;
-  width: 44px;
-  height: 44px;
+  width: max(24px, var(--tamano-tienda, 44px));
+  height: max(24px, var(--tamano-tienda, 44px));
   flex: none;
   box-sizing: border-box;
   align-items: center;
   justify-content: center;
-  border-radius: 12px;
-  background: #1f1f1f;
-  color: #fff;
+  border-radius: 50%;
+  background: #100f0f;
+  color: #e5242d;
   text-decoration: none;
   transition: background-color 0.25s;
 }
 
+.icono svg {
+  width: 56%;
+  height: 56%;
+}
+
 .icono:hover {
-  background: #e5242d;
+  background: #2a2727;
 }
 
 .icono:focus-visible {

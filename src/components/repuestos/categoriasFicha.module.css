@@ -136,6 +136,7 @@
  * texto baja a dos líneas y sin flecha, en vez de cortarse.
  */
 .tienda {
+  --tamano-tienda: 44px;
   position: absolute;
   right: 14px;
   bottom: 14px;

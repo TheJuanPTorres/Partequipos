@@ -131,6 +131,7 @@ import * as migration_20261125_191535_categorias_en_portada from './20261125_191
 import * as migration_20261125_213752_menu_apartados from './20261125_213752_menu_apartados';
 import * as migration_20261126_142737_buzon_pruebas from './20261126_142737_buzon_pruebas';
 import * as migration_20261126_145016_enlace_tienda from './20261126_145016_enlace_tienda';
+import * as migration_20261127_062610_busqueda_tienda from './20261127_062610_busqueda_tienda';
 
 export const migrations = [
   {
@@ -796,6 +797,11 @@ export const migrations = [
   {
     up: migration_20261126_145016_enlace_tienda.up,
     down: migration_20261126_145016_enlace_tienda.down,
-    name: '20261126_145016_enlace_tienda'
+    name: '20261126_145016_enlace_tienda',
+  },
+  {
+    up: migration_20261127_062610_busqueda_tienda.up,
+    down: migration_20261127_062610_busqueda_tienda.down,
+    name: '20261127_062610_busqueda_tienda'
   },
 ];

@@ -1,7 +1,30 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
-import { borrables, leerManifiesto, sinVersion, type Manifiesto } from "./versionesIniciales";
+import {
+  borrables,
+  leerManifiesto,
+  mismoDestino,
+  sinVersion,
+  type Manifiesto,
+} from "./versionesIniciales";
+
+describe("mismoDestino", () => {
+  const base: Manifiesto = { creado: "x", versiones: [] };
+  it("un manifiesto solo vale para su destino", () => {
+    assert.equal(mismoDestino({ ...base, destino: "preview" }, "preview"), true);
+    assert.equal(mismoDestino({ ...base, destino: "preview" }, "produccion"), false);
+    assert.equal(mismoDestino({ ...base, destino: "produccion" }, "preview"), false);
+  });
+  it("sin destino es de los primeros del preview, nunca del sitio publicado", () => {
+    assert.equal(mismoDestino(base, "preview"), true);
+    assert.equal(mismoDestino(base, "produccion"), false);
+  });
+  it("leerManifiesto conserva el destino y rechaza uno que no es texto", () => {
+    assert.equal(leerManifiesto({ ...base, destino: "produccion" }).destino, "produccion");
+    assert.throws(() => leerManifiesto({ ...base, destino: 3 }), /destino/);
+  });
+});
 
 describe("sinVersion", () => {
   it("devuelve solo los documentos sin ninguna versión, en su orden", () => {

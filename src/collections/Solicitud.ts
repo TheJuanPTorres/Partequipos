@@ -23,8 +23,6 @@ export const Solicitud: CollectionConfig = {
   labels: { singular: "Solicitud", plural: "Solicitudes" },
   admin: {
     useAsTitle: "nombre",
-    // «Autorizó» (2026-11-27): quién autorizó el tratamiento de datos, a la vista en la bandeja.
-    defaultColumns: ["nombre", "tipo", "estado", "autorizacionDatos", "createdAt"],
     group: "Mensajes recibidos",
     description:
       "Formularios enviados desde el sitio. Contienen datos personales: no se publican y solo son visibles aquí.",

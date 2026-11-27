@@ -48,8 +48,13 @@ borrar, pídelo a un administrador.
 
 ## 3. Lo más importante: guardar es publicar
 
-**No hay borradores.** Al pulsar **Guardar**, el cambio está en el sitio
-público: en cuanto alguien recarga la página, lo ve.
+**Casi todo se publica al guardar.** Al pulsar **Guardar**, el cambio está en el
+sitio público: en cuanto alguien recarga la página, lo ve.
+
+**Salvo en los artículos del blog y en las páginas**, que tienen borradores:
+«Guardar borrador» guarda sin publicar, «Ver en el sitio» enseña el borrador
+(solo a quien tiene sesión en el panel) y «Publicar» lo pone en la web. Cada
+publicación queda en **Versiones**, y desde ahí se puede volver a una anterior.
 
 Consecuencias prácticas:
 
@@ -58,8 +63,9 @@ Consecuencias prácticas:
 - **Revisa antes de guardar**, sobre todo títulos y precios o datos técnicos.
 - **El menú, el pie y los datos de la empresa (horario, contacto, logo)
   afectan a todas las páginas a la vez.**
-- No hay historial de versiones: si cambias un texto, el anterior no se
-  guarda. Si es largo o delicado, copia el original antes.
+- Fuera de artículos, páginas y fichas de producto no hay historial de
+  versiones: si cambias un texto, el anterior no se guarda. Si es largo o
+  delicado, copia el original antes.
 
 ## 4. El menú del panel
 
@@ -74,7 +80,8 @@ A la izquierda, en grupos:
 | Lubricantes        | Marcas y líneas y productos                                                                              |
 | Servicio técnico   | La página de Servicio técnico (abre su ficha)                                                            |
 | Blog               | Artículos y categorías del blog                                                                          |
-| Empresa y sedes    | Datos de la empresa y redes, sedes, páginas (Nosotros, Contáctanos, legales…) y «Trabaja con nosotros»   |
+| Páginas            | Las páginas del sitio: institucionales, legales y páginas nuevas (campañas, avisos…). Ver §5.11          |
+| Empresa y sedes    | Datos de la empresa y redes, sedes y «Trabaja con nosotros»                                              |
 | Fotos y archivos   | Imágenes, documentos (PDF) y vídeos                                                                      |
 | Configuración      | Cabecera y menú, pie, textos de las páginas índice, buscadores y correo                                  |
 
@@ -339,7 +346,7 @@ oficial, no lo pongas.
 
 ### 5.8 La portada
 
-- Es la página de tipo «Portada» (ruta `inicio`) en **Portada → Portada** (o en Empresa y sedes → Páginas).
+- Es la página de tipo «Portada» (ruta `inicio`) en **Portada → Portada** (o en Páginas → Páginas).
 - **Hero (carrusel):** cada diapositiva lleva título, párrafo, imagen de fondo,
   una versión **vertical para móvil** (recomendada: el móvil carga mucho más
   rápido) y, si quieres, la máquina recortada en PNG transparente.
@@ -476,6 +483,56 @@ lleva una tarjeta por tipo de máquina.
   zona tranquila donde va el título. Vacía, sale la del encabezado de la primera
   marca de repuestos que lo tenga.
 
+### 5.11 Crear una página nueva
+
+Para una página que no es del catálogo ni del blog: una campaña, un aviso, un
+texto legal nuevo…
+
+1. **Crear.** **Páginas → Páginas → Crear.** Escribe el **título**: es el
+   `<h1>` de la página y el nombre en el panel.
+2. **Dirección web** (columna de la derecha). Es lo que va detrás de
+   `partequipos.com/`, por ejemplo `campana-filtros-2027`.
+   - Solo **minúsculas sin tildes ni ñ, números y guiones**; para una página
+     «dentro» de otra, `/` entre tramos (`nosotros/nuestra-historia`). Sin
+     espacios y sin `/` al principio ni al final.
+   - Si la escribes mal, el panel no guarda y te **propone** una a partir del
+     título (por ejemplo, «Campaña Filtros» → `campana-filtros`).
+   - **Direcciones reservadas.** No puede empezar por una sección propia de la
+     web: `maquinaria-pesada`, `repuestos-maquinaria-pesada-colombia`,
+     `lubricantes`, `noticias`, `category`, `buscar`, `api`, `admin`,
+     `vista-previa`, `laboratorio`, `.well-known`, `sitemap.xml`,
+     `robots.txt`… **Por qué:** esas direcciones ya las sirve otra parte de
+     la web, así que tu página nunca se vería (o taparía una sección entera).
+   - Tampoco puede ser **el origen de una redirección** (Configuración →
+     Redirecciones, «Desde»): quien la visitara iría a otra página.
+   - Ni la de un **artículo del blog** (comparten `partequipos.com/<dirección>/`).
+   - Después de publicarla ya no se cambia (§7).
+3. **Contenido.**
+   - **Entradilla:** un párrafo corto bajo el título.
+   - **Contenido:** el texto. Usa los **títulos** del editor (Encabezado 2, 3
+     y 4) en orden, sin saltar niveles, porque estructuran la página para
+     Google y para los lectores de pantalla. Hay listas, citas, enlaces e
+     imágenes (cada imagen con su texto alternativo, §5.5).
+   - **Enlaces:** una ruta del sitio que empiece por `/` (`/contactanos/`), un
+     ancla (`#horario`) o una dirección `https://`, `mailto:` o `tel:`. El
+     panel no guarda un enlace `javascript:` ni `data:`.
+   - Pegar desde Word o Google Docs: revisa después títulos, listas y enlaces.
+   - Si añades **bloques** (pestaña de bloques), la página se compone con
+     ellos y deja de mostrarse el «Contenido».
+4. **SEO.** En «Buscadores y redes sociales», el título y la descripción para
+   Google y la imagen al compartir (§8). Vacíos, se usan el título y la
+   entradilla.
+5. **Vista previa.** Pulsa **Guardar borrador** y luego **Ver en el sitio**:
+   ves la página tal como quedará. Solo la ves tú (con tu sesión); para los
+   visitantes todavía no existe. «Salir de la vista previa», arriba, vuelve a
+   lo publicado.
+6. **Publicar.** Cuando esté lista, **Publicar**. Desde ese momento está en
+   `partequipos.com/<dirección>/` y en el mapa del sitio para Google.
+7. **Añadirla al menú** (si hace falta). Una página nueva no sale sola en el
+   menú: en **Configuración → Cabecera y menú → Enlaces del menú** (o en el
+   **Pie de página**) añade un enlace con su dirección, por ejemplo
+   `/campana-filtros-2027/`, y guarda (§5.9).
+
 ## 6. Retirar algo sin borrarlo
 
 | Qué                  | Cómo                         |
@@ -497,8 +554,8 @@ lleva una tarjeta por tipo de máquina.
   «Puede cambiar direcciones web ya publicadas»: la dirección antigua seguirá
   llevando a la nueva (el sitio crea solo una redirección de origen «Cambio de
   dirección web»).
-- En las **páginas** (Empresa y sedes → Páginas) funciona igual, y puede llevar
-  más de un tramo («nosotros/trabaja-con-nosotros»).
+- En las **páginas** (Páginas → Páginas) funciona igual, y puede llevar más
+  de un tramo («nosotros/trabaja-con-nosotros»). Tiene sus propias reglas: §5.11.
 
 ## 8. Buscadores y redes sociales
 

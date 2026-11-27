@@ -19,6 +19,7 @@ import { validarYouTube } from "../lib/fields/youtube";
 import { enlace, parrafo, texto } from "../lib/fields/textosPortada";
 import { revalidarPagina, revalidarPaginaBorrada } from "./hooks/revalidateHooks";
 import { slugEditable } from "../lib/fields/slugField";
+import { direccionDePaginaValida, enlacesDeTextoSeguros } from "./hooks/direccionDePagina";
 import { slugUnicoFrenteA } from "./hooks/slugUnicoEntreColecciones";
 import {
   borradoAdmin,
@@ -63,14 +64,14 @@ const AYUDA_ANCHO_USADOS =
 export const PaginaInstitucional: CollectionConfig = {
   slug: "paginas",
   labels: {
-    singular: "Página institucional",
-    plural: "Páginas institucionales",
+    singular: "Página",
+    plural: "Páginas",
   },
   admin: {
     useAsTitle: "titulo",
-    group: "Empresa y sedes",
+    group: "Páginas",
     description:
-      "Páginas fijas del sitio (Nosotros, Contacto, textos legales…) y la portada. No cambies la ruta de una página publicada: Google ya conoce esa dirección.",
+      "Páginas del sitio: institucionales, legales y páginas nuevas (campañas, avisos…).",
   },
   access: {
     // Con el token de lectura (runbooks), solo lo publicado: nunca un borrador.
@@ -87,7 +88,12 @@ export const PaginaInstitucional: CollectionConfig = {
     beforeOperation: [nacePublicado],
     // Lado inverso del guardarraiz: una pagina no puede tapar un articulo del
     // blog, que vive en el mismo espacio de nombres raiz.
-    beforeValidate: [slugUnicoFrenteA("articulos", "un artículo del blog")],
+    beforeValidate: [
+      slugUnicoFrenteA("articulos", "un artículo del blog"),
+      // Formato, rutas propias de la web y origen de una redirección (tanda 26, tarea 6).
+      direccionDePaginaValida,
+      enlacesDeTextoSeguros,
+    ],
     afterChange: [revalidarPagina],
     afterDelete: [revalidarPaginaBorrada],
   },
@@ -109,7 +115,8 @@ export const PaginaInstitucional: CollectionConfig = {
         admin: {
           position: "sidebar",
           description:
-            "La dirección de la página, sin barras al principio ni al final. Ej.: «nosotros» o «nosotros/trabaja-con-nosotros». La portada usa «inicio». " +
+            "La dirección de la página: minúsculas sin tildes ni ñ, números y guiones, con «/» entre tramos y sin barras al principio ni al final. Ej.: «nosotros» o «nosotros/trabaja-con-nosotros». La portada usa «inicio». " +
+            "No puede empezar por una sección propia de la web (maquinaria-pesada, repuestos-maquinaria-pesada-colombia, lubricantes, noticias, buscar…) ni ser el origen de una redirección. " +
             "Después de crearla ya no se puede cambiar; si tiene una errata, pide a un administrador el permiso «Puede cambiar direcciones web ya publicadas»: la dirección antigua seguirá llevando a la nueva.",
         },
         // Igual que el resto de slugs (ADR 0005, parte B): solo al crear, o con el

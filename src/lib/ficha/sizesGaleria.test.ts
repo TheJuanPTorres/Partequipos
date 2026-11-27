@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
-import { encajeDeFoto, sizesDeFoto } from "./sizesGaleria";
+import { encajeDeFoto, sizesDeFoto, teclaGaleria } from "./sizesGaleria";
 
 const foto = (width: number, height: number) => ({ url: "/x.jpg", alt: "x", width, height });
 const SIZES = "(min-width: 1025px) max(810px, 50.625vw), (min-width: 768px) 88vw, 85vw";
@@ -38,5 +38,22 @@ describe("sizesDeFoto", () => {
       sizesDeFoto(SIZES, foto(1500, 1000)),
       "(min-width: 1025px) max(810px, 50.625vw), (min-width: 768px) calc(88vw * 1.125), calc(85vw * 1.125)",
     );
+  });
+});
+
+describe("teclaGaleria (flechas de la galería)", () => {
+  it("←/→ dan la vuelta; Inicio y Fin, la primera y la última", () => {
+    assert.equal(teclaGaleria("ArrowRight", 0, 5), 1);
+    assert.equal(teclaGaleria("ArrowRight", 4, 5), 0);
+    assert.equal(teclaGaleria("ArrowLeft", 0, 5), 4);
+    assert.equal(teclaGaleria("Home", 3, 5), 0);
+    assert.equal(teclaGaleria("End", 1, 5), 4);
+  });
+
+  it("con una foto, con modificador u otra tecla, nada", () => {
+    assert.equal(teclaGaleria("ArrowRight", 0, 1), null);
+    assert.equal(teclaGaleria("ArrowRight", 0, 5, true), null);
+    assert.equal(teclaGaleria("Tab", 0, 5), null);
+    assert.equal(teclaGaleria("ArrowDown", 0, 5), null);
   });
 });

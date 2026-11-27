@@ -8,6 +8,7 @@ import {
   hrefConContexto,
   hrefConUrl,
   mensajeConUrl,
+  mensajeExperto,
   mensajeWhatsApp,
   urlDePagina,
 } from "./whatsapp";
@@ -193,5 +194,41 @@ describe("la URL de la página en el mensaje (tanda 26, punto 28)", () => {
     assert.ok(
       readFileSync("src/components/layout/WhatsApp.tsx", "utf8").includes("base={getSiteUrl()}"),
     );
+  });
+});
+
+describe("«Habla con un experto» (2026-11-27)", () => {
+  const url = "https://partequipos.com/maquinaria-pesada/maquinaria-pesada-usada/excavadoras/x/";
+
+  it("nombra la máquina con su artículo y deja la URL en su propia línea, al final", () => {
+    assert.equal(
+      mensajeExperto("la", " Miniexcavadora Hitachi LANDCROS ZX40U-5B 2018 ", url),
+      `Hola, quiero hablar con un experto sobre la Miniexcavadora Hitachi LANDCROS ZX40U-5B 2018.\n${url}`,
+    );
+    assert.equal(
+      mensajeExperto("el", "Compactador Dynapac CA250", url).split("\n")[0],
+      "Hola, quiero hablar con un experto sobre el Compactador Dynapac CA250.",
+    );
+  });
+
+  it("en el navegador no se le suma otra URL: ya la lleva", () => {
+    const enlace = enlaceWhatsApp(
+      "+57 317 000 0000",
+      mensajeExperto("la", "Excavadora X", url),
+    )!.href;
+    assert.equal(hrefConUrl(enlace, url), enlace);
+    assert.equal(new URL(enlace).searchParams.get("text")?.split("\n").length, 2);
+  });
+
+  it("las fichas arman ese mensaje con esta función, no con la URL en la misma línea", () => {
+    for (const fichero of [
+      "src/app/(site)/maquinaria-pesada/maquinaria-pesada-usada/[categoria]/[unidad]/page.tsx",
+      "src/components/ficha/PaginaFichaNueva.tsx",
+      "src/lib/vistaPrevia/fichaUsada.ts",
+    ]) {
+      const fuente = readFileSync(fichero, "utf8");
+      assert.ok(fuente.includes("mensajeExperto(articulo, "), fichero);
+      assert.ok(!/experto sobre \$\{articulo\}[^`]*: \$\{/.test(fuente), fichero);
+    }
   });
 });

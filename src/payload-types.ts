@@ -260,6 +260,14 @@ export interface Solicitude {
    * Página desde la que se envió el formulario.
    */
   origen?: string | null;
+  /**
+   * Si la persona marcó la casilla de autorización (Ley 1581 de 2012) al enviar el formulario. Las solicitudes anteriores al 27 de noviembre de 2026 no lo registran.
+   */
+  autorizacionDatos?: boolean | null;
+  /**
+   * El texto de la casilla que aceptó. La fecha es la de la solicitud.
+   */
+  autorizacionTexto?: string | null;
   updatedAt: string;
 }
 /**
@@ -2999,6 +3007,8 @@ export interface SolicitudesSelect<T extends boolean = true> {
   referencia?: T;
   referenciaTexto?: T;
   origen?: T;
+  autorizacionDatos?: T;
+  autorizacionTexto?: T;
   updatedAt?: T;
 }
 /**

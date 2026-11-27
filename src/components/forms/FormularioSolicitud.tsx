@@ -1,13 +1,23 @@
 "use client";
 
 import { IconBrandWhatsapp } from "@tabler/icons-react";
-import { useActionState, useEffect, useId, useRef, useState, type FormEvent } from "react";
+import {
+  useActionState,
+  useEffect,
+  useId,
+  useRef,
+  useState,
+  type ChangeEvent,
+  type FormEvent,
+} from "react";
 
+import { CasillaAutorizacion } from "@/components/forms/CasillaAutorizacion";
 import { Campo, claseControl } from "@/components/forms/Campo";
 import { Turnstile } from "@/components/forms/Turnstile";
 import { enviarEvento } from "@/lib/analitica/navegador";
 import { ESTADO_INICIAL } from "@/lib/actions/estadoFormulario";
 import { enviarSolicitud } from "@/lib/actions/solicitudes";
+import { CAMPO_AUTORIZACION, MENSAJE_AUTORIZACION } from "@/lib/formularios/autorizacionDatos";
 import { CAMPO_TIEMPO, CAMPO_TRAMPA } from "@/lib/formularios/camposAntiSpam";
 import { CAMPOS_EN_VIVO, errorEnVivo } from "@/lib/formularios/validacionVivo";
 import { INTERESES, PERFILES, type TipoSolicitud } from "@/lib/validation/opcionesSolicitud";
@@ -163,6 +173,23 @@ export function FormularioSolicitud({
     if (soloSiYaMarcado && (!marcado || revisado !== null)) return;
     if (!soloSiYaMarcado && revisado === null && !marcado) return;
     setVivosDe({ de: estado, v: { ...vivos, [nombre]: revisado } });
+  }
+
+  /*
+   * LA CASILLA DE AUTORIZACIÓN (Ley 1581, 2026-11-27): obligatoria y sin marcar. Al enviar sin ella
+   * el formulario NO sale (se avisa junto a la casilla y el foco va a ella); el servidor la exige
+   * igual. Al marcarla se retira el aviso.
+   */
+  function alEnviar(e: FormEvent<HTMLFormElement>) {
+    const casilla = e.currentTarget.elements.namedItem(CAMPO_AUTORIZACION);
+    if (casilla instanceof HTMLInputElement && !casilla.checked) {
+      e.preventDefault();
+      setVivosDe({ de: estado, v: { ...vivos, autorizacion: MENSAJE_AUTORIZACION } });
+      casilla.focus();
+    }
+  }
+  function alCambiarCasilla(e: ChangeEvent<HTMLInputElement>) {
+    if (e.target.checked) setVivosDe({ de: estado, v: { ...vivos, autorizacion: null } });
   }
 
   const idBase = useId();
@@ -396,6 +423,7 @@ export function FormularioSolicitud({
         action={accion}
         className="mt-6 space-y-4"
         noValidate
+        onSubmit={alEnviar}
         onBlur={(e) => revisar(e, false)}
         onInput={(e) => revisar(e, true)}
       >
@@ -496,6 +524,14 @@ export function FormularioSolicitud({
               />
             )}
           </Campo>
+
+          {/* Obligatoria y sin marcar, antes del botón de enviar. */}
+          <CasillaAutorizacion
+            id={campo("autorizacion")}
+            error={err.autorizacion}
+            defaultChecked={previo.autorizacion === "on"}
+            alCambiar={alCambiarCasilla}
+          />
 
           {/*
            * Cada respuesta del servidor reinicia el reto: el token es de un solo

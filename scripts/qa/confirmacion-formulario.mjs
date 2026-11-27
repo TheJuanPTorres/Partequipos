@@ -77,6 +77,49 @@ try {
     await pagina.type(`${F} textarea[name="mensaje"]`, "Prueba automática del formulario.");
     // Tiempo mínimo y, si hay, que el reto de Turnstile llegue a dar su token.
     await new Promise((r) => setTimeout(r, 6000));
+    // La casilla de autorización (Ley 1581): sin marcar de entrada y, sin ella, el envío no sale.
+    const casilla = `${F} input[name="autorizacion"]`;
+    comprobar(
+      `${ancho}: la casilla de autorización existe, sin marcar y antes del botón`,
+      await pagina.$eval(`${F}`, (f) => {
+        const c = f.querySelector('input[name="autorizacion"]');
+        const b = f.querySelector('button[type="submit"]');
+        return (
+          !!c &&
+          c.checked === false &&
+          !!(c.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING)
+        );
+      }),
+    );
+    await pagina.click(`${F} button[type="submit"]`);
+    await new Promise((r) => setTimeout(r, 1200));
+    const sin = await pagina.evaluate((sel) => {
+      const c = document.querySelector(sel);
+      const e = document.getElementById(c.getAttribute("aria-describedby") ?? "x");
+      return {
+        invalida: c.getAttribute("aria-invalid") === "true",
+        foco: document.activeElement === c,
+        mensaje: e ? e.textContent.trim() : null,
+        alerta: e ? e.getAttribute("role") === "alert" : false,
+        confirmacion: !!document.querySelector('[role="status"] svg[data-check]'),
+      };
+    }, casilla);
+    comprobar(
+      `${ancho}: sin la casilla no se envía: aviso junto a ella, anunciado y con foco`,
+      sin.invalida &&
+        sin.foco &&
+        /autorizar el tratamiento/.test(sin.mensaje ?? "") &&
+        sin.alerta &&
+        !sin.confirmacion,
+      JSON.stringify(sin),
+    );
+    if (salida) await pagina.screenshot({ path: path.join(salida, `sin-casilla-${ancho}.png`) });
+    await pagina.click(casilla);
+    comprobar(
+      `${ancho}: al marcarla se retira el aviso`,
+      await pagina.$eval(casilla, (c) => c.getAttribute("aria-invalid") !== "true"),
+    );
+    await new Promise((r) => setTimeout(r, 3500));
     await pagina.click(`${F} button[type="submit"]`);
     await pagina.waitForSelector('[role="status"] svg[data-check]', { timeout: 30000 });
     await new Promise((r) => setTimeout(r, 800));

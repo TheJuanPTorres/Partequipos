@@ -9,6 +9,7 @@ const base = {
   nombre: "Juan Pérez",
   correo: "juan@ejemplo.com",
   mensaje: "Necesito información sobre repuestos para una excavadora.",
+  autorizacion: "on",
 };
 
 const valida = (extra: Record<string, unknown> = {}) => validarSolicitud({ ...base, ...extra });
@@ -92,7 +93,13 @@ describe("validarSolicitud — casos inválidos", () => {
   it("rechaza un id de referencia negativo", () => rechaza({ referenciaId: "-3" }, "referenciaId"));
 
   it("da un solo error por campo", () => {
-    const r = validarSolicitud({ tipo: "contacto", nombre: "", correo: "", mensaje: "" });
+    const r = validarSolicitud({
+      tipo: "contacto",
+      nombre: "",
+      correo: "",
+      mensaje: "",
+      autorizacion: "on",
+    });
     assert.ok(!r.ok);
     assert.equal(Object.keys(r.errores).length, 3);
   });
@@ -101,6 +108,32 @@ describe("validarSolicitud — casos inválidos", () => {
     for (const entrada of [null, undefined, "texto", 42, []]) {
       assert.equal(validarSolicitud(entrada).ok, false);
     }
+  });
+});
+
+describe("validarSolicitud — autorización del tratamiento de datos (Ley 1581)", () => {
+  const sin = (extra: Record<string, unknown> = {}) => {
+    const resto: Partial<typeof base> = { ...base };
+    delete resto.autorizacion;
+    return validarSolicitud({ ...resto, ...extra });
+  };
+  const falla = (r: ReturnType<typeof validarSolicitud>) => {
+    assert.equal(r.ok, false);
+    if (!r.ok) {
+      assert.match(r.errores.autorizacion ?? "", /autorizar el tratamiento de tus datos/);
+    }
+  };
+  it("sin la casilla, se rechaza con su mensaje", () => falla(sin()));
+  it("con cualquier valor que no sea «on», también", () => {
+    for (const v of ["", "off", "true", "1", "si", undefined, null, false, true]) {
+      falla(sin({ autorizacion: v }));
+    }
+  });
+  it("con la casilla marcada, se acepta", () => assert.equal(valida().ok, true));
+  it("el error es del campo «autorizacion», no del formulario", () => {
+    const r = sin();
+    assert.equal(r.ok, false);
+    if (!r.ok) assert.deepEqual(Object.keys(r.errores), ["autorizacion"]);
   });
 });
 

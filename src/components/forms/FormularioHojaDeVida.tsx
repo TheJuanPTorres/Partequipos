@@ -1,5 +1,6 @@
 "use client";
 
+import { CasillaAutorizacion } from "@/components/forms/CasillaAutorizacion";
 import { IconPaperclip } from "@tabler/icons-react";
 import { useEffect, useId, useRef, useState, type ChangeEvent, type FormEvent } from "react";
 
@@ -11,7 +12,6 @@ import {
   MAX_PDF_BYTES,
   MAX_PDF_MB,
   RUTA_API_HV,
-  RUTA_POLITICA_DATOS,
   type ErroresHv,
   type RespuestaHv,
 } from "@/lib/hojaDeVida/constantes";
@@ -349,32 +349,7 @@ export function FormularioHojaDeVida({
             ) : null}
           </section>
 
-          <section data-campo="" data-autorizacion="">
-            <label htmlFor={campo("autorizacion")}>
-              <input
-                id={campo("autorizacion")}
-                name="autorizacion"
-                type="checkbox"
-                required
-                aria-invalid={errores.autorizacion ? true : undefined}
-                aria-describedby={errores.autorizacion ? campo("autorizacion-error") : undefined}
-              />
-              <span>
-                Autorizo el tratamiento de mis datos personales según la{" "}
-                <a href={RUTA_POLITICA_DATOS} target="_blank" rel="noopener">
-                  política de tratamiento de datos
-                  <span className="sr-only"> (se abre en otra pestaña)</span>
-                </a>
-                . <span className="text-red-700">*</span>
-                <span className="sr-only">(obligatorio)</span>
-              </span>
-            </label>
-            {errores.autorizacion ? (
-              <p id={campo("autorizacion-error")} role="alert" data-error="">
-                {errores.autorizacion}
-              </p>
-            ) : null}
-          </section>
+          <CasillaAutorizacion id={campo("autorizacion")} error={errores.autorizacion} />
 
           {siteKey ? <Turnstile siteKey={siteKey} reinicio={reinicio} /> : null}
         </div>

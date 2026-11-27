@@ -69,7 +69,16 @@ export const LISTADOS: Record<string, Listado> = {
     busqueda: ["titulo", "entradilla"],
   },
   solicitudes: {
-    columnas: ["estado", "tipo", "nombre", "correo", "referenciaTexto", "createdAt"],
+    // «Autorizó» (2026-11-27): quién autorizó el tratamiento de datos (Ley 1581).
+    columnas: [
+      "estado",
+      "tipo",
+      "nombre",
+      "correo",
+      "autorizacionDatos",
+      "referenciaTexto",
+      "createdAt",
+    ],
     busqueda: ["nombre", "correo", "empresa", "mensaje"],
   },
   media: { columnas: ["filename", "alt", "width", "updatedAt"], busqueda: ["filename", "alt"] },

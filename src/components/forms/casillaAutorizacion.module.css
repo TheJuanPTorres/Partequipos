@@ -1,0 +1,57 @@
+/*
+ * La casilla de autorización de datos (2026-11-27). Texto de 14 px que se parte en las líneas que
+ * haga falta (390 px y zoom al 200 %: nada de alto fijo ni `nowrap`), con la casilla de 24 px y
+ * toda la etiqueta como objetivo táctil (mínimo 32 px de alto; WCAG 2.5.8). Sobre el botón de
+ * enviar, dentro de la ventana modal y en las páginas.
+ */
+.casilla {
+  min-width: 0;
+}
+
+.casilla > label {
+  display: flex;
+  min-height: 32px;
+  align-items: flex-start;
+  gap: 10px;
+  color: var(--color-texto, #1a1a1a);
+  font-size: 14px;
+  line-height: 1.4;
+  cursor: pointer;
+  overflow-wrap: anywhere;
+}
+
+.casilla input[type="checkbox"] {
+  flex: none;
+  width: 24px;
+  height: 24px;
+  margin: 0;
+  accent-color: var(--color-marca, #e5242d);
+}
+
+.casilla a {
+  color: var(--color-marca, #c81e26);
+  text-decoration: underline;
+}
+
+.casilla input[aria-invalid="true"] {
+  outline: 2px solid #c4161c;
+  outline-offset: 2px;
+}
+
+.casilla input:focus-visible {
+  outline: 3px solid var(--color-texto, #1a1a1a);
+  outline-offset: 2px;
+}
+
+.asterisco {
+  color: #b91c1c;
+}
+
+/* Alineado con el texto de la casilla: 4 px de margen (como los demás errores) + 30 px de sangría (casilla de 24 px y hueco de 10, menos esos 4). */
+.error {
+  margin: 6px 0 0 4px;
+  padding-left: 30px;
+  color: #c4161c;
+  font-size: 13px;
+  line-height: 18px;
+}

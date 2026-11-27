@@ -236,31 +236,23 @@
   outline-offset: 2px;
 }
 
+/*
+ * La casilla de autorización (`CasillaAutorizacion`): su etiqueta SE VE (es el texto legal con el
+ * enlace a la política), a diferencia de las etiquetas de los campos, que esta piel deja solo para
+ * lectores. Más específica que la regla de arriba (`form > div label`); el resto del aspecto lo da
+ * `casillaAutorizacion.module.css`.
+ */
 .formulario section[data-autorizacion] > label {
-  display: flex;
-  gap: 10px;
-  align-items: flex-start;
-  color: var(--color-texto);
-  font-size: 14px;
-  line-height: 1.4;
-  cursor: pointer;
+  position: static;
+  width: auto;
+  height: auto;
+  overflow: visible;
+  clip-path: none;
+  white-space: normal;
+  text-align: left;
 }
 
-.formulario section[data-autorizacion] input[type="checkbox"] {
-  flex: none;
-  width: 20px;
-  height: 20px;
-  margin-top: 1px;
-  accent-color: var(--color-marca);
-}
-
-.formulario section[data-autorizacion] a {
-  color: var(--color-marca);
-  text-decoration: underline;
-}
-
-.formulario section[data-archivo] input[aria-invalid="true"] + [data-adjuntar],
-.formulario section[data-autorizacion] [aria-invalid="true"] {
+.formulario section[data-archivo] input[aria-invalid="true"] + [data-adjuntar] {
   outline: 2px solid #c4161c;
   outline-offset: 2px;
 }

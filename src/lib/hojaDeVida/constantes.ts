@@ -19,8 +19,8 @@ export const MAX_HV = {
   mensaje: 2000,
 } as const;
 
-/** La política con la que se autoriza el tratamiento de los datos (Ley 1581 de 2012). */
-export const RUTA_POLITICA_DATOS = "/tratamiento-de-datos/";
+/** La política con la que se autoriza el tratamiento de los datos (Ley 1581 de 2012): la común de todos los formularios. */
+export { RUTA_POLITICA_DATOS } from "@/lib/formularios/autorizacionDatos";
 
 /** Dónde se envía la hoja de vida (ruta de la API, con barra final por `trailingSlash`). */
 export const RUTA_API_HV = "/api/hoja-de-vida/";

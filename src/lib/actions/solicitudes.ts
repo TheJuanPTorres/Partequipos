@@ -6,6 +6,7 @@ import { getPayload } from "payload";
 
 import type { EstadoFormulario } from "@/lib/actions/estadoFormulario";
 import { procesarSolicitud } from "@/lib/actions/procesarSolicitud";
+import { TEXTO_AUTORIZACION } from "@/lib/formularios/autorizacionDatos";
 import { limiteDeEnvios } from "@/lib/formularios/antiSpam";
 import { verificarTurnstile } from "@/lib/turnstile";
 
@@ -56,6 +57,10 @@ export async function enviarSolicitud(
           perfil: datos.perfil as
             "empresa" | "comprador" | "emprendedor" | "proveedor" | "empleado" | "otro" | undefined,
           mensaje: datos.mensaje,
+          // Prueba de la autorización (Ley 1581): solo se llega aquí con la casilla marcada; la
+          // fecha es la de la solicitud (`createdAt`).
+          autorizacionDatos: true,
+          autorizacionTexto: TEXTO_AUTORIZACION,
           referenciaTexto: datos.referenciaTexto,
           origen: datos.origen,
           ...(datos.referenciaTipo && datos.referenciaId

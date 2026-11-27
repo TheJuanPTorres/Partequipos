@@ -3,7 +3,7 @@ import Link from "next/link";
 
 import { BotonTienda } from "@/components/tienda/BotonTienda";
 import type { TarjetaMarca } from "@/lib/repuestos/marca";
-import { destinoTienda } from "@/lib/tienda/enlaceTienda";
+import { destinoPorNombre, type ConfigTienda } from "@/lib/tienda/enlaceTienda";
 
 import estilos from "./categoriasFicha.module.css";
 
@@ -23,13 +23,13 @@ export function CategoriasFicha({
   id,
   titulo,
   categorias,
-  tiendaGeneral = null,
+  tienda = { general: null, busqueda: null },
 }: {
   id: string;
   titulo: string;
   categorias: TarjetaMarca[];
-  /** El enlace de la tienda general (el botón «Tienda» de la cabecera), si el panel lo tiene. */
-  tiendaGeneral?: string | null;
+  /** La tienda del panel: el enlace general («Tienda» de la cabecera) y la búsqueda. */
+  tienda?: ConfigTienda;
 }) {
   const conEnlace = categorias.filter((c) => c.href);
   if (conEnlace.length === 0) return null;
@@ -44,12 +44,12 @@ export function CategoriasFicha({
         data-entrada
       >
         {conEnlace.map((c) => {
-          const tienda = destinoTienda(c.enlaceTienda, tiendaGeneral);
+          const destino = destinoPorNombre(c.enlaceTienda, c.titulo, tienda);
           return (
             <li key={c.clave} className={estilos.caja}>
               <Link
                 href={c.href ?? "#"}
-                className={`${estilos.tarjeta} ${tienda ? estilos.conTienda : ""}`}
+                className={`${estilos.tarjeta} ${destino ? estilos.conTienda : ""}`}
               >
                 <span className={estilos.panel}>
                   <span aria-hidden="true" className={estilos.luz} />
@@ -83,9 +83,9 @@ export function CategoriasFicha({
                   </span>
                 </span>
               </Link>
-              {tienda ? (
+              {destino ? (
                 <BotonTienda
-                  href={tienda}
+                  href={destino}
                   origen="categoria"
                   nombre={c.titulo}
                   className={estilos.tienda}

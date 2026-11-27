@@ -53,6 +53,65 @@ export function destinoTienda(
   return esEnlaceTiendaValido(general) ? general.trim() : null;
 }
 
+/**
+ * LA BÚSQUEDA DE LA TIENDA (2026-11-27, diseño nuevo): el botón abre la búsqueda de la tienda con el
+ * nombre corto del elemento. La dirección de la búsqueda se escribe en el panel («Búsqueda de la
+ * tienda», global «Menú principal (cabecera)»), nunca en el código, y TERMINA en el parámetro de la
+ * consulta, sin valor (`https://…/catalogsearch/result/?q=`): se le añade el nombre codificado.
+ */
+export function esBusquedaTiendaValida(valor: unknown): valor is string {
+  return esEnlaceTiendaValido(valor) && valor.trim().endsWith("=");
+}
+
+/** Validación del campo del panel: vacío vale; si no, https:// y terminada en `=` (p. ej. `?q=`). */
+export function validarBusquedaTienda(valor: unknown): true | string {
+  if (valor === undefined || valor === null) return true;
+  if (typeof valor !== "string" || valor.trim() === "") return true;
+  return esBusquedaTiendaValida(valor)
+    ? true
+    : "Escribe la dirección completa de la búsqueda, empezando por https:// y terminada en el parámetro de la consulta, por ejemplo https://tienda.partequipos.com/catalogsearch/result/?q=";
+}
+
+/** «CADENA PARA EXCAVADORA MAQUINARIA PESADA» → «CADENA PARA EXCAVADORA»; «… PARA MAQUINARIA PESADA» → sin él. */
+export function nombreCorto(nombre: string | null | undefined): string {
+  return (nombre ?? "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .replace(/\s+(para\s+)?maquinaria\s+pesada$/i, "")
+    .trim();
+}
+
+/** La búsqueda de la tienda con el nombre corto (tildes y «&» codificados); `null` si no se puede. */
+export function urlBusqueda(
+  base: string | null | undefined,
+  nombre: string | null | undefined,
+): string | null {
+  const corto = nombreCorto(nombre);
+  if (!corto || !esBusquedaTiendaValida(base)) return null;
+  return `${base.trim()}${encodeURIComponent(corto)}`;
+}
+
+/** Lo que el panel tiene de la tienda: el enlace general y la búsqueda (cualquiera puede faltar). */
+export type ConfigTienda = { general: string | null; busqueda: string | null };
+
+/**
+ * El destino del botón de un elemento. Orden: su enlace propio válido → la búsqueda de la tienda
+ * con su nombre corto → el enlace de su grupo → la tienda general. `null` si no hay ninguno (sin
+ * botón). Con la búsqueda vacía en el panel, es lo de siempre: propio → grupo → general.
+ */
+export function destinoPorNombre(
+  propio: string | null | undefined,
+  nombre: string | null | undefined,
+  config: ConfigTienda,
+  delGrupo?: string | null,
+): string | null {
+  if (esEnlaceTiendaValido(propio)) return propio.trim();
+  const busqueda = urlBusqueda(config.busqueda, nombre);
+  if (busqueda) return busqueda;
+  if (esEnlaceTiendaValido(delGrupo)) return delGrupo.trim();
+  return esEnlaceTiendaValido(config.general) ? config.general.trim() : null;
+}
+
 /** Orígenes del evento GA4 `clic_tienda`: de qué botón sale el clic. */
 export type OrigenTienda = "modelo" | "categoria" | "tipo-repuesto" | "producto";
 

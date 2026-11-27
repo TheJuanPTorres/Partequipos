@@ -779,7 +779,7 @@ export interface ModelosRepuesto {
    */
   tipo: number | TiposEquipo;
   /**
-   * Opcional. La dirección (https://…) de la página de este modelo en la tienda, por ejemplo https://… página de este producto en la tienda. Si lo dejas vacío, lleva a la tienda general (la del botón «Tienda» de la cabecera).
+   * Opcional. La dirección (https://…) de la página de este modelo en la tienda. Si lo dejas vacío, lleva a la tienda general (la del botón «Tienda» de la cabecera).
    */
   enlaceTienda?: string | null;
   /**
@@ -1003,7 +1003,7 @@ export interface CategoriasTecnica {
   colorMarca?: string | null;
   descripcion?: string | null;
   /**
-   * Opcional. La dirección (https://…) de la página de esta categoría en la tienda, por ejemplo https://… página de este producto en la tienda. Si lo dejas vacío, lleva a la tienda general (la del botón «Tienda» de la cabecera).
+   * Opcional. La dirección (https://…) de la página de esta categoría en la tienda. Si lo dejas vacío, lleva a la tienda general (la del botón «Tienda» de la cabecera).
    */
   enlaceTienda?: string | null;
   /**
@@ -1034,14 +1034,14 @@ export interface CategoriasTecnica {
          */
         descripcion?: string | null;
         /**
-         * Opcional. La dirección (https://…) de la página de este tipo de repuesto en la tienda, por ejemplo https://… página de este producto en la tienda. Si lo dejas vacío, lleva a la tienda general (la del botón «Tienda» de la cabecera).
+         * Opcional. La dirección (https://…) de la página de este tipo de repuesto en la tienda. Si lo dejas vacío, lleva a la tienda general (la del botón «Tienda» de la cabecera).
          */
         enlaceTienda?: string | null;
         productos?:
           | {
               texto: string;
               /**
-               * Opcional. La dirección (https://…) de la página de este producto en la tienda, por ejemplo https://… página de este producto en la tienda. Si lo dejas vacío, lleva a la tienda general (la del botón «Tienda» de la cabecera).
+               * Opcional. La dirección (https://…) de la página de este producto en la tienda. Si lo dejas vacío, lleva a la tienda general (la del botón «Tienda» de la cabecera).
                */
               enlaceTienda?: string | null;
               id?: string | null;
@@ -4263,6 +4263,10 @@ export interface Cabecera {
         id?: string | null;
       }[]
     | null;
+  /**
+   * Opcional. La dirección de la búsqueda de la tienda, terminada en el parámetro de la consulta, por ejemplo https://tienda.partequipos.com/catalogsearch/result/?q= . Los botones «Ver en la tienda» de repuestos le añaden el nombre del repuesto (sin «para maquinaria pesada») y abren esa búsqueda, salvo los que tengan su propio «Enlace en la tienda». Si lo dejas vacío, van a la tienda general (el enlace «Tienda» del menú).
+   */
+  busquedaTienda?: string | null;
   botonTexto?: string | null;
   botonEnlace?: string | null;
   /**
@@ -4877,6 +4881,7 @@ export interface CabeceraSelect<T extends boolean = true> {
         enlace?: T;
         id?: T;
       };
+  busquedaTienda?: T;
   botonTexto?: T;
   botonEnlace?: T;
   menuMaquinaria?:

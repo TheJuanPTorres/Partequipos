@@ -6,7 +6,7 @@ import { BotonTienda } from "@/components/tienda/BotonTienda";
 import { VerTodosEquipos } from "@/components/nueva/VerTodosEquipos";
 import type { ConfigFormulario } from "@/lib/formularios/configFormulario";
 import { mensajeCotizar, type GrupoVista } from "@/lib/repuestos/grupos";
-import { destinoTienda } from "@/lib/tienda/enlaceTienda";
+import { destinoPorNombre, type ConfigTienda } from "@/lib/tienda/enlaceTienda";
 
 import estilos from "./marca.module.css";
 import { RecuadrosConScroll } from "./RecuadrosConScroll";
@@ -43,7 +43,7 @@ export function TarjetasGrupos({
   grupos,
   formulario,
   anclaContacto,
-  tiendaGeneral = null,
+  tienda = { general: null, busqueda: null },
 }: {
   id: string;
   titulo: string;
@@ -53,8 +53,8 @@ export function TarjetasGrupos({
   /** El formulario de contacto de la página; cada tarjeta le añade su mensaje. */
   formulario: ConfigFormulario;
   anclaContacto: string;
-  /** El enlace de la tienda general (el botón «Tienda» de la cabecera), si el panel lo tiene. */
-  tiendaGeneral?: string | null;
+  /** La tienda del panel: el enlace general («Tienda» de la cabecera) y la búsqueda. */
+  tienda?: ConfigTienda;
 }) {
   if (grupos.length === 0) return null;
   const idTitulo = `${id}-titulo`;
@@ -72,7 +72,7 @@ export function TarjetasGrupos({
           const idT = `${id}-${g.id}`;
           const idLista = `${idT}-productos`;
           // El del grupo o, vacío, el general; cada producto puede tener el suyo.
-          const tiendaGrupo = destinoTienda(g.enlaceTienda, tiendaGeneral);
+          const tiendaGrupo = destinoPorNombre(g.enlaceTienda, g.nombre, tienda);
           return (
             <li key={g.id} className={estilos.tarjeta}>
               {g.imagen ? (
@@ -121,7 +121,7 @@ export function TarjetasGrupos({
                         id: i,
                         nombre: p,
                         href: null,
-                        tienda: destinoTienda(g.enlacesProductos[i], tiendaGrupo),
+                        tienda: destinoPorNombre(g.enlacesProductos[i], p, tienda, g.enlaceTienda),
                       }))}
                       buscador
                       cotizar={{ formulario, categoria }}
@@ -131,7 +131,12 @@ export function TarjetasGrupos({
                     />
                   ) : null}
                   {tiendaGrupo ? (
-                    <BotonTienda href={tiendaGrupo} origen="tipo-repuesto" nombre={g.nombre} />
+                    <BotonTienda
+                      href={tiendaGrupo}
+                      origen="tipo-repuesto"
+                      nombre={g.nombre}
+                      className={estilos.tiendaGrupo}
+                    />
                   ) : null}
                 </div>
                 {/*

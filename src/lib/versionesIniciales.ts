@@ -24,14 +24,19 @@ export function sinVersion(docs: readonly Id[], padresConVersion: Iterable<Id>):
 /** Lo que crea una pasada: por colección, el documento y la versión creada. */
 export type Manifiesto = {
   creado: string;
+  /** Dónde se aplicó (`preview` o el sitio publicado). Sin él, los primeros del preview. */
+  destino?: string;
   versiones: { coleccion: ColeccionConBorradores; documento: Id; version: Id }[];
 };
 
 /** Valida un manifiesto leído de un fichero: solo colecciones con borradores e ids presentes. */
 export function leerManifiesto(datos: unknown): Manifiesto {
   if (!datos || typeof datos !== "object") throw new Error("Manifiesto vacío o no es un objeto.");
-  const { creado, versiones } = datos as Partial<Manifiesto>;
+  const { creado, destino, versiones } = datos as Partial<Manifiesto>;
   if (typeof creado !== "string") throw new Error("Manifiesto sin «creado».");
+  if (destino !== undefined && typeof destino !== "string") {
+    throw new Error("Manifiesto con «destino» que no es texto.");
+  }
   if (!Array.isArray(versiones)) throw new Error("Manifiesto sin «versiones».");
   for (const v of versiones) {
     if (!COLECCIONES_CON_BORRADORES.includes(v?.coleccion as ColeccionConBorradores)) {
@@ -44,7 +49,15 @@ export function leerManifiesto(datos: unknown): Manifiesto {
       }
     }
   }
-  return { creado, versiones };
+  return destino === undefined ? { creado, versiones } : { creado, destino, versiones };
+}
+
+/**
+ * ¿El manifiesto es de este destino? Revertir con el manifiesto de otro borraría versiones por id en
+ * una base que no es la suya. Un manifiesto sin destino es de los primeros del preview.
+ */
+export function mismoDestino(manifiesto: Manifiesto, destino: string): boolean {
+  return (manifiesto.destino ?? "preview") === destino;
 }
 
 /**

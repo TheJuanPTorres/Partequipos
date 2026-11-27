@@ -6,7 +6,8 @@
  * `db.queryDrafts`). Las migraciones que activaron los borradores no crearon versiones, así que lo
  * importado antes no sale en la lista. Detalle en `src/lib/versionesIniciales.ts`.
  *
- *   npm run preview:ejecutar -- payload run scripts/paginas/versiones-iniciales.ts <modo> [manifiesto.json]
+ *   npm run preview:ejecutar -- payload run scripts/paginas/versiones-iniciales.ts <modo> preview [manifiesto.json]
+ *   npx payload run scripts/paginas/versiones-iniciales.ts <modo> produccion [manifiesto.json]   (runbook)
  *
  * Modos:
  * - `simular`: lista, por colección, los documentos SIN ninguna versión. No escribe nada.
@@ -27,17 +28,25 @@
  * principal (ni `_status` ni `updatedAt` del documento). La versión copia el documento tal cual,
  * con su `_status` y su `updatedAt`; la fecha de la versión es la del momento en que se crea.
  *
- * SOLO EN EL PREVIEW: se niega fuera de `preview:ejecutar` o si la base no es la del preview. El modo
- * para el sitio publicado lo añade quien ejecuta el runbook, con el destino declarado, como en los
- * demás scripts de datos.
+ * DESTINO, comprobado ANTES de cargar Payload (como `scripts/fotos/fotos-ampliadas.ts`):
+ * - `preview`: solo con `preview:ejecutar` y la base y el Blob del preview (`veredictoEntornoPreview`).
+ * - `produccion`: solo con la base (host pooler) y el almacén del sitio publicado
+ *   (`veredictoDestino`); fija `ALMACEN_BLOB_ESPERADO` y lo exige (`exigirAlmacen`). Lo ejecuta
+ *   Juan Pablo con `runbook-versiones-iniciales.md`; los agentes, nunca.
+ * En los dos, se niega si `payload_migrations` tiene el marcador «dev» (§10.9), y el manifiesto
+ * lleva su destino: `revertir` no acepta el de otro destino.
  */
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 
+import { exigirAlmacen } from "../blob/exigirAlmacen";
+import { veredictoMigraciones } from "../../src/lib/db/veredictoMigraciones";
+import { veredictoDestino } from "../../src/lib/demo/copiaDemo";
 import { veredictoEntornoPreview } from "../../src/lib/preview/entornoPreview";
 import { COLECCIONES_CON_BORRADORES } from "../../src/lib/borradores";
 import {
   borrables,
   leerManifiesto,
+  mismoDestino,
   sinVersion,
   type Id,
   type Manifiesto,
@@ -45,27 +54,62 @@ import {
 
 const MODOS = ["simular", "aplicar", "comprobar", "revertir"] as const;
 type Modo = (typeof MODOS)[number];
-const [modo, archivo] = process.argv.slice(2) as [Modo | undefined, string | undefined];
-if (!modo || !MODOS.includes(modo) || ((modo === "aplicar" || modo === "revertir") && !archivo)) {
-  throw new Error(
-    "Uso: simular | aplicar <manifiesto.json> | comprobar | revertir <manifiesto.json>",
+const args = process.argv.slice(2);
+const modo = MODOS.find((m) => args.includes(m)) as Modo | undefined;
+const destino = args.find((a) => a === "preview" || a === "produccion");
+const archivo = args.find((a) => a.endsWith(".json"));
+const fallar = (m: string): never => {
+  const e = new Error(`[versiones-iniciales] ✗ ${m}`);
+  e.stack = e.message;
+  throw e;
+};
+if (!modo) {
+  fallar(
+    "indica el modo: simular, aplicar <manifiesto.json>, comprobar o revertir <manifiesto.json>",
   );
 }
-if (process.env.ENTORNO_PREVIEW !== "1") {
-  throw new Error("Solo con npm run preview:ejecutar (entorno del preview).");
+if (!destino) fallar("indica el destino: preview o produccion");
+if ((modo === "aplicar" || modo === "revertir") && !archivo) {
+  fallar(`el modo ${modo} necesita el manifiesto (<ruta>.json)`);
 }
-const v = veredictoEntornoPreview({
-  DATABASE_URI: process.env.DATABASE_URI,
-  BLOB_READ_WRITE_TOKEN: process.env.BLOB_READ_WRITE_TOKEN,
-  VERCEL_AUTOMATION_BYPASS_SECRET: process.env.VERCEL_AUTOMATION_BYPASS_SECRET,
-});
-if (!v.valido) throw new Error(`No es el preview: ${v.motivo}`);
+if (destino === "preview") {
+  if (process.env.ENTORNO_PREVIEW !== "1") {
+    fallar("el destino preview, solo con npm run preview:ejecutar (entorno del preview)");
+  }
+  const v = veredictoEntornoPreview({
+    DATABASE_URI: process.env.DATABASE_URI,
+    BLOB_READ_WRITE_TOKEN: process.env.BLOB_READ_WRITE_TOKEN,
+    VERCEL_AUTOMATION_BYPASS_SECRET: process.env.VERCEL_AUTOMATION_BYPASS_SECRET,
+  });
+  if (!v.valido) fallar(`no es el preview: ${v.motivo}`);
+} else {
+  const v = veredictoDestino(destino, process.env.DATABASE_URI, process.env.BLOB_READ_WRITE_TOKEN);
+  if (!v.valido) fallar(`destino no válido, no se hace nada: ${v.motivo}`);
+  if (v.valido) process.env.ALMACEN_BLOB_ESPERADO = v.almacen;
+  exigirAlmacen("[versiones-iniciales]");
+}
 
 process.env.PAYLOAD_DISABLE_PUSH = "true";
 process.env.PAYLOAD_SIN_GENERAR_TIPOS = "true";
 const { default: config } = await import("../../src/payload.config");
 const { createLocalReq, getPayload, saveVersion } = await import("payload");
 const payload = await getPayload({ config });
+
+// Sin marcador «dev» en `payload_migrations` (§10.9): con él, la base no está como dicen las
+// migraciones, y no se toca.
+{
+  const { docs } = await payload.find({
+    collection: "payload-migrations",
+    limit: 0,
+    pagination: false,
+    overrideAccess: true,
+  });
+  const m = veredictoMigraciones(docs.map((d) => ({ batch: d.batch ?? 0, name: d.name ?? "" })));
+  if (m.codigo !== 0) fallar("la base tiene el marcador «dev» en payload_migrations: no se toca");
+  console.log(
+    `[versiones-iniciales] destino ${destino} · ${m.aplicadas.length} migraciones · sin marcador «dev» ✓`,
+  );
+}
 
 async function faltan(coleccion: (typeof COLECCIONES_CON_BORRADORES)[number]): Promise<Id[]> {
   const docs = await payload.db.find({ collection: coleccion, limit: 0, pagination: false });
@@ -84,7 +128,11 @@ if (modo === "simular" || modo === "aplicar") {
   if (modo === "aplicar" && archivo && existsSync(archivo)) {
     throw new Error(`El manifiesto ${archivo} ya existe: usa otro nombre (no se pisa).`);
   }
-  const manifiesto: Manifiesto = { creado: new Date().toISOString(), versiones: [] };
+  const manifiesto: Manifiesto = {
+    creado: new Date().toISOString(),
+    destino: destino!,
+    versiones: [],
+  };
   for (const coleccion of COLECCIONES_CON_BORRADORES) {
     const ids = await faltan(coleccion);
     console.log(
@@ -160,6 +208,9 @@ if (modo === "simular" || modo === "aplicar") {
   }
 } else {
   const manifiesto = leerManifiesto(JSON.parse(readFileSync(archivo!, "utf8")));
+  if (!mismoDestino(manifiesto, destino!)) {
+    fallar(`el manifiesto es del destino «${manifiesto.destino ?? "preview"}», no de «${destino}»`);
+  }
   for (const coleccion of COLECCIONES_CON_BORRADORES) {
     const delManifiesto = manifiesto.versiones.filter((x) => x.coleccion === coleccion);
     if (!delManifiesto.length) continue;

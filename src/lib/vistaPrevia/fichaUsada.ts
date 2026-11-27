@@ -6,7 +6,7 @@ import { camposDeAditamento } from "@/lib/usados/aditamentos";
 import { datosDeUnidad, parrafos } from "@/lib/usados/ficha";
 import { sinTelefonoDeEmpresa } from "@/lib/usados/telefonoEnDescripcion";
 import { imagenDeMedia, poblado } from "@/lib/utils/relations";
-import { enlaceWhatsApp } from "@/lib/whatsapp";
+import { enlaceWhatsApp, mensajeExperto } from "@/lib/whatsapp";
 import type { CategoriasUsada, Documento, EquiposUsado } from "@/payload-types";
 
 /*
@@ -59,10 +59,7 @@ export function piezasFichaUsada(
     poblado<{ id: number; nombre: string }>(unidad.marcaUsada)?.nombre ?? unidad.marca ?? null;
 
   const articulo = articuloDefinido(categoria.nombre);
-  const experto = enlaceWhatsApp(
-    empresa.whatsapp,
-    `Hola, quiero hablar con un experto sobre ${articulo} ${nombre}: ${urlDe(ruta)}`,
-  );
+  const experto = enlaceWhatsApp(empresa.whatsapp, mensajeExperto(articulo, nombre, urlDe(ruta)));
 
   return {
     nombre,

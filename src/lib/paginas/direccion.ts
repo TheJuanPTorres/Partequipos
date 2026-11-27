@@ -7,6 +7,8 @@
  * que ya es ORIGEN de una redirección tampoco se vería (el proxy redirige antes). Aquí, la decisión
  * pura, con pruebas; el gancho `direccionDePaginaValida` la aplica al guardar (panel y API local).
  */
+import { REDIRECTS_FIJOS } from "../redirects/fijos";
+import { normalizarRuta } from "../redirects/normalizar";
 
 /** Cada tramo: minúsculas a-z y 0-9, separados por un guion (sin guion al principio ni al final). */
 const TRAMO = "[a-z0-9]+(?:-[a-z0-9]+)*";
@@ -79,6 +81,16 @@ export function errorDeReservada(direccion: string): string | null {
     `La dirección web no puede empezar por «${primero}»: esa parte de la web ya la usa ` +
     "una sección propia (maquinaria, repuestos, el blog, la API…) y la página no se vería. Elige otra."
   );
+}
+
+/**
+ * ¿La dirección es el origen de uno de los redirects FIJOS del código (`REDIRECTS_FIJOS`, en
+ * `next.config.ts`, p. ej. `/maquinaria/` → `/maquinaria-pesada/`)? Esos no están en la colección
+ * «Redirecciones», así que se miran aquí (verificador del #625).
+ */
+export function esOrigenFijo(direccion: string): boolean {
+  const ruta = normalizarRuta(direccion);
+  return REDIRECTS_FIJOS.some((r) => normalizarRuta(r.source) === ruta);
 }
 
 /** El error si la dirección ya es el ORIGEN de una redirección (la página no se vería), o `null`. */

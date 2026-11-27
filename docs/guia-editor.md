@@ -504,7 +504,8 @@ texto legal nuevo…
      `robots.txt`… **Por qué:** esas direcciones ya las sirve otra parte de
      la web, así que tu página nunca se vería (o taparía una sección entera).
    - Tampoco puede ser **el origen de una redirección** (Configuración →
-     Redirecciones, «Desde»): quien la visitara iría a otra página.
+     Redirecciones, «Desde», o una de las fijas del sitio, como `maquinaria`):
+     quien la visitara iría a otra página.
    - Ni la de un **artículo del blog** (comparten `partequipos.com/<dirección>/`).
    - Después de publicarla ya no se cambia (§7).
 3. **Contenido.**

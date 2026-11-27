@@ -13,9 +13,10 @@ import {
   errorDeFormato,
   errorDeRedireccion,
   errorDeReservada,
+  esOrigenFijo,
 } from "../../src/lib/paginas/direccion";
 import { normalizarRuta } from "../../src/lib/redirects/normalizar";
-import { errorDeEnlaces } from "../../src/lib/paginas/enlacesTexto";
+import { errorDeEnlaces, errorDeImagenesVacias } from "../../src/lib/paginas/enlacesTexto";
 
 if (process.env.ENTORNO_PREVIEW !== "1") {
   throw new Error("Solo con npm run preview:ejecutar (entorno del preview).");
@@ -55,8 +56,9 @@ for (const p of paginas.docs) {
   const error =
     errorDeFormato(p.slug, p.titulo) ??
     errorDeReservada(p.slug) ??
-    errorDeRedireccion(p.slug, origenes.has(normalizarRuta(p.slug))) ??
-    errorDeEnlaces(p);
+    errorDeRedireccion(p.slug, origenes.has(normalizarRuta(p.slug)) || esOrigenFijo(p.slug)) ??
+    errorDeEnlaces(p) ??
+    errorDeImagenesVacias(p);
   if (error) malas++;
   console.log(`${error ? "✗" : "✓"} ${p.slug}${error ? ` — ${error}` : ""}`);
 }

@@ -8,7 +8,8 @@
  *   redirección y un enlace `javascript:` en el texto) y comprueba que no se guardó ninguna. Después
  *   crea «prueba-pagina-libre» (publicada) con título, entradilla y un texto con h2–h4, lista,
  *   cita, enlace e imagen con texto alternativo; comprueba que tiene 1 versión, la vuelve a guardar
- *   con un cambio y comprueba que tiene 2.
+ *   con un cambio y comprueba que tiene 2. Por último, que un BORRADOR con una imagen pegada sin
+ *   fichero también se rechaza.
  * - `retirar`: borra «prueba-pagina-libre» (y sus versiones) y comprueba que no queda nada.
  */
 import { errorDeFormato, errorDeReservada } from "../../src/lib/paginas/direccion";
@@ -151,7 +152,7 @@ if (modo === "crear") {
   }
   const sobrantes = await payload.count({
     collection: "paginas",
-    where: { or: [{ slug: { like: "prueba" } }, { titulo: { equals: "Prueba Libre" } }] },
+    where: { slug: { in: rechazos.map(([, d]) => String(d.slug)) } },
     overrideAccess: true,
   });
   console.log(`  páginas de prueba guardadas por error: ${sobrantes.totalDocs} (esperado 0)`);
@@ -180,6 +181,41 @@ if (modo === "crear") {
     },
   });
   console.log(`✓ guardada otra vez, versiones: ${await contarVersiones(creada.id)} (esperado 2)`);
+  // Un BORRADOR también se valida: imagen pegada sin fichero, como la deja Word.
+  const pegado = {
+    root: {
+      ...(await contenido("/contactanos/")).root,
+      children: [
+        ...(await contenido("/contactanos/")).root.children,
+        {
+          type: "upload",
+          format: "",
+          version: 3,
+          pending: { src: "file:///C:/x/clip.png", formID: "a" },
+        },
+      ],
+    },
+  };
+  const antes = await contarVersiones(creada.id);
+  try {
+    await payload.update({
+      collection: "paginas",
+      id: creada.id,
+      draft: true,
+      overrideAccess: true,
+      data: { contenido: pegado as never },
+    });
+    throw new Error("✗ borrador con imagen vacía se guardó y tenía que rechazarse");
+  } catch (e) {
+    const m = e instanceof Error ? e.message : String(e);
+    if (m.startsWith("✗")) throw e;
+    const detalle =
+      (e as { data?: { errors?: { message?: string }[] } }).data?.errors?.[0]?.message ?? m;
+    console.log(`✓ rechazado (borrador con imagen pegada sin fichero): ${detalle}`);
+  }
+  console.log(
+    `  versiones tras el rechazo: ${await contarVersiones(creada.id)} (esperado ${antes})`,
+  );
 } else {
   const { docs } = await payload.find({
     collection: "paginas",

@@ -75,6 +75,7 @@
 .miniatura:focus-visible,
 .controlVisor:focus-visible,
 .controlPantalla:focus-visible,
+.visor:focus-visible,
 .migas a:focus-visible {
   outline: 3px solid var(--color-texto);
   outline-offset: 3px;
@@ -1100,23 +1101,24 @@
 
 .pantallaMarco {
   position: relative;
-  display: grid;
-  place-items: center;
   width: 100%;
   height: 100%;
-  padding: 56px 16px;
+  overflow: hidden;
+  touch-action: pan-y;
 }
 
+/*
+ * La foto ocupa TODA la pantalla posible sin recortarse (tanda 26, t3): `fill` + `contain`. Antes,
+ * `width: auto` la dejaba a su tamaño natural como mucho, una vertical se salía por abajo y 56 px
+ * arriba y abajo quedaban para los controles.
+ */
 .pantallaFoto {
-  max-width: 100%;
-  max-height: 100%;
-  width: auto;
-  height: auto;
   object-fit: contain;
 }
 
 .controlPantalla {
   position: absolute;
+  z-index: 1;
   display: grid;
   place-items: center;
   width: 44px;
@@ -1124,9 +1126,14 @@
   padding: 0;
   border: 0;
   border-radius: 50%;
-  background: rgb(255 255 255 / 0.15);
+  /* Sobre la foto: oscuro, para que el icono blanco se lea sobre cualquier foto (AA). */
+  background: rgb(16 15 15 / 0.65);
   color: var(--color-fondo);
   cursor: pointer;
+}
+
+.controlPantalla:hover {
+  background: rgb(16 15 15 / 0.85);
 }
 
 .controlPantalla svg {
@@ -1149,6 +1156,23 @@
   top: 50%;
   right: 8px;
   transform: translateY(-50%);
+}
+
+/* «3 / 12», abajo y centrado sobre la foto. */
+.contadorPantalla {
+  position: absolute;
+  z-index: 1;
+  bottom: 8px;
+  left: 50%;
+  margin: 0;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: rgb(16 15 15 / 0.65);
+  color: var(--color-fondo);
+  font-size: 14px;
+  line-height: 1.4;
+  font-variant-numeric: tabular-nums;
+  transform: translateX(-50%);
 }
 
 /* ====================== IMPRESIÓN ====================== */

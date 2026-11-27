@@ -3,7 +3,7 @@
  * `partequipos-cierre\informes6-11-18-panel-organizacion-fase1.md` §2). Sustituye a los 8
  * grupos de la F1 (2026-10-06).
  *
- * Diez grupos en el orden en que piensa el cliente: primero lo que llega (mensajes), luego lo que
+ * Once grupos (desde la tanda 26, «Páginas» con su grupo propio) en el orden en que piensa el cliente: primero lo que llega (mensajes), luego lo que
  * ve el visitante (portada, maquinaria, repuestos, lubricantes, servicio técnico, blog), la empresa
  *  las fotos y archivos (grupo propio, decisión de dirección del 2026-11-19) y, al final, la
  * configuración. Cada colección y global lleva su grupo en `admin.group`; las
@@ -23,6 +23,7 @@ export const GRUPOS_DEL_MENU = [
   "Lubricantes",
   "Servicio técnico",
   "Blog",
+  "Páginas",
   "Empresa y sedes",
   "Fotos y archivos",
   "Configuración",
@@ -62,9 +63,10 @@ export const ORDEN_DE_ENTRADAS = [
   // Blog
   "articulos",
   "categorias-blog",
+  // Páginas (tanda 26, tarea 6: grupo propio)
+  "paginas",
   // Empresa y sedes (+ los datos de la empresa, directa)
   "sedes",
-  "paginas",
   "vacantes-buk",
   // Fotos y archivos
   "media",
@@ -112,7 +114,7 @@ export const ETIQUETAS_DEL_MENU: Record<string, string> = {
   articulos: "Artículos",
   "categorias-blog": "Categorías del blog",
   sedes: "Sedes",
-  paginas: "Páginas (Nosotros, Contáctanos, legales…)",
+  paginas: "Páginas",
   "vacantes-buk": "Trabaja con nosotros",
   cabecera: "Cabecera y menú",
   pie: "Pie de página",

@@ -5,6 +5,7 @@ import { postgresAdapter } from "@payloadcms/db-postgres";
 import { BlocksFeature, lexicalEditor } from "@payloadcms/richtext-lexical";
 import { vercelBlobStorage } from "@payloadcms/storage-vercel-blob";
 import { endurecerSubidaDirecta } from "./lib/blob/rutaSubidaDirecta";
+import { RUTA_EDITOR_PAGINAS } from "./lib/panel/editorPaginas";
 /*
  * @payloadcms/translations NO está en package.json a propósito. Payload 3.88.0
  * la declara como dependencia exacta en su misma versión, así que su presencia
@@ -216,6 +217,16 @@ export default buildConfig({
          * de «solicitudes» solo cuenta. docs/diseno/decisiones-panel.md §23.
          */
         dashboard: { Component: "/components/admin/portada/Portada" },
+        /*
+         * Editor visual de páginas a pantalla completa (tanda 26, t8, fase 0): ESQUELETO, sin Puck.
+         * Una vista con ruta propia se pinta sin la plantilla del panel y SIN su comprobación de
+         * acceso: la vista decide quién entra (`src/lib/panel/editorPaginas.ts`).
+         */
+        editorPaginas: {
+          Component: "/components/admin/editorPaginas/VistaEditorPaginas",
+          path: RUTA_EDITOR_PAGINAS,
+          exact: true,
+        },
       },
     },
   },

@@ -330,6 +330,20 @@
   line-height: 18px;
 }
 
+/*
+ * La casilla de autorización (2026-11-27): su aviso mide una o dos líneas según el ancho (en el móvil
+ * son dos), así que no reserva sitio como los campos: fluye bajo el texto de la casilla, sin tapar
+ * nada. El foco va a la casilla al aparecer.
+ */
+.ventana[data-anim~="F4"] form [data-autorizacion] {
+  padding-bottom: 0;
+}
+
+.ventana[data-anim~="F4"] form [data-autorizacion] [data-error] {
+  position: static;
+  margin: 6px 0 0 4px;
+}
+
 .ventana[data-anim~="F4"] [aria-invalid="true"] {
   border-color: #c4161c;
 }

@@ -1,5 +1,6 @@
 import { enlaceWhatsApp } from "@/lib/whatsapp";
 import { getEmpresa } from "@/lib/queries/getSeo";
+import { getSiteUrl } from "@/lib/seo/config";
 
 import { WhatsAppFlotante } from "./WhatsAppFlotante";
 
@@ -14,5 +15,7 @@ export const MENSAJE_WHATSAPP = "Hola, vengo de la web de Partequipos y quiero m
 export async function WhatsApp() {
   const empresa = await getEmpresa();
   const enlace = enlaceWhatsApp(empresa.whatsapp, MENSAJE_WHATSAPP);
-  return enlace ? <WhatsAppFlotante href={enlace.href} /> : null;
+  // La base canónica del sitio (la del SEO): con ella se escribe la URL de la página en los
+  // mensajes de WhatsApp (tanda 26, punto 28).
+  return enlace ? <WhatsAppFlotante href={enlace.href} base={getSiteUrl()} /> : null;
 }

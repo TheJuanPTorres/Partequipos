@@ -3,7 +3,7 @@
 import { usePathname } from "next/navigation";
 import { useEffect, useRef } from "react";
 
-import { hrefConContexto } from "@/lib/whatsapp";
+import { hrefConContexto, hrefConUrl, urlDePagina } from "@/lib/whatsapp";
 
 import estilos from "./whatsappFlotante.module.css";
 
@@ -29,7 +29,10 @@ import estilos from "./whatsappFlotante.module.css";
 /** Aire entre el botón y lo que esquiva, en px. */
 const AIRE = 8;
 
-export function WhatsAppFlotante({ href }: { href: string }) {
+/** La dirección de la página en la que está el visitante, con la base canónica del sitio. */
+const urlDeAqui = (base: string) => urlDePagina(base, location.pathname, location.search);
+
+export function WhatsAppFlotante({ href, base }: { href: string; base: string }) {
   const enlace = useRef<HTMLAnchorElement>(null);
   const ruta = usePathname();
 
@@ -41,8 +44,40 @@ export function WhatsAppFlotante({ href }: { href: string }) {
     const contexto = document
       .querySelector<HTMLElement>("[data-whatsapp-contexto]")
       ?.getAttribute("data-whatsapp-contexto");
-    a.href = hrefConContexto(href, contexto);
-  }, [href, ruta]);
+    // Y, al final del mensaje, la dirección de la página (tanda 26).
+    a.href = hrefConUrl(hrefConContexto(href, contexto), urlDeAqui(base));
+  }, [href, base, ruta]);
+
+  /*
+   * LA URL DE LA PÁGINA EN TODOS LOS WHATSAPP CON MENSAJE (tanda 26, punto 28): «Habla con un
+   * experto», el de la ventana «Cotizar», los de los listados… Cada uno arma su mensaje en su
+   * componente (muchos, en el servidor, donde no se conocen los filtros del listado), así que la
+   * URL se añade AQUÍ, una sola vez para todo el sitio: justo antes de usarse el enlace (al
+   * apuntarlo, enfocarlo o tocarlo), con la dirección que tiene la página en ese momento. Vale
+   * también para abrir en otra pestaña y para «copiar dirección del enlace». `hrefConUrl` solo
+   * toca los enlaces a la empresa con mensaje y no repite la URL.
+   */
+  useEffect(() => {
+    const poner = (e: Event) => {
+      const a = (e.target as Element | null)?.closest?.<HTMLAnchorElement>('a[href*="wa.me/"]');
+      if (!a) return;
+      const actual = a.getAttribute("href") ?? "";
+      // Si el enlace sigue siendo el que se dejó puesto, se parte del ORIGINAL: al cambiar los
+      // filtros del listado sin recargar, la URL de antes se sustituye, no se suma otra.
+      const original = a.dataset.waPuesto === actual ? (a.dataset.waOriginal ?? actual) : actual;
+      const nuevo = hrefConUrl(original, urlDeAqui(base));
+      if (nuevo === actual) return;
+      a.dataset.waOriginal = original;
+      a.dataset.waPuesto = nuevo;
+      a.setAttribute("href", nuevo);
+    };
+    const eventos = ["pointerover", "pointerdown", "focusin", "touchstart"] as const;
+    for (const tipo of eventos)
+      document.addEventListener(tipo, poner, { capture: true, passive: true });
+    return () => {
+      for (const tipo of eventos) document.removeEventListener(tipo, poner, { capture: true });
+    };
+  }, [base]);
 
   useEffect(() => {
     const a = enlace.current;

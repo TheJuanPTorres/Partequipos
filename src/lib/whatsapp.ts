@@ -58,3 +58,65 @@ export function conMensaje(enlace: EnlaceWhatsApp, mensaje: string): EnlaceWhats
   url.searchParams.set("text", mensaje);
   return { ...enlace, href: url.toString() };
 }
+
+/*
+ * LA URL DE LA PÁGINA EN EL MENSAJE (tanda 26, punto 28; Juan Pablo, 2026-11-27): todo WhatsApp
+ * con mensaje escrito acaba, en su propia línea, con la dirección completa de la página desde la
+ * que se pulsó. WhatsApp no admite texto enlazado: va la URL a la vista y él la convierte en
+ * enlace. Así quien atiende sabe qué máquina o qué listado miraba el visitante.
+ */
+
+/** Parámetros de campañas y de anuncios: no dicen nada de la página y no viajan en el mensaje. */
+const DE_SEGUIMIENTO = /^(utm_.*|gclid|fbclid)$/i;
+
+/**
+ * La dirección completa de una página para el mensaje: la BASE CANÓNICA del sitio (la del SEO,
+ * `seoConfig.siteUrl`, no el dominio en el que se esté: al lanzar será partequipos.com sin tocar
+ * nada), la ruta con su barra final y la consulta SIN parámetros de seguimiento (los filtros de
+ * un listado se quedan). Sin `#`.
+ */
+export function urlDePagina(base: string, ruta: string, consulta = ""): string {
+  const origen = base.trim().replace(/\/+$/, "");
+  let camino = (ruta.trim().split(/[?#]/)[0] ?? "") || "/";
+  if (!camino.startsWith("/")) camino = `/${camino}`;
+  if (!camino.endsWith("/")) camino = `${camino}/`;
+  const entrada = new URLSearchParams(consulta.split("#")[0]);
+  const salida = new URLSearchParams();
+  for (const [clave, valor] of entrada) {
+    if (!DE_SEGUIMIENTO.test(clave)) salida.append(clave, valor);
+  }
+  const filtros = salida.toString();
+  return `${origen}${camino}${filtros ? `?${filtros}` : ""}`;
+}
+
+/** El mensaje con la URL al final, en su propia línea. Si ya la trae, tal cual (sin duplicar). */
+export function mensajeConUrl(mensaje: string, url: string): string {
+  const texto = mensaje.trimEnd();
+  const u = url.trim();
+  if (!u) return texto;
+  // Ya la lleva (con o sin la barra final, o con otros parámetros detrás): no se repite.
+  if (texto.includes(u) || texto.includes(u.replace(/\/$/, ""))) return texto;
+  return texto ? `${texto}\n${u}` : u;
+}
+
+/**
+ * Un enlace de WhatsApp A LA EMPRESA con mensaje escrito (`wa.me/<número>?text=…`), con la URL de
+ * la página al final del mensaje. Cualquier otro enlace vuelve tal cual: uno sin mensaje (no se
+ * le inventa), «compartir por WhatsApp» (`wa.me/?text=…`, sin número: ya lleva su URL) u otro
+ * sitio.
+ */
+export function hrefConUrl(href: string, url: string): string {
+  let destino: URL;
+  try {
+    destino = new URL(href);
+  } catch {
+    return href;
+  }
+  if (destino.hostname !== "wa.me" || !/^\/\d{10,}\/?$/.test(destino.pathname)) return href;
+  const mensaje = destino.searchParams.get("text");
+  if (!mensaje?.trim()) return href;
+  const conUrl = mensajeConUrl(mensaje, url);
+  if (conUrl === mensaje) return href;
+  destino.searchParams.set("text", conUrl);
+  return destino.toString();
+}

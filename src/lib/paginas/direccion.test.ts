@@ -10,6 +10,7 @@ import {
   errorDeFormato,
   errorDeRedireccion,
   errorDeReservada,
+  esOrigenFijo,
 } from "./direccion";
 
 const APP = path.join(process.cwd(), "src", "app");
@@ -114,6 +115,11 @@ describe("direccion: rutas propias de la web", () => {
 });
 
 describe("direccion: origen de una redirección", () => {
+  it("reconoce los redirects fijos del código (`/maquinaria/`)", () => {
+    assert.equal(esOrigenFijo("maquinaria"), true);
+    assert.equal(esOrigenFijo("maquinaria/otra"), false);
+    assert.equal(esOrigenFijo("prueba-pagina-libre"), false);
+  });
   it("solo da error si ya es origen", () => {
     assert.match(errorDeRedireccion("vieja", true) ?? "", /origen de una redirección/);
     assert.equal(errorDeRedireccion("nueva", false), null);

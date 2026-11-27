@@ -53,3 +53,44 @@ export function errorDeEnlaces(datos: unknown): string | null {
     "o una dirección https://, mailto: o tel:."
   );
 }
+
+/**
+ * IMÁGENES SIN FICHERO (apoyo de C, 2026-11-27): al pegar desde Word o Google Docs, Lexical deja un
+ * bloque de imagen VACÍO (nodo `upload` sin `value`) que se guardaba sin error y se pinta como un
+ * hueco. Cuántos hay en el documento.
+ */
+export function imagenesSinFichero(datos: unknown): number {
+  let n = 0;
+  const visitar = (nodo: unknown, profundidad: number) => {
+    if (!nodo || typeof nodo !== "object" || profundidad > 200) return;
+    if (Array.isArray(nodo)) {
+      for (const x of nodo) visitar(x, profundidad + 1);
+      return;
+    }
+    const o = nodo as Record<string, unknown>;
+    // Pegado de Word/Docs: `{ type: "upload", pending: { src: "file:///…" } }`, sin `relationTo` ni
+    // `value`. Cualquier nodo de imagen sin un fichero de «Imágenes» cuenta.
+    if (o.type === "upload") {
+      const v = o.value;
+      const sinFichero =
+        v === null ||
+        v === undefined ||
+        v === "" ||
+        (typeof v === "object" && !("id" in (v as object)));
+      if (sinFichero || "pending" in o) n++;
+    }
+    for (const valor of Object.values(o)) visitar(valor, profundidad + 1);
+  };
+  visitar(datos, 0);
+  return n;
+}
+
+/** El mensaje para el editor, o `null` si todas las imágenes del texto tienen su fichero. */
+export function errorDeImagenesVacias(datos: unknown): string | null {
+  const n = imagenesSinFichero(datos);
+  if (!n) return null;
+  return (
+    `El texto tiene ${n === 1 ? "un bloque de imagen vacío" : `${n} bloques de imagen vacíos`} ` +
+    "(suele pasar al pegar desde Word o Google Docs). Quítalo o elige su imagen en «Imágenes» antes de guardar."
+  );
+}

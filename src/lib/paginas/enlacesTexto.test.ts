@@ -1,7 +1,13 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
-import { enlacesInseguros, errorDeEnlaces, esquemaInseguro } from "./enlacesTexto";
+import {
+  enlacesInseguros,
+  errorDeEnlaces,
+  errorDeImagenesVacias,
+  esquemaInseguro,
+  imagenesSinFichero,
+} from "./enlacesTexto";
 
 const enlace = (url: string, type = "link") => ({
   type,
@@ -50,5 +56,35 @@ describe("enlaces del texto enriquecido", () => {
     );
     assert.match(errorDeEnlaces(pagina) ?? "", /2 enlaces .*javascript:, data:/);
     assert.equal(errorDeEnlaces({ contenido: doc(enlace("https://a.co")) }), null);
+  });
+});
+
+describe("imágenes del texto sin fichero", () => {
+  const subida = (value: unknown) => ({
+    type: "upload",
+    relationTo: "media",
+    value,
+    fields: null,
+    version: 3,
+  });
+  it("cuenta los bloques de imagen vacíos y deja los que tienen fichero", () => {
+    const pagina = {
+      contenido: doc(subida(null), subida(5), subida({ id: 7, url: "/x.png" })),
+      secciones: [{ contenido: doc(subida(undefined), subida("")) }],
+      // Así lo deja pegar desde Word (y Docs, con la URL de Google): sin relationTo ni value.
+      bloques: [
+        {
+          contenido: doc({
+            type: "upload",
+            format: "",
+            version: 3,
+            pending: { src: "file:///C:/x/clip_image001.png", formID: "a" },
+          }),
+        },
+      ],
+    };
+    assert.equal(imagenesSinFichero(pagina), 4);
+    assert.match(errorDeImagenesVacias(pagina) ?? "", /4 bloques de imagen vacíos/);
+    assert.equal(errorDeImagenesVacias({ contenido: doc(subida(5)) }), null);
   });
 });

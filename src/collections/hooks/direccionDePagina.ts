@@ -2,8 +2,13 @@ import { ValidationError } from "payload";
 import type { CollectionBeforeValidateHook } from "payload";
 
 import { normalizarRuta } from "@/lib/redirects/normalizar";
-import { errorDeEnlaces } from "@/lib/paginas/enlacesTexto";
-import { errorDeFormato, errorDeRedireccion, errorDeReservada } from "@/lib/paginas/direccion";
+import { errorDeEnlaces, errorDeImagenesVacias } from "@/lib/paginas/enlacesTexto";
+import {
+  errorDeFormato,
+  errorDeRedireccion,
+  errorDeReservada,
+  esOrigenFijo,
+} from "@/lib/paginas/direccion";
 
 /**
  * «DIRECCIÓN WEB» SEGURA AL GUARDAR UNA PÁGINA (tanda 26, tarea 6): formato, rutas propias de la
@@ -30,7 +35,7 @@ export const direccionDePaginaValida: CollectionBeforeValidateHook = async ({
       overrideAccess: true,
       req,
     });
-    error = errorDeRedireccion(slug, totalDocs > 0);
+    error = errorDeRedireccion(slug, totalDocs > 0 || esOrigenFijo(slug));
   }
   if (error) throw new ValidationError({ errors: [{ path: "slug", message: error }] });
   return data;
@@ -39,10 +44,11 @@ export const direccionDePaginaValida: CollectionBeforeValidateHook = async ({
 /**
  * ENLACES DEL TEXTO, AL GUARDAR (tanda 26, tarea 6): ningún enlace de un texto enriquecido de la
  * página puede llevar `javascript:`, `data:` ni otro esquema que no sea de una página web, un
- * correo o un teléfono (`src/lib/paginas/enlacesTexto.ts`). Panel y API local.
+ * correo o un teléfono, ni quedar un bloque de imagen sin fichero (lo deja pegar desde Word o
+ * Docs; `src/lib/paginas/enlacesTexto.ts`). Panel y API local.
  */
 export const enlacesDeTextoSeguros: CollectionBeforeValidateHook = ({ data }) => {
-  const error = errorDeEnlaces(data);
+  const error = errorDeEnlaces(data) ?? errorDeImagenesVacias(data);
   if (error) throw new ValidationError({ errors: [{ path: "contenido", message: error }] });
   return data;
 };

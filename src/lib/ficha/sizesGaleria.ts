@@ -69,3 +69,22 @@ function partesDeSizes(sizes: string): string[] {
   partes.push(sizes.slice(desde));
   return partes;
 }
+
+/**
+ * La foto a la que lleva una tecla en la galería (y en la pantalla completa): ←/→ la anterior y la
+ * siguiente (dando la vuelta), Inicio/Fin la primera y la última. `null`: la tecla no es de la
+ * galería (sigue su curso), hay una sola foto o va con Alt, Ctrl o Cmd.
+ */
+export function teclaGaleria(
+  tecla: string,
+  actual: number,
+  total: number,
+  conModificador = false,
+): number | null {
+  if (total < 2 || conModificador) return null;
+  if (tecla === "ArrowRight") return (actual + 1) % total;
+  if (tecla === "ArrowLeft") return (actual - 1 + total) % total;
+  if (tecla === "Home") return 0;
+  if (tecla === "End") return total - 1;
+  return null;
+}

@@ -158,9 +158,15 @@ export const PaginaInstitucional: CollectionConfig = {
         relationTo: "media",
         label: "Foto de fondo del encabezado",
         admin: {
-          condition: (data) => data?.slug === SLUG_POLITICA_GARANTIA,
+          // Desde la tanda 26 (t6), también en las páginas de solo texto (`PaginaTexto`): toda página
+          // sin bloques salvo la portada y Contáctanos, que tienen su plantilla.
+          condition: (data) =>
+            data?.slug === SLUG_POLITICA_GARANTIA ||
+            (data?.slug !== "inicio" &&
+              data?.slug !== "contactanos" &&
+              !(Array.isArray(data?.bloques) && data.bloques.length > 0)),
           description:
-            "Opcional. Foto a todo el ancho detrás del título, con un velo oscuro para que se lea. Sin ella, el encabezado queda en un tono oscuro.",
+            "Opcional. Foto a todo el ancho detrás del título, con un velo oscuro para que se lea. Sin ella, el encabezado queda en un tono oscuro. Solo en las páginas sin bloques.",
         },
       },
       {
